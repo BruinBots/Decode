@@ -5,13 +5,24 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.Components.Intake;
+import org.firstinspires.ftc.teamcode.Components.Launcher;
+
 public class MainBot {
     public DcMotorEx leftFrontMotor;
     public DcMotorEx rightFrontMotor;
     public DcMotorEx leftBackMotor;
     public DcMotorEx rightBackMotor;
 
-    public MainBot(HardwareMap hardwareMap) {
+    // Components
+    public Launcher launcher;
+    public Intake intake;
+
+    public static MainBot shared;
+    public Telemetry telemetry;
+
+    public MainBot(HardwareMap hardwareMap, Telemetry telemetry) {
         leftFrontMotor = hardwareMap.get(DcMotorEx.class, "left_front");
         rightFrontMotor = hardwareMap.get(DcMotorEx.class, "right_front");
         leftBackMotor = hardwareMap.get(DcMotorEx.class, "left_back");
@@ -19,6 +30,12 @@ public class MainBot {
 
         leftFrontMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         leftBackMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+
+        // Components
+        launcher = new Launcher(hardwareMap);
+        intake = new Intake(hardwareMap);
+
+        this.telemetry = telemetry;
     }
 
     public void moveBotMecanum(double drive, double rotate, double strafe, double scaleFactor) {
