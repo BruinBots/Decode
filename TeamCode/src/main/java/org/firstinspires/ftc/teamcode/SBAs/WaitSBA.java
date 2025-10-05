@@ -8,6 +8,8 @@ public class WaitSBA implements SBA {
         this.waitMs = waitMs;
     }
 
+    public void preInit() {}
+
     public void init() {
         startMs = System.currentTimeMillis();
     }

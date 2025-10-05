@@ -11,6 +11,8 @@ public class ServoSBA implements SBA {
         this.targetPos = targetPos;
     }
 
+    public void preInit() {}
+
     public void init() {
         // Move servo to target position
         servo.setPosition(targetPos);

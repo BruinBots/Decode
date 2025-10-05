@@ -19,17 +19,18 @@ public class SBARunner {
             return;
         }
         SBA sba = curSBAs[curIdx];
+        sba.preInit();
         if (!sba.sanity()) {
             stop();
         } // Quit if sanity check fails
         sba.init();
-        while (sba.isBusy()) { // Move on to next SBA if current SBA finishes
-            sba.loop();
+        sba.loop();
+        if (!sba.isBusy()) { // move onto next SBA if done with current one
+            curIdx++;
+            if (curIdx > curSBAs.length - 1) {
+                stop();
+            } // End SBA list if curIdx gets past the list limit
         }
-        curIdx++;
-        if (curIdx > curSBAs.length - 1) {
-            stop();
-        } // End SBA list if curIdx gets past the list limit
     }
 
     // TODO: SBA Stubs down here

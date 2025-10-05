@@ -61,6 +61,8 @@ public class VelMotor {
             this.spinUp = spinUp;
         }
 
+        public void preInit() {}
+
         @Override
         public boolean sanity() {
             return true;

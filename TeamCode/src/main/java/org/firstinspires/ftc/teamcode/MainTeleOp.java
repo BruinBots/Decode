@@ -18,20 +18,20 @@ public class MainTeleOp extends OpMode {
 
     @Override
     public void loop() {
-        if (gamepad1.a) {
-            bot.launcher.spinUp();
-        } else if (gamepad1.b) {
-            bot.launcher.doStop();
-        }
-
-        if (gamepad1.x) {
-            bot.intake.spinUp();
-        } else if (gamepad1.y) {
-            bot.intake.doStop();
-        }
-
-        bot.launcher.doTelemetry();
-        bot.intake.doTelemetry();
-        telemetry.update();
+//        if (gamepad1.a) {
+//            bot.launcher.spinUp();
+//        } else if (gamepad1.b) {
+//            bot.launcher.doStop();
+//        }
+//
+//        if (gamepad1.x) {
+//            bot.intake.spinUp();
+//        } else if (gamepad1.y) {
+//            bot.intake.doStop();
+//        }
+//
+//        bot.launcher.doTelemetry();
+//        bot.intake.doTelemetry();
+//        telemetry.update();
     }
 }

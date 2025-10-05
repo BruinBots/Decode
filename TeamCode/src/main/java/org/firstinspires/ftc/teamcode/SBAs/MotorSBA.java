@@ -38,6 +38,8 @@ public class MotorSBA implements SBA {
         this.maxPos = maxPos;
     }
 
+    public void preInit() {}
+
     public void init() {
         // Set motor target position
         motor.setPower(power);
