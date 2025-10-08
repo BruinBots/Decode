@@ -5,11 +5,11 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 
 @Config
 public class Launcher extends VelMotor {
-    public static double LAUNCH_SPEED = 2.0; // revs/sec
-    public static double MIN_LAUNCH_SPEED = 1.5; // revs/sec
+    public static double LAUNCH_SPEED = 300; // rpm
+    public static double MIN_LAUNCH_SPEED = 250; // rpm
 
     public Launcher(HardwareMap hardwareMap) {
-        super(hardwareMap, "launchMotor");
+        super(hardwareMap, "launchMotor", 27);
     }
 
     @Override

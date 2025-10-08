@@ -3,14 +3,20 @@ package org.firstinspires.ftc.teamcode.SBAs;
 public class SBARunner {
     public SBA[] curSBAs;
     public int curIdx;
+    public int curInitIdx;
 
     public void runSBAs(SBA... sbas) {
         curSBAs = sbas;
         curIdx = 0;
+        curInitIdx = -1;
     }
 
     public void stop() {
         runSBAs(new SBA[]{});
+    }
+
+    public boolean isBusy() {
+        return curSBAs.length > 0;
     }
 
     public void loop() {
@@ -19,11 +25,14 @@ public class SBARunner {
             return;
         }
         SBA sba = curSBAs[curIdx];
-        sba.preInit();
-        if (!sba.sanity()) {
-            stop();
-        } // Quit if sanity check fails
-        sba.init();
+        if (curInitIdx < curIdx) {
+            sba.preInit();
+            if (!sba.sanity()) {
+                stop();
+            } // Quit if sanity check fails
+            sba.init();
+            curInitIdx = curIdx;
+        }
         sba.loop();
         if (!sba.isBusy()) { // move onto next SBA if done with current one
             curIdx++;

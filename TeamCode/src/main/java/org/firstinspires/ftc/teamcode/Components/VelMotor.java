@@ -10,14 +10,18 @@ import org.firstinspires.ftc.teamcode.MainBot;
 import org.firstinspires.ftc.teamcode.SBAs.SBA;
 
 public class VelMotor {
-    private DcMotorEx motor;
+    public DcMotorEx motor;
     private String motorName;
 
-    public VelMotor(HardwareMap hardwareMap, String motorName) {
+    private double ticksPerRev;
+
+    public VelMotor(HardwareMap hardwareMap, String motorName, double ticksPerRev) {
         motor = hardwareMap.get(DcMotorEx.class, motorName);
-        motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+//        motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
         this.motorName = motorName;
+        this.ticksPerRev = ticksPerRev;
     }
 
     public double getSpeed() { return 0.0; }
@@ -26,7 +30,7 @@ public class VelMotor {
     public void spinUp() {
         // Set motor target velocity to the desired speed
         motor.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
-        motor.setVelocity(getSpeed() *360.0, AngleUnit.DEGREES);
+        motor.setVelocity(getSpeed()*ticksPerRev/60.0);
     }
 
     public boolean isReady() {
@@ -47,7 +51,7 @@ public class VelMotor {
 
     public void doTelemetry() {
         Telemetry telemetry = MainBot.shared.telemetry;
-        telemetry.addData(motorName + " Velocity", motor.getVelocity(AngleUnit.DEGREES));
+        telemetry.addData(motorName + " Velocity", motor.getVelocity()*60.0/ticksPerRev+"/"+getSpeed()*ticksPerRev/60.0);
         telemetry.addData(motorName + " Power", motor.getPower());
     }
 
