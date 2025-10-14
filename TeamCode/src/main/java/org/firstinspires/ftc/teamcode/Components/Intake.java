@@ -10,8 +10,8 @@ public class Intake extends VelMotor {
     public static double MIN_INTAKE_SPEED = 250; // rpm
 
     public Intake(HardwareMap hardwareMap) {
-        super(hardwareMap, "test", -175);
-//        motor.setDirection(DcMotorSimple.Direction.REVERSE);
+        super(hardwareMap, "intakeMotor", -175);
+        motor.setDirection(DcMotorSimple.Direction.REVERSE);
     }
 
     @Override

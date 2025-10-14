@@ -10,14 +10,17 @@ import org.firstinspires.ftc.teamcode.SBAs.SBARunner;
 public class AimBotTester extends OpMode {
     public MainBot bot;
     public SBARunner runner;
+    public AimBot aimBot;
 
     @Override
     public void init() {
         MainBot.shared = new MainBot(hardwareMap, telemetry);
         bot = MainBot.shared;
 
+        aimBot = new AimBot();
+
         runner = new SBARunner();
-        runner.runSBAs(new AimBot());
+        runner.runSBAs(aimBot.getAimSBA());
     }
 
     @Override
@@ -25,12 +28,12 @@ public class AimBotTester extends OpMode {
         runner.loop();
         if (runner.curSBAs.length < 1) {
             // Found goal april tag within tolerance, re run for testing
-            runner.runSBAs(new AimBot());
+            runner.runSBAs(aimBot.getAimSBA());
         }
     }
 
     @Override
     public void stop() {
-        AimBot.stop();
+        bot.stop();
     }
 }

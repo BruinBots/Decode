@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -8,6 +10,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.Components.AimBot;
 import org.firstinspires.ftc.teamcode.Components.AimBotTester;
+import org.firstinspires.ftc.teamcode.Components.AprilTags;
 import org.firstinspires.ftc.teamcode.Components.Intake;
 import org.firstinspires.ftc.teamcode.Components.Launcher;
 import org.firstinspires.ftc.vision.VisionPortal;
@@ -19,15 +22,16 @@ public class MainBot {
 //    public DcMotorEx rightBackMotor;
 //
 //    // Components
-//    public Launcher launcher;
-//    public Intake intake;
+    public Launcher launcher;
+    public Intake intake;
 
     public static MainBot shared;
-    public Telemetry telemetry;
+
+    public MultipleTelemetry telemetry;
+    FtcDashboard dashboard = FtcDashboard.getInstance();
+
     public HardwareMap hardwareMap;
-
-    public VisionPortal visionPortal;
-
+    public AprilTags aprilTags;
 
     public MainBot(HardwareMap hardwareMap, Telemetry telemetry) {
 //        leftFrontMotor = hardwareMap.get(DcMotorEx.class, "left_front");
@@ -39,13 +43,13 @@ public class MainBot {
 //        leftBackMotor.setDirection(DcMotorSimple.Direction.REVERSE);
 //
 //        // Components
-//        launcher = new Launcher(hardwareMap);
-//        intake = new Intake(hardwareMap);
+        launcher = new Launcher(hardwareMap);
+        intake = new Intake(hardwareMap);
 
-        this.telemetry = telemetry;
+        this.telemetry = new MultipleTelemetry(dashboard.getTelemetry(), telemetry);
         this.hardwareMap = hardwareMap;
 
-        AimBot.initVisionPortal(hardwareMap);
+        aprilTags = new AprilTags(hardwareMap);
     }
 
     public void moveBotMecanum(double drive, double rotate, double strafe, double scaleFactor) {
@@ -70,5 +74,9 @@ public class MainBot {
 //        rightFrontMotor.setPower(wheelSpeeds[1] * scaleFactor);
 //        leftBackMotor.setPower(wheelSpeeds[2] * scaleFactor);
 //        rightBackMotor.setPower(wheelSpeeds[3] * scaleFactor);
+    }
+
+    public void stop() {
+        aprilTags.stop();
     }
 }
