@@ -6,11 +6,13 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.sun.tools.javac.Main;
 
 import org.firstinspires.ftc.teamcode.SBAs.SBA;
+import org.firstinspires.ftc.teamcode.SBAs.SBARunner;
 
 @Config
 @TeleOp
 public class MainTeleOp extends OpMode {
     public MainBot bot;
+    public SBARunner runner;
 
     public static double DRIVE_FACTOR = 0.3;
 
@@ -18,31 +20,35 @@ public class MainTeleOp extends OpMode {
     public void init() {
         MainBot.shared = new MainBot(hardwareMap, telemetry);
         bot = MainBot.shared;
+        runner = new SBARunner();
     }
 
     @Override
     public void loop() {
         if (gamepad1.left_bumper) {
-            bot.launcher.kickUp();
-        } else {
-            bot.launcher.kickDown();
+            runner.runSBAs(bot.launcher.kick());
         }
 //
         if (gamepad1.a) {
-            bot.intake.spinUp();
+//            bot.intake.spinUp();
+            runner.runSBAs(bot.intake.getSpinUpSBA());
         } else if (gamepad1.b) {
-            bot.intake.doStop();
+//            bot.intake.doStop();
+            runner.runSBAs(bot.intake.getStopSBA());
         }
 
         if (gamepad1.x) {
-            bot.launcher.spinUp();
+//            bot.launcher.spinUp();
+            runner.runSBAs(bot.launcher.getSpinUpSBA());
         } else if (gamepad1.y) {
-            bot.launcher.doStop();
+//            bot.launcher.doStop();
+            runner.runSBAs(bot.launcher.getStopSBA());
         }
 //
         bot.launcher.doTelemetry();
         bot.intake.doTelemetry();
         telemetry.update();
+        runner.loop();
 
         bot.moveBotMecanum(gamepad1.left_stick_y, gamepad1.right_stick_x, gamepad1.left_stick_x, DRIVE_FACTOR);
     }
