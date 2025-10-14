@@ -28,23 +28,19 @@ public class MainTeleOp extends OpMode {
         if (gamepad1.left_bumper) {
             runner.runSBAs(bot.launcher.kick());
         }
-//
+
         if (gamepad1.a) {
-//            bot.intake.spinUp();
-            runner.runSBAs(bot.intake.getSpinUpSBA());
+            bot.intake.spinUp();
         } else if (gamepad1.b) {
-//            bot.intake.doStop();
-            runner.runSBAs(bot.intake.getStopSBA());
+            bot.intake.doStop();
         }
 
         if (gamepad1.x) {
-//            bot.launcher.spinUp();
-            runner.runSBAs(bot.launcher.getSpinUpSBA());
+            bot.launcher.spinUp();
         } else if (gamepad1.y) {
-//            bot.launcher.doStop();
-            runner.runSBAs(bot.launcher.getStopSBA());
+            bot.launcher.doStop();
         }
-//
+
         bot.launcher.doTelemetry();
         bot.intake.doTelemetry();
         telemetry.update();
