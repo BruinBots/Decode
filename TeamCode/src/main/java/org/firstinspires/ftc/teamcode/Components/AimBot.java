@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.Components;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.sun.tools.javac.Main;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.MainBot;
@@ -43,7 +44,7 @@ public class AimBot {
         aprilTags = MainBot.shared.aprilTags;
     }
 
-    private void readAprilTag() {
+    public void readAprilTag() {
         List<AprilTagDetection> currentDetections = aprilTags.readAprilTags();
 
         for (AprilTagDetection detection : currentDetections) {
@@ -90,6 +91,16 @@ public class AimBot {
             return Math.copySign(TURN_MAX_POWER, power);
         } else {
             return power;
+        }
+    }
+
+    public void doTelemetry() {
+        if (foundGoal) {
+            MainBot.shared.telemetry.addData("AimBot Read", distance + "ft, " + angleError + "º");
+            MainBot.shared.telemetry.addData("AimBot Result", getLaunchPower() + "L, " + getTurnPower()+"T");
+        } else {
+            MainBot.shared.telemetry.addData("AimBot Read", "N/A");
+            MainBot.shared.telemetry.addData("AimBot Result", "N/A");
         }
     }
 

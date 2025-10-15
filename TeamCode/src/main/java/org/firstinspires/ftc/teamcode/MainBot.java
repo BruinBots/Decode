@@ -9,19 +9,18 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.Components.AimBot;
-import org.firstinspires.ftc.teamcode.Components.AimBotTester;
 import org.firstinspires.ftc.teamcode.Components.AprilTags;
 import org.firstinspires.ftc.teamcode.Components.Intake;
 import org.firstinspires.ftc.teamcode.Components.Launcher;
-import org.firstinspires.ftc.vision.VisionPortal;
+import org.firstinspires.ftc.teamcode.Components.ObeliskReader;
 
 public class MainBot {
-//    public DcMotorEx leftFrontMotor;
-//    public DcMotorEx rightFrontMotor;
-//    public DcMotorEx leftBackMotor;
-//    public DcMotorEx rightBackMotor;
-//
-//    // Components
+    public DcMotorEx leftFrontMotor;
+    public DcMotorEx rightFrontMotor;
+    public DcMotorEx leftBackMotor;
+    public DcMotorEx rightBackMotor;
+
+    // Components
     public Launcher launcher;
     public Intake intake;
 
@@ -34,15 +33,15 @@ public class MainBot {
     public AprilTags aprilTags;
 
     public MainBot(HardwareMap hardwareMap, Telemetry telemetry) {
-//        leftFrontMotor = hardwareMap.get(DcMotorEx.class, "left_front");
-//        rightFrontMotor = hardwareMap.get(DcMotorEx.class, "right_front");
-//        leftBackMotor = hardwareMap.get(DcMotorEx.class, "left_back");
-//        rightBackMotor = hardwareMap.get(DcMotorEx.class, "right_back");
-//
-//        leftFrontMotor.setDirection(DcMotorSimple.Direction.REVERSE);
-//        leftBackMotor.setDirection(DcMotorSimple.Direction.REVERSE);
-//
-//        // Components
+        leftFrontMotor = hardwareMap.get(DcMotorEx.class, "leftFront");
+        rightFrontMotor = hardwareMap.get(DcMotorEx.class, "rightFront");
+        leftBackMotor = hardwareMap.get(DcMotorEx.class, "leftBack");
+        rightBackMotor = hardwareMap.get(DcMotorEx.class, "rightBack");
+
+        leftFrontMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+        leftBackMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+
+        // Components
         launcher = new Launcher(hardwareMap);
         intake = new Intake(hardwareMap);
 
@@ -70,10 +69,10 @@ public class MainBot {
         }
 
         // setting motor power and scaling down to preference
-//        leftFrontMotor.setPower(wheelSpeeds[0] * scaleFactor);
-//        rightFrontMotor.setPower(wheelSpeeds[1] * scaleFactor);
-//        leftBackMotor.setPower(wheelSpeeds[2] * scaleFactor);
-//        rightBackMotor.setPower(wheelSpeeds[3] * scaleFactor);
+        leftFrontMotor.setPower(wheelSpeeds[0] * scaleFactor);
+        rightFrontMotor.setPower(wheelSpeeds[1] * scaleFactor);
+        leftBackMotor.setPower(wheelSpeeds[2] * scaleFactor);
+        rightBackMotor.setPower(wheelSpeeds[3] * scaleFactor);
     }
 
     public void stop() {

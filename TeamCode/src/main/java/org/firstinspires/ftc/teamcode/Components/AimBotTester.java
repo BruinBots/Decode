@@ -26,7 +26,7 @@ public class AimBotTester extends OpMode {
     @Override
     public void loop() {
         runner.loop();
-        if (runner.curSBAs.length < 1) {
+        if (runner.curSBAs.size() < 1) {
             // Found goal april tag within tolerance, re run for testing
             runner.runSBAs(aimBot.getAimSBA());
         }

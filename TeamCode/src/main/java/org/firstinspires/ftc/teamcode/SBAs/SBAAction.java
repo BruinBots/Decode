@@ -7,22 +7,29 @@ import com.acmerobotics.roadrunner.Action;
 
 public class SBAAction implements Action {
     private boolean initialized = false;
-    private SBA sba;
+    private SBA[] sbas;
+    private int curIdx = 0;
 
-    public SBAAction(SBA sba) {
-        this.sba = sba;
+    public SBAAction(SBA... sbas) {
+        this.sbas = sbas;
     }
 
     @Override
     public boolean run(@NonNull TelemetryPacket packet) {
         if (!initialized) {
-            if (!sba.sanity()) {
+            if (!sbas[curIdx].sanity()) {
                 return true;
             }
-            sba.init();
+            sbas[curIdx].init();
         }
 
-        sba.loop();
-        return !sba.isBusy();
+        sbas[curIdx].loop();
+        if (!sbas[curIdx].isBusy()) {
+            curIdx += 1;
+            if (curIdx > sbas.length - 1) {
+                return true;
+            }
+        }
+        return false;
     }
 }

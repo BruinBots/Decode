@@ -5,6 +5,8 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.sun.tools.javac.Main;
 
+import org.firstinspires.ftc.teamcode.Components.AimBot;
+import org.firstinspires.ftc.teamcode.Components.ObeliskReader;
 import org.firstinspires.ftc.teamcode.SBAs.SBA;
 import org.firstinspires.ftc.teamcode.SBAs.SBARunner;
 
@@ -14,19 +16,28 @@ public class MainTeleOp extends OpMode {
     public MainBot bot;
     public SBARunner runner;
 
-    public static double DRIVE_FACTOR = 0.3;
+    public static double DRIVE_FACTOR = 0.6;
+
+    public AimBot aimBot;
+    public ObeliskReader obeliskReader;
 
     @Override
     public void init() {
         MainBot.shared = new MainBot(hardwareMap, telemetry);
         bot = MainBot.shared;
+
         runner = new SBARunner();
+        aimBot = new AimBot();
+        obeliskReader = new ObeliskReader();
     }
 
     @Override
     public void loop() {
         if (gamepad1.left_bumper) {
-            runner.runSBAs(bot.launcher.kick());
+//            runner.runSBAs(bot.launcher.kick());
+            bot.launcher.kickUp();
+        } else {
+            bot.launcher.kickDown();
         }
 
         if (gamepad1.a) {
@@ -43,6 +54,12 @@ public class MainTeleOp extends OpMode {
 
         bot.launcher.doTelemetry();
         bot.intake.doTelemetry();
+
+        aimBot.readAprilTag();
+        aimBot.doTelemetry();
+
+        telemetry.addData("Obelisk", obeliskReader.read().toString());
+
         telemetry.update();
         runner.loop();
 

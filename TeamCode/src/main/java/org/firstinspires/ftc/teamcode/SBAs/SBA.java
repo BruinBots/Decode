@@ -7,4 +7,8 @@ public interface SBA {
     void init();
     void loop();
     boolean isBusy();
+
+    public default SBAAction action() {
+        return new SBAAction(this);
+    }
 }

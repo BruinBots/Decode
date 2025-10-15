@@ -5,7 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 
 public class SBARunner {
-    public ArrayList<SBA> curSBAs;
+    public ArrayList<SBA> curSBAs = new ArrayList<>();
     public int curIdx;
     public int curInitIdx;
 
