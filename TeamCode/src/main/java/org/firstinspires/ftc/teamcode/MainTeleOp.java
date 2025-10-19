@@ -29,15 +29,24 @@ public class MainTeleOp extends OpMode {
         runner = new SBARunner();
         aimBot = new AimBot();
         obeliskReader = new ObeliskReader();
+
+        bot.launcher.setAimBot(aimBot);
     }
 
     @Override
     public void loop() {
         if (gamepad1.left_bumper) {
-//            runner.runSBAs(bot.launcher.kick());
-            bot.launcher.kickUp();
-        } else {
-            bot.launcher.kickDown();
+            runner.runSBAs(bot.launcher.kick());
+//            bot.launcher.kickUp();
+        }
+        else {
+//            bot.launcher.kickDown();
+        }
+
+        if (gamepad1.dpad_up) {
+            bot.intake.kickUp();
+        } else if (gamepad1.dpad_down) {
+            bot.intake.kickDown();
         }
 
         if (gamepad1.a) {
@@ -52,6 +61,10 @@ public class MainTeleOp extends OpMode {
             bot.launcher.doStop();
         }
 
+        if (gamepad1.right_bumper && gamepad1.dpad_right) {
+            runner.runSBAs(new SBA[]{aimBot.getAimSBA()});
+        }
+
         bot.launcher.doTelemetry();
         bot.intake.doTelemetry();
 
@@ -60,8 +73,9 @@ public class MainTeleOp extends OpMode {
 
         telemetry.addData("Obelisk", obeliskReader.read().toString());
 
-        telemetry.update();
         runner.loop();
+
+        telemetry.update();
 
         bot.moveBotMecanum(gamepad1.left_stick_y, gamepad1.right_stick_x, gamepad1.left_stick_x, DRIVE_FACTOR);
     }

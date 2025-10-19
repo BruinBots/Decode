@@ -18,10 +18,13 @@ public class AimBot {
     private AprilTags aprilTags;
 
     public boolean foundGoal = false;
+    private long foundGoalTime = 0;
     public double distance = 0.0;
     public double horizontal = 0.0;
     public double rawAngleError = 180.0;
     public double angleError = 180.0;
+
+    public static double TIME_BUFFER = 500; // max time in ms from last found april tag to reading there's no april tag
 
     // Launcher power constants
     public static double MIN_DISTANCE = 37.0;
@@ -33,7 +36,7 @@ public class AimBot {
     public static double FAR_DISTANCE = 82.0;
 
     // Turn bot P controller constants
-    public static double TURN_kP = 0.05;
+    public static double TURN_kP = 0.005;
     public static double TURN_MIN_POWER = 0.15;
     public static double TURN_MAX_POWER = 0.35;
 
@@ -61,9 +64,11 @@ public class AimBot {
                 double angleAdjust = -yaw*ADJUST_kP;
                 angleError = rawAngleError - angleAdjust;
 
-                foundGoal = true;
+                foundGoalTime = System.currentTimeMillis();
             }
         }
+
+        foundGoal = (System.currentTimeMillis() - foundGoalTime) < TIME_BUFFER;
     }
 
     public double getLaunchPower() {
@@ -96,7 +101,7 @@ public class AimBot {
 
     public void doTelemetry() {
         if (foundGoal) {
-            MainBot.shared.telemetry.addData("AimBot Read", distance + "ft, " + angleError + "º");
+            MainBot.shared.telemetry.addData("AimBot Read", distance + "in, " + angleError + "º");
             MainBot.shared.telemetry.addData("AimBot Result", getLaunchPower() + "L, " + getTurnPower()+"T");
         } else {
             MainBot.shared.telemetry.addData("AimBot Read", "N/A");

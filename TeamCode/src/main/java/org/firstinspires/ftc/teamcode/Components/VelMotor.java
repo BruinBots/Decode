@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.Components;
 
+import android.annotation.SuppressLint;
+
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -51,8 +53,8 @@ public class VelMotor {
 
     public void doTelemetry() {
         Telemetry telemetry = MainBot.shared.telemetry;
-        telemetry.addData(motorName + " Velocity", motor.getVelocity()*60.0/ticksPerRev+"/"+getSpeed()*ticksPerRev/60.0);
-        telemetry.addData(motorName + " Power", motor.getPower());
+        telemetry.addData(motorName + " Velocity", String.format("%.2f/%.2f", motor.getVelocity()*60.0/ticksPerRev, getSpeed()*ticksPerRev/60.0));
+        telemetry.addData(motorName + " Power", String.format("%.2f", motor.getPower()));
     }
 
     // SBA Integration
