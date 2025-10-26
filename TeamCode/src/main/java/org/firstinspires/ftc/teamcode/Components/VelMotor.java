@@ -2,32 +2,44 @@ package org.firstinspires.ftc.teamcode.Components;
 
 import android.annotation.SuppressLint;
 
+import androidx.annotation.NonNull;
+
+import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
+import com.acmerobotics.roadrunner.Action;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.MainBot;
-import org.firstinspires.ftc.teamcode.SBAs.SBA;
 
 public class VelMotor {
     public DcMotorEx motor;
+    public Servo servo;
     private String motorName;
+    private String servoName;
 
     private double ticksPerRev;
 
-    public VelMotor(HardwareMap hardwareMap, String motorName, double ticksPerRev) {
+    public VelMotor(HardwareMap hardwareMap, String motorName, String servoName, double ticksPerRev) {
         motor = hardwareMap.get(DcMotorEx.class, motorName);
 //        motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
+        servo = hardwareMap.get(Servo.class, servoName);
+
         this.motorName = motorName;
+        this.servoName = servoName;
         this.ticksPerRev = ticksPerRev;
     }
 
     public double getSpeed() { return 0.0; }
     public double getMinSpeed() { return 0.0; }
+
+    public double getUpPosition() { return 0.0; }
+    public double getDownPosition() { return 0.0; }
 
     public void spinUp() {
         // Set motor target velocity to the desired speed
@@ -37,8 +49,7 @@ public class VelMotor {
 
     public boolean isReady() {
         // Returns if the motor is at the target speed
-        double curVel = motor.getVelocity(AngleUnit.DEGREES);
-        return curVel >= getMinSpeed();
+        return getCurrentVelocity() >= getMinSpeed();
     }
 
     public void doStop() {
@@ -47,62 +58,99 @@ public class VelMotor {
         motor.setPower(0);
     }
 
+    public void servoUp() {
+        servo.setPosition(getUpPosition());
+    }
+
+    public void servoDown() {
+        servo.setPosition(getDownPosition());
+    }
+
     public boolean isStopped() {
-        return motor.getVelocity() < 0.5;
+        return getCurrentVelocity() < 30;
+    }
+
+    public double getCurrentVelocity() {
+        return motor.getVelocity()*60.0/ticksPerRev;
     }
 
     public void doTelemetry() {
         Telemetry telemetry = MainBot.shared.telemetry;
-        telemetry.addData(motorName + " Velocity", String.format("%.2f/%.2f", motor.getVelocity()*60.0/ticksPerRev, getSpeed()*ticksPerRev/60.0));
+        telemetry.addData(motorName + " Velocity", String.format("%.2f/%.2f", getCurrentVelocity(), getSpeed()*ticksPerRev/60.0));
         telemetry.addData(motorName + " Power", String.format("%.2f", motor.getPower()));
     }
 
-    // SBA Integration
-    public class VelMotorSBA implements SBA {
-        private VelMotor vMotor;
-        private boolean spinUp;
+    class SpinUpAction implements Action {
+        private VelMotor motor;
+        private boolean firstLoop = true;
 
-        public VelMotorSBA(VelMotor vMotor, boolean spinUp) {
-            this.vMotor = vMotor;
-            this.spinUp = spinUp;
-        }
-
-        public void preInit() {}
-
-        @Override
-        public boolean sanity() {
-            return true;
+        private SpinUpAction(VelMotor motor) {
+            this.motor = motor;
         }
 
         @Override
-        public void init() {
-            if (spinUp) {
-                vMotor.spinUp();
-            } else {
-                vMotor.doStop();
+        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+            if (firstLoop) {
+                motor.spinUp();
+                firstLoop = false;
+                return true;
             }
-        }
-
-        @Override
-        public void loop() {
-
-        }
-
-        @Override
-        public boolean isBusy() {
-            if (spinUp) {
-                return !vMotor.isReady();
-            } else {
-                return !vMotor.isStopped();
-            }
+            return motor.isReady();
         }
     }
 
-    public SBA getSpinUpSBA() {
-        return new VelMotorSBA(this, true);
+    public SpinUpAction getSpinUpAction() {
+        return new SpinUpAction(this);
     }
 
-    public SBA getStopSBA() {
-        return new VelMotorSBA(this, false);
+    class StopAction implements Action {
+        private VelMotor motor;
+        private boolean firstLoop = true;
+
+        private StopAction(VelMotor motor) {
+            this.motor = motor;
+        }
+
+        @Override
+        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+            if (firstLoop) {
+                motor.doStop();
+                firstLoop = false;
+                return true;
+            }
+            return motor.isStopped();
+        }
+    }
+
+    public StopAction getStopAction() {
+        return new StopAction(this);
+    }
+
+    class ServoAction implements Action {
+        private VelMotor motor;
+        private boolean isUp;
+
+        private ServoAction(VelMotor motor, boolean isUp) {
+            this.motor = motor;
+            this.isUp = isUp;
+        }
+
+        @Override
+        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+            if (isUp) {
+                motor.servoUp();
+            } else {
+                motor.servoDown();
+            }
+            return false;
+        }
+    }
+
+    public ServoAction servoUpAction() {
+        return new ServoAction(this, true);
+    }
+
+    public ServoAction servoDownAction() {
+        return new ServoAction(this, false);
     }
 }

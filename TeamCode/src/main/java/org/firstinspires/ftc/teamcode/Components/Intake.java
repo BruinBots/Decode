@@ -5,9 +5,6 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
-import org.firstinspires.ftc.teamcode.SBAs.SBA;
-import org.firstinspires.ftc.teamcode.SBAs.ServoSBA;
-import org.firstinspires.ftc.teamcode.SBAs.WaitSBA;
 
 @Config
 public class Intake extends VelMotor {
@@ -16,7 +13,6 @@ public class Intake extends VelMotor {
 
     public static double SERVO_DOWN_POS = 0.15;
     public static double SERVO_UP_POS = 0.5;
-    public static int SERVO_WAIT = 500; // ms
 
     private Servo servo;
 
@@ -37,19 +33,11 @@ public class Intake extends VelMotor {
         return MIN_INTAKE_SPEED;
     }
 
-    public void kickUp() {
-        servo.setPosition(SERVO_UP_POS);
+    public static double getServoUpPos() {
+        return SERVO_UP_POS;
     }
 
-    public void kickDown() {
-        servo.setPosition(SERVO_DOWN_POS);
-    }
-
-    public SBA[] kick() {
-        return new SBA[] {
-                new ServoSBA(servo, SERVO_UP_POS),
-                new WaitSBA(SERVO_WAIT),
-                new ServoSBA(servo, SERVO_DOWN_POS),
-        };
+    public static double getServoDownPos() {
+        return SERVO_DOWN_POS;
     }
 }

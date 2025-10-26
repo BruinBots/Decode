@@ -1,5 +1,10 @@
 package org.firstinspires.ftc.teamcode.Components;
 
+import androidx.annotation.NonNull;
+
+import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
+import com.acmerobotics.roadrunner.Action;
+
 import org.firstinspires.ftc.teamcode.MainBot;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 
@@ -12,6 +17,8 @@ public class ObeliskReader {
         PPG,
         UNKNOWN,
     }
+
+    private ObeliskState lastRead;
 
     public ObeliskReader() { }
 
@@ -29,5 +36,30 @@ public class ObeliskReader {
             }
         }
         return ObeliskState.UNKNOWN;
+    }
+
+    public ObeliskState getLastRead() {
+        return lastRead;
+    }
+
+    public class ObeliskReadAction implements Action {
+
+        public ObeliskReader obeliskReader;
+
+        private ObeliskReadAction(ObeliskReader obeliskReader) {
+            this.obeliskReader = obeliskReader;
+        }
+
+        @Override
+        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+            ObeliskState state = obeliskReader.read();
+            if (state == ObeliskState.UNKNOWN) { return true; }
+            obeliskReader.lastRead = state;
+            return false;
+        }
+    }
+
+    public ObeliskReadAction getReadAction() {
+        return new ObeliskReadAction(this);
     }
 }

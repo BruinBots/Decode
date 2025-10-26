@@ -1,15 +1,13 @@
 package org.firstinspires.ftc.teamcode.Components;
 
-import com.acmerobotics.dashboard.config.Config;
-import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.sun.tools.javac.Main;
+import androidx.annotation.NonNull;
 
-import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import com.acmerobotics.dashboard.config.Config;
+import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
+import com.acmerobotics.roadrunner.Action;
+
 import org.firstinspires.ftc.teamcode.MainBot;
-import org.firstinspires.ftc.teamcode.SBAs.SBA;
-import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
-import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 
 import java.util.List;
 
@@ -61,7 +59,7 @@ public class AimBot {
                 // Angle-adjusted aimng algorithm
                 // https://discord.com/channels/775043247802286080/775048219465220128/1427015590161420450
                 double yaw = detection.ftcPose.yaw;
-                double angleAdjust = -yaw*ADJUST_kP;
+                double angleAdjust = -yaw * ADJUST_kP;
                 angleError = rawAngleError - angleAdjust;
 
                 foundGoalTime = System.currentTimeMillis();
@@ -102,36 +100,38 @@ public class AimBot {
     public void doTelemetry() {
         if (foundGoal) {
             MainBot.shared.telemetry.addData("AimBot Read", distance + "in, " + angleError + "º");
-            MainBot.shared.telemetry.addData("AimBot Result", getLaunchPower() + "L, " + getTurnPower()+"T");
+            MainBot.shared.telemetry.addData("AimBot Result", getLaunchPower() + "L, " + getTurnPower() + "T");
         } else {
             MainBot.shared.telemetry.addData("AimBot Read", "N/A");
             MainBot.shared.telemetry.addData("AimBot Result", "N/A");
         }
     }
 
-    public class AimBotSBA implements SBA {
-        private AimBot aimBot;
+    public class AimBotAction implements Action {
 
-        public AimBotSBA(AimBot aimBot) {
+        private AimBot aimBot;
+        private boolean firstLoop = true;
+
+        private AimBotAction(AimBot aimBot) {
             this.aimBot = aimBot;
         }
 
-        public void preInit() {
-            aimBot.aprilTags.start();
-        }
+        @Override
+        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+            if (firstLoop) {
+                aprilTags.start();
 
-        public boolean sanity() {
+                // Reset found goal variables
+                aimBot.foundGoal = false;
+                aimBot.foundGoalTime = 0;
+
+                firstLoop = false;
+                return true; // Keep iterating later on
+            }
             aimBot.readAprilTag();
-            return foundGoal && distance >= 10.0 && distance <= 100.0 && Math.abs(angleError) <= 30.0;
-        }
-
-        public void init() { }
-
-        public void loop() {
-            readAprilTag();
             double launchPower = getLaunchPower();
             double turnPower = getTurnPower();
-            if (foundGoal) {
+            if (aimBot.foundGoal) {
                 MainBot.shared.telemetry.addData("Goal Distance", distance);
                 MainBot.shared.telemetry.addData("Goal Horizontal Distance", horizontal);
                 MainBot.shared.telemetry.addData("Goal RAW Angle Error", rawAngleError);
@@ -144,17 +144,13 @@ public class AimBot {
             }
             MainBot.shared.telemetry.addData("Launch Power", launchPower);
             MainBot.shared.telemetry.addData("Turn Power", turnPower);
-            MainBot.shared.telemetry.update();
-
             MainBot.shared.moveBotMecanum(0, turnPower, 0, 1);
-        }
 
-        public boolean isBusy() {
             return !foundGoal || Math.abs(angleError) >= 2.0;
         }
     }
 
-    public AimBotSBA getAimSBA() {
-        return new AimBotSBA(this);
+    public AimBotAction getAction() {
+        return new AimBotAction(this);
     }
 }

@@ -1,52 +1,56 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
+import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
+import com.acmerobotics.roadrunner.Action;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.sun.tools.javac.Main;
 
 import org.firstinspires.ftc.teamcode.Components.AimBot;
 import org.firstinspires.ftc.teamcode.Components.ObeliskReader;
-import org.firstinspires.ftc.teamcode.SBAs.SBA;
-import org.firstinspires.ftc.teamcode.SBAs.SBARunner;
+
+import java.util.ArrayList;
 
 @Config
 @TeleOp
 public class MainTeleOp extends OpMode {
     public MainBot bot;
-    public SBARunner runner;
+    public ArrayList<Action> actions;
 
     public static double DRIVE_FACTOR = 0.6;
 
     public AimBot aimBot;
     public ObeliskReader obeliskReader;
 
+    public FtcDashboard dash;
+
     @Override
     public void init() {
         MainBot.shared = new MainBot(hardwareMap, telemetry);
         bot = MainBot.shared;
 
-        runner = new SBARunner();
         aimBot = new AimBot();
         obeliskReader = new ObeliskReader();
 
         bot.launcher.setAimBot(aimBot);
+
+        dash = FtcDashboard.getInstance();
     }
 
     @Override
     public void loop() {
         if (gamepad1.left_bumper) {
-            runner.runSBAs(bot.launcher.kick());
-//            bot.launcher.kickUp();
+            bot.launcher.servoUp();
         }
         else {
-//            bot.launcher.kickDown();
+            bot.launcher.servoDown();
         }
 
         if (gamepad1.dpad_up) {
-            bot.intake.kickUp();
+            bot.intake.servoUp();
         } else if (gamepad1.dpad_down) {
-            bot.intake.kickDown();
+            bot.intake.servoDown();
         }
 
         if (gamepad1.a) {
@@ -62,7 +66,7 @@ public class MainTeleOp extends OpMode {
         }
 
         if (gamepad1.right_bumper && gamepad1.dpad_right) {
-            runner.runSBAs(new SBA[]{aimBot.getAimSBA()});
+            actions.add(aimBot.getAction());
         }
 
         bot.launcher.doTelemetry();
@@ -73,7 +77,15 @@ public class MainTeleOp extends OpMode {
 
         telemetry.addData("Obelisk", obeliskReader.read().toString());
 
-        runner.loop();
+        TelemetryPacket packet = new TelemetryPacket();
+        ArrayList<Action> newActions = new ArrayList<>();
+        for (Action action : actions) {
+            action.preview(packet.fieldOverlay());
+            if (action.run(packet)) {
+                newActions.add(action);
+            }
+        }
+        actions = newActions;
 
         telemetry.update();
 
