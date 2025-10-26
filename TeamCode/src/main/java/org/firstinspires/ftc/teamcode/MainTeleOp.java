@@ -69,6 +69,34 @@ public class MainTeleOp extends OpMode {
             actions.add(aimBot.getAction());
         }
 
+//        if (gamepad1.left_bumper) {
+//            // reverse intake
+//        } else if (gamepad1.right_bumper) {
+//            // intake
+//        }
+//
+//        if (gamepad1.y) {
+//            // launch one
+//        }
+//
+//        if (gamepad1.dpad_up) {
+//            // henryjack up
+//        } else if (gamepad1.dpad_down) {
+//            // henryjack down
+//        }
+//
+//        if (gamepad1.a) {
+//            // clear current ball from launcher
+//        }
+//
+//        if (gamepad1.x) {
+//            // aim with apriltags
+//        }
+//
+//        if (gamepad1.b) {
+//            // launch all
+//        }
+
         bot.launcher.doTelemetry();
         bot.intake.doTelemetry();
 
