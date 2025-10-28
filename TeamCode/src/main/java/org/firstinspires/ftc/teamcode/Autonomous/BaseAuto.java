@@ -10,6 +10,8 @@ import com.acmerobotics.roadrunner.Vector2d;
 import com.sun.tools.javac.Main;
 
 import org.firstinspires.ftc.teamcode.Components.AimBot;
+import org.firstinspires.ftc.teamcode.Components.Intake;
+import org.firstinspires.ftc.teamcode.Components.Launcher;
 import org.firstinspires.ftc.teamcode.Components.ObeliskReader;
 import org.firstinspires.ftc.teamcode.Components.WaitAction;
 import org.firstinspires.ftc.teamcode.MainBot;
@@ -43,20 +45,26 @@ public class BaseAuto {
         }
     }
 
-    public TrajectoryEnd launch(Pose2d startPose) {
+    public TrajectoryEnd launch(Pose2d startPose, boolean isFirstLaunch) {
         TrajectoryActionBuilder builder = drive.actionBuilder(startPose)
-                .afterTime(0, bot.launcher.getSpinUpAction())
-                .splineTo(new Vector2d(-42, -36), Math.toRadians(225));
+                .afterTime(0, bot.launcher.getSpinUpAction(Launcher.LAUNCH_POWER, Launcher.MIN_LAUNCH_SPEED));
+        if (isFirstLaunch) {
+                builder = builder
+                        .splineTo(new Vector2d(-42, -36), Math.toRadians(225));
+        } else {
+            builder = builder
+                    .splineToLinearHeading(new Pose2d(-42, -36, Math.toRadians(225)), Math.toRadians(225));
+        }
         return new TrajectoryEnd(
                 new SequentialAction(
                         builder.build(),
                         new ParallelAction(
                                 aimBot.getAction(),
-                                bot.launcher.getSpinUpAction()
+                                bot.launcher.getSpinUpAction(Launcher.LAUNCH_POWER, Launcher.MIN_LAUNCH_SPEED)
                         ),
-                        bot.launcher.servoUpAction(),
+                        bot.launcher.getServoAction(Launcher.SERVO_UP_POS),
                         new WaitAction(1000),
-                        bot.launcher.servoDownAction()
+                        bot.launcher.getServoAction(Launcher.SERVO_DOWN_POS)
                 ),
                 builder.endTrajectory()
         );
@@ -65,7 +73,7 @@ public class BaseAuto {
     public TrajectoryEnd obeliskRead(Pose2d startPose) {
         TrajectoryActionBuilder builder = drive.actionBuilder(startPose)
                 .setReversed(true)
-                .splineTo(new Vector2d(-12, -18), Math.toRadians(-20))
+                .lineToYLinearHeading(-18, Math.toRadians(-20))
                 .setReversed(false);
         return new TrajectoryEnd(
                 new SequentialAction(
@@ -78,39 +86,35 @@ public class BaseAuto {
 
     // Intake paths
     // TODO: Replace Action with TrajectoryEnd
-    public Action GPPIntake(Pose2d startPose) {
-        return drive.actionBuilder(startPose)
-                .turn(Math.toRadians(90))
-                .splineTo(new Vector2d(-12, -36), Math.toRadians(270))
-                .lineToY(-48)
-                .setReversed(true)
-                .lineToY(-36)
-                .splineTo(new Vector2d(0, -18), Math.toRadians(0))
-                .setReversed(false)
-                .build();
-    }
-
-    public Action PGPIntake(Pose2d startPose) {
-        return drive.actionBuilder(startPose)
-                .turn(Math.toRadians(180))
-                .splineTo(new Vector2d(12, -36), Math.toRadians(270))
-                .lineToY(-48)
-                .setReversed(true)
-                .lineToY(-36)
-                .splineTo(new Vector2d(24, -18), Math.toRadians(0))
-                .setReversed(false)
-                .build();
-    }
-
-    public Action PPGIntake(Pose2d startPose) {
-        return drive.actionBuilder(startPose)
-                .turn(Math.toRadians(180))
+    public TrajectoryActionBuilder GPPIntake(TrajectoryActionBuilder builder) {
+        return builder
+                .afterDisp(1, bot.intake.getSpinUpAction(Intake.INTAKE_POWER, Intake.MIN_INTAKE_SPEED))
                 .splineTo(new Vector2d(36, -36), Math.toRadians(270))
                 .lineToY(-48)
                 .setReversed(true)
-                .lineToY(-36)
-                .splineTo(new Vector2d(48, -18), Math.toRadians(0))
+                .splineToLinearHeading(new Pose2d(18, -18, Math.toRadians(180)), Math.toRadians(180))
                 .setReversed(false)
-                .build();
+                .splineTo(new Vector2d(-42, -36), Math.toRadians(225));
+    }
+
+    public TrajectoryActionBuilder PGPIntake(TrajectoryActionBuilder builder) {
+        return builder
+                .afterDisp(1, bot.intake.getSpinUpAction(Intake.INTAKE_POWER, Intake.MIN_INTAKE_SPEED))
+                .splineTo(new Vector2d(-12, -36), Math.toRadians(270))
+                .lineToY(-48)
+                .setReversed(true)
+                .splineToLinearHeading(new Pose2d(-42, -36, Math.toRadians(225)), Math.toRadians(225))
+                .setReversed(false);
+    }
+
+    public TrajectoryActionBuilder PPGIntake(TrajectoryActionBuilder builder) {
+        return builder
+                .afterDisp(1, bot.intake.getSpinUpAction(Intake.INTAKE_POWER, Intake.MIN_INTAKE_SPEED))
+                .splineTo(new Vector2d(12, -36), Math.toRadians(270))
+                .lineToY(-48)
+                .setReversed(true)
+                .splineToLinearHeading(new Pose2d(0, -18, Math.toRadians(180)), Math.toRadians(180))
+                .setReversed(false)
+                .splineTo(new Vector2d(-42, -36), Math.toRadians(225));
     }
 }

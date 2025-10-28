@@ -8,6 +8,8 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.Components.AimBot;
+import org.firstinspires.ftc.teamcode.Components.Intake;
+import org.firstinspires.ftc.teamcode.Components.Launcher;
 import org.firstinspires.ftc.teamcode.Components.ObeliskReader;
 
 import java.util.ArrayList;
@@ -33,34 +35,32 @@ public class MainTeleOp extends OpMode {
         aimBot = new AimBot();
         obeliskReader = new ObeliskReader();
 
-        bot.launcher.setAimBot(aimBot);
-
         dash = FtcDashboard.getInstance();
     }
 
     @Override
     public void loop() {
         if (gamepad1.left_bumper) {
-            bot.launcher.servoUp();
+            bot.launcher.setServo(Launcher.SERVO_UP_POS);
         }
         else {
-            bot.launcher.servoDown();
+            bot.launcher.setServo(Launcher.SERVO_DOWN_POS);
         }
 
         if (gamepad1.dpad_up) {
-            bot.intake.servoUp();
+            bot.intake.setServo(Intake.SERVO_UP_POS);
         } else if (gamepad1.dpad_down) {
-            bot.intake.servoDown();
+            bot.intake.setServo(Intake.SERVO_DOWN_POS);
         }
 
         if (gamepad1.a) {
-            bot.intake.spinUp();
+            bot.intake.spinUp(Intake.INTAKE_POWER);
         } else if (gamepad1.b) {
             bot.intake.doStop();
         }
 
         if (gamepad1.x) {
-            bot.launcher.spinUp();
+            bot.launcher.spinUp(Launcher.LAUNCH_POWER);
         } else if (gamepad1.y) {
             bot.launcher.doStop();
         }
@@ -69,11 +69,13 @@ public class MainTeleOp extends OpMode {
             actions.add(aimBot.getAction());
         }
 
-//        if (gamepad1.left_bumper) {
-//            // reverse intake
-//        } else if (gamepad1.right_bumper) {
-//            // intake
-//        }
+        if (gamepad1.left_bumper) {
+            bot.intake.spinUp(-Intake.REVERSE_POWER);
+        } else if (gamepad1.right_bumper) {
+            bot.intake.spinUp(Intake.INTAKE_POWER);
+        } else {
+            bot.intake.doStop();
+        }
 //
 //        if (gamepad1.y) {
 //            // launch one
@@ -99,6 +101,9 @@ public class MainTeleOp extends OpMode {
 
         bot.launcher.doTelemetry();
         bot.intake.doTelemetry();
+
+        bot.launcher.cookedMotor.loop();
+        bot.intake.cookedMotor.loop();
 
         aimBot.readAprilTag();
         aimBot.doTelemetry();

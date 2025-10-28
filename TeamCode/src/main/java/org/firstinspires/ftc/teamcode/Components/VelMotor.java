@@ -13,11 +13,15 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.teamcode.CookedMotor;
 import org.firstinspires.ftc.teamcode.MainBot;
+import org.firstinspires.ftc.teamcode.Utils.ServoAction;
 
 public class VelMotor {
     public DcMotorEx motor;
     public Servo servo;
+    public CookedMotor cookedMotor;
+
     private String motorName;
     private String servoName;
 
@@ -28,6 +32,8 @@ public class VelMotor {
 //        motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
+        cookedMotor = new CookedMotor(motor, 6);
+
         servo = hardwareMap.get(Servo.class, servoName);
 
         this.motorName = motorName;
@@ -35,35 +41,25 @@ public class VelMotor {
         this.ticksPerRev = ticksPerRev;
     }
 
-    public double getSpeed() { return 0.0; }
-    public double getMinSpeed() { return 0.0; }
-
-    public double getUpPosition() { return 0.0; }
-    public double getDownPosition() { return 0.0; }
-
-    public void spinUp() {
+    public void spinUp(double power) {
         // Set motor target velocity to the desired speed
-        motor.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
-        motor.setVelocity(getSpeed()*ticksPerRev/60.0);
+        motor.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
+        motor.setPower(power);
     }
 
-    public boolean isReady() {
+    public boolean isAtSpeed(double speed) {
         // Returns if the motor is at the target speed
-        return getCurrentVelocity() >= getMinSpeed();
+        return getCurrentVelocity() >= speed;
     }
 
     public void doStop() {
         // Stop the motor
-        motor.setVelocity(0);
+        motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         motor.setPower(0);
     }
 
-    public void servoUp() {
-        servo.setPosition(getUpPosition());
-    }
-
-    public void servoDown() {
-        servo.setPosition(getDownPosition());
+    public void setServo(double position) {
+        servo.setPosition(position);
     }
 
     public boolean isStopped() {
@@ -71,86 +67,47 @@ public class VelMotor {
     }
 
     public double getCurrentVelocity() {
-        return motor.getVelocity()*60.0/ticksPerRev;
+        return motor.getVelocity() * 60.0 / ticksPerRev;
     }
 
     public void doTelemetry() {
         Telemetry telemetry = MainBot.shared.telemetry;
-        telemetry.addData(motorName + " Velocity", String.format("%.2f/%.2f", getCurrentVelocity(), getSpeed()*ticksPerRev/60.0));
+        telemetry.addData(motorName + " Velocity", String.format("%.2f", getCurrentVelocity()));
         telemetry.addData(motorName + " Power", String.format("%.2f", motor.getPower()));
     }
 
     class SpinUpAction implements Action {
         private VelMotor motor;
+        private double power;
+        private double speed;
         private boolean firstLoop = true;
 
-        private SpinUpAction(VelMotor motor) {
+        private SpinUpAction(VelMotor motor, double power, double speed) {
             this.motor = motor;
+            this.power = power;
+            this.speed = speed;
         }
 
         @Override
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
             if (firstLoop) {
-                motor.spinUp();
+                motor.spinUp(power);
                 firstLoop = false;
                 return true;
             }
-            return motor.isReady();
-        }
-    }
-
-    public SpinUpAction getSpinUpAction() {
-        return new SpinUpAction(this);
-    }
-
-    class StopAction implements Action {
-        private VelMotor motor;
-        private boolean firstLoop = true;
-
-        private StopAction(VelMotor motor) {
-            this.motor = motor;
-        }
-
-        @Override
-        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-            if (firstLoop) {
-                motor.doStop();
-                firstLoop = false;
-                return true;
-            }
-            return motor.isStopped();
-        }
-    }
-
-    public StopAction getStopAction() {
-        return new StopAction(this);
-    }
-
-    class ServoAction implements Action {
-        private VelMotor motor;
-        private boolean isUp;
-
-        private ServoAction(VelMotor motor, boolean isUp) {
-            this.motor = motor;
-            this.isUp = isUp;
-        }
-
-        @Override
-        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-            if (isUp) {
-                motor.servoUp();
+            if (speed > 0) {
+                return !motor.isAtSpeed(speed);
             } else {
-                motor.servoDown();
+                return !motor.isStopped();
             }
-            return false;
         }
     }
 
-    public ServoAction servoUpAction() {
-        return new ServoAction(this, true);
+    public SpinUpAction getSpinUpAction(double power, double speed) {
+        return new SpinUpAction(this, power, speed);
     }
 
-    public ServoAction servoDownAction() {
-        return new ServoAction(this, false);
+    public ServoAction getServoAction(double position) {
+        return new ServoAction(servo, position);
     }
 }

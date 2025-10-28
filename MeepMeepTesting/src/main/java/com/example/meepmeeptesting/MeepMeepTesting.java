@@ -11,6 +11,7 @@ import java.awt.Image;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Vector;
 
 import javax.imageio.ImageIO;
 
@@ -20,38 +21,39 @@ public class MeepMeepTesting {
 
         RoadRunnerBotEntity myBot = new DefaultBotBuilder(meepMeep)
                 // Set bot constraints: maxVel, maxAccel, maxAngVel, maxAngAccel, track width
-                .setConstraints(60, 60, Math.toRadians(180), Math.toRadians(180), 15)
+                .setConstraints(60, 600, Math.toRadians(360), Math.toRadians(3600), 15)
                 .followTrajectorySequence(drive -> drive.trajectorySequenceBuilder(new Pose2d(-60, -12, 0))
                         .splineTo(new Vector2d(-42, -36), Math.toRadians(225))
                         // Launch
                         .setReversed(true)
-                        .splineTo(new Vector2d(-12, -18), Math.toRadians(-20))
-                        // Read obelisk, spin up intake (max 3s), also try panning to find the obelisk
+                        .lineToLinearHeading(new Pose2d(-38, -12, Math.toRadians(-10)))
+//                        // Read obelisk, spin up intake (max 3s), also try panning to find the obelisk
                         .setReversed(false)
-                        // GPP
-                        .turn(Math.toRadians(90))
-                        .splineTo(new Vector2d(-12, -36), Math.toRadians(270))
-                        .forward(12)
-                        .setReversed(true)
-                        .back(12)
-                        .splineTo(new Vector2d(0, -18), Math.toRadians(0))
-                        // PGP
-                        .turn(Math.toRadians(180))
-                        .splineTo(new Vector2d(12, -36), Math.toRadians(270))
-                        .forward(12)
-                        .setReversed(true)
-                        .back(12)
-                        .splineTo(new Vector2d(24, -18), Math.toRadians(0))
-                        // PPG
-                        .turn(Math.toRadians(180))
+//                        // PGP
+//                        .splineTo(new Vector2d(-12, -36), Math.toRadians(270))
+//                        .forward(12)
+//                        .setReversed(true)
+//                        .splineToLinearHeading(new Pose2d(-42, -36, Math.toRadians(225)), Math.toRadians(225))
+//                        // PGP
+//                        .turn(Math.toRadians(180))
+//                        .splineTo(new Vector2d(12, -36), Math.toRadians(270))
+//                        .forward(12)
+//                        .setReversed(true)
+//                        .splineToLinearHeading(new Pose2d(0, -18, Math.toRadians(270)), Math.toRadians(180))
+//                        .setReversed(false)
+//                        .splineTo(new Vector2d(-42, -36), Math.toRadians(225))
+//                        // PPG
+//                        .turn(Math.toRadians(180))
                         .splineTo(new Vector2d(36, -36), Math.toRadians(270))
                         .forward(12)
                         .setReversed(true)
-                        .back(12)
-                        .splineTo(new Vector2d(48, -18), Math.toRadians(0))
-                        // Score again
+//                        .back(12)
+                        .splineToLinearHeading(new Pose2d(18, -18, Math.toRadians(180)), Math.toRadians(180))
                         .setReversed(false)
                         .splineTo(new Vector2d(-42, -36), Math.toRadians(225))
+//                        // Score again
+//                        .setReversed(false)
+//                        .splineTo(new Vector2d(-42, -36), Math.toRadians(225))
                         .build());
 
 
