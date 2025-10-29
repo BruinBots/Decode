@@ -38,8 +38,8 @@ public class MainBot {
         leftBackMotor = hardwareMap.get(DcMotorEx.class, "leftBack");
         rightBackMotor = hardwareMap.get(DcMotorEx.class, "rightBack");
 
-        leftFrontMotor.setDirection(DcMotorSimple.Direction.REVERSE);
-        leftBackMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+//        leftFrontMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+//        leftBackMotor.setDirection(DcMotorSimple.Direction.REVERSE);
 
         // Components
         launcher = new Launcher(hardwareMap);

@@ -17,7 +17,7 @@ public class Launcher extends VelMotor {
 
     public Launcher(HardwareMap hardwareMap) {
         super(hardwareMap, "launchMotor", "kickServo", 27);
-        motor.setDirection(DcMotorSimple.Direction.REVERSE);
+//        motor.setDirection(DcMotorSimple.Direction.REVERSE);
 
     }
 }

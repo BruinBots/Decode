@@ -36,6 +36,8 @@ public class MainTeleOp extends OpMode {
         obeliskReader = new ObeliskReader();
 
         dash = FtcDashboard.getInstance();
+
+        actions = new ArrayList<>();
     }
 
     @Override
@@ -48,15 +50,17 @@ public class MainTeleOp extends OpMode {
         }
 
         if (gamepad1.dpad_up) {
-            bot.intake.setServo(Intake.SERVO_UP_POS);
+            bot.intake.kickUp();
         } else if (gamepad1.dpad_down) {
-            bot.intake.setServo(Intake.SERVO_DOWN_POS);
+            bot.intake.kickDown();
         }
 
         if (gamepad1.a) {
-            bot.intake.spinUp(Intake.INTAKE_POWER);
+            bot.intake.spinUp();
         } else if (gamepad1.b) {
-            bot.intake.doStop();
+            bot.intake.reverse();
+        } else {
+            bot.intake.stop();
         }
 
         if (gamepad1.x) {
@@ -69,13 +73,13 @@ public class MainTeleOp extends OpMode {
             actions.add(aimBot.getAction());
         }
 
-        if (gamepad1.left_bumper) {
-            bot.intake.spinUp(-Intake.REVERSE_POWER);
-        } else if (gamepad1.right_bumper) {
-            bot.intake.spinUp(Intake.INTAKE_POWER);
-        } else {
-            bot.intake.doStop();
-        }
+//        if (gamepad1.left_bumper) {
+//            bot.intake.spinUp(-Intake.REVERSE_POWER);
+//        } else if (gamepad1.right_bumper) {
+//            bot.intake.spinUp(Intake.INTAKE_POWER);
+//        } else {
+//            bot.intake.doStop();
+//        }
 //
 //        if (gamepad1.y) {
 //            // launch one
@@ -103,7 +107,6 @@ public class MainTeleOp extends OpMode {
         bot.intake.doTelemetry();
 
         bot.launcher.cookedMotor.loop();
-        bot.intake.cookedMotor.loop();
 
         aimBot.readAprilTag();
         aimBot.doTelemetry();
