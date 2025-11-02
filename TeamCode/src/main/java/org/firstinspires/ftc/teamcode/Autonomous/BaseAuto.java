@@ -86,8 +86,8 @@ public class BaseAuto {
 
     // Intake paths
     // TODO: Replace Action with TrajectoryEnd
-    public TrajectoryActionBuilder GPPIntake(TrajectoryActionBuilder builder) {
-        return builder
+    public TrajectoryEnd GPPIntake(TrajectoryActionBuilder builder) {
+        builder = builder
                 .afterDisp(1, bot.intake.getServoAction(Intake.INTAKE_IN_POS))
                 .splineTo(new Vector2d(36, -36), Math.toRadians(270))
                 .lineToY(-48)
@@ -95,20 +95,28 @@ public class BaseAuto {
                 .splineToLinearHeading(new Pose2d(18, -18, Math.toRadians(180)), Math.toRadians(180))
                 .setReversed(false)
                 .splineTo(new Vector2d(-42, -36), Math.toRadians(225));
+        return new TrajectoryEnd(
+                builder.build(),
+                builder
+        );
     }
 
-    public TrajectoryActionBuilder PGPIntake(TrajectoryActionBuilder builder) {
-        return builder
+    public TrajectoryEnd PGPIntake(TrajectoryActionBuilder builder) {
+        builder = builder
                 .afterDisp(1, bot.intake.getServoAction(Intake.INTAKE_IN_POS))
                 .splineTo(new Vector2d(-12, -36), Math.toRadians(270))
                 .lineToY(-48)
                 .setReversed(true)
                 .splineToLinearHeading(new Pose2d(-42, -36, Math.toRadians(225)), Math.toRadians(225))
                 .setReversed(false);
+        return new TrajectoryEnd(
+                builder.build(),
+                builder
+        );
     }
 
-    public TrajectoryActionBuilder PPGIntake(TrajectoryActionBuilder builder) {
-        return builder
+    public TrajectoryEnd PPGIntake(TrajectoryActionBuilder builder) {
+        builder = builder
                 .afterDisp(1, bot.intake.getServoAction(Intake.INTAKE_IN_POS))
                 .splineTo(new Vector2d(12, -36), Math.toRadians(270))
                 .lineToY(-48)
@@ -116,5 +124,9 @@ public class BaseAuto {
                 .splineToLinearHeading(new Pose2d(0, -18, Math.toRadians(180)), Math.toRadians(180))
                 .setReversed(false)
                 .splineTo(new Vector2d(-42, -36), Math.toRadians(225));
+        return new TrajectoryEnd(
+                builder.build(),
+                builder
+        );
     }
 }

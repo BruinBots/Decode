@@ -123,8 +123,13 @@ public class MainTeleOp extends OpMode {
         }
         actions = newActions;
 
+//        telemetry.addData("left_stick_y", gamepad1.left_stick_y);
+//        telemetry.addData("right_stick_x", gamepad1.right_stick_x);
+//        telemetry.addData("left_stick_x", gamepad1.left_stick_x);
+
         telemetry.update();
 
-        bot.moveBotMecanum(gamepad1.left_stick_y, gamepad1.right_stick_x, gamepad1.left_stick_x, DRIVE_FACTOR);
+        // NOTE: Left stick y is negative when pushed forward (up)
+        bot.moveBotMecanum(-gamepad1.left_stick_y, gamepad1.right_stick_x, gamepad1.left_stick_x, DRIVE_FACTOR);
     }
 }

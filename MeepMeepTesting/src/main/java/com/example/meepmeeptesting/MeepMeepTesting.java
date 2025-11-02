@@ -17,43 +17,14 @@ import javax.imageio.ImageIO;
 
 public class MeepMeepTesting {
     public static void main(String[] args) {
-        MeepMeep meepMeep = new MeepMeep(800);
+        MeepMeep meepMeep = new MeepMeep(600);
 
         RoadRunnerBotEntity myBot = new DefaultBotBuilder(meepMeep)
                 // Set bot constraints: maxVel, maxAccel, maxAngVel, maxAngAccel, track width
                 .setConstraints(60, 600, Math.toRadians(360), Math.toRadians(3600), 15)
                 .followTrajectorySequence(drive -> drive.trajectorySequenceBuilder(new Pose2d(-60, -12, 0))
                         .splineTo(new Vector2d(-42, -36), Math.toRadians(225))
-                        // Launch
-                        .setReversed(true)
-                        .lineToLinearHeading(new Pose2d(-38, -12, Math.toRadians(-10)))
-//                        // Read obelisk, spin up intake (max 3s), also try panning to find the obelisk
-                        .setReversed(false)
-//                        // PGP
-//                        .splineTo(new Vector2d(-12, -36), Math.toRadians(270))
-//                        .forward(12)
-//                        .setReversed(true)
-//                        .splineToLinearHeading(new Pose2d(-42, -36, Math.toRadians(225)), Math.toRadians(225))
-//                        // PGP
-//                        .turn(Math.toRadians(180))
-//                        .splineTo(new Vector2d(12, -36), Math.toRadians(270))
-//                        .forward(12)
-//                        .setReversed(true)
-//                        .splineToLinearHeading(new Pose2d(0, -18, Math.toRadians(270)), Math.toRadians(180))
-//                        .setReversed(false)
-//                        .splineTo(new Vector2d(-42, -36), Math.toRadians(225))
-//                        // PPG
-//                        .turn(Math.toRadians(180))
-                        .splineTo(new Vector2d(36, -36), Math.toRadians(270))
-                        .forward(12)
-                        .setReversed(true)
-//                        .back(12)
-                        .splineToLinearHeading(new Pose2d(18, -18, Math.toRadians(180)), Math.toRadians(180))
-                        .setReversed(false)
-                        .splineTo(new Vector2d(-42, -36), Math.toRadians(225))
-//                        // Score again
-//                        .setReversed(false)
-//                        .splineTo(new Vector2d(-42, -36), Math.toRadians(225))
+
                         .build());
 
 

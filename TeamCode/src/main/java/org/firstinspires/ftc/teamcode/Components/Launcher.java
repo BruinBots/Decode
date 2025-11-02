@@ -13,7 +13,7 @@ public class Launcher extends VelMotor {
     public static double MIN_LAUNCH_SPEED = 5600; // rpm
 
     public static double SERVO_DOWN_POS = 0.2;
-    public static double SERVO_UP_POS = 0.05;
+    public static double SERVO_UP_POS = 0.38;
 
     public Launcher(HardwareMap hardwareMap) {
         super(hardwareMap, "launchMotor", "kickServo", 27);
