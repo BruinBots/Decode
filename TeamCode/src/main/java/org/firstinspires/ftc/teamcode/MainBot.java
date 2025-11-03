@@ -32,6 +32,11 @@ public class MainBot {
     public HardwareMap hardwareMap;
     public AprilTags aprilTags;
 
+    private double lastDrive;
+    private double lastStrafe;
+    private double lastRotate;
+    private double lastScaleFactor;
+
     public MainBot(HardwareMap hardwareMap, Telemetry telemetry) {
         leftFrontMotor = hardwareMap.get(DcMotorEx.class, "leftFront");
         rightFrontMotor = hardwareMap.get(DcMotorEx.class, "rightFront");
@@ -51,6 +56,13 @@ public class MainBot {
         this.hardwareMap = hardwareMap;
 
         aprilTags = new AprilTags(hardwareMap);
+    }
+
+    public void queueMoveBotMecanum(double drive, double rotate, double strafe, double scaleFactor) {
+        lastDrive = drive;
+        lastRotate = rotate;
+        lastStrafe = strafe;
+        lastScaleFactor = scaleFactor;
     }
 
     public void moveBotMecanum(double drive, double rotate, double strafe, double scaleFactor) {

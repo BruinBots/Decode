@@ -19,6 +19,7 @@ import java.util.ArrayList;
 public class MainTeleOp extends OpMode {
     public MainBot bot;
     public ArrayList<Action> actions;
+    public ArrayList<Action> driveActions;
 
     public static double DRIVE_FACTOR = 0.6;
 
@@ -26,6 +27,8 @@ public class MainTeleOp extends OpMode {
     public ObeliskReader obeliskReader;
 
     public FtcDashboard dash;
+
+    private boolean didAddAimBotAction = false;
 
     @Override
     public void init() {
@@ -38,6 +41,7 @@ public class MainTeleOp extends OpMode {
         dash = FtcDashboard.getInstance();
 
         actions = new ArrayList<>();
+        driveActions = new ArrayList<>();
     }
 
     @Override
@@ -69,8 +73,11 @@ public class MainTeleOp extends OpMode {
             bot.launcher.doStop();
         }
 
-        if (gamepad1.right_bumper && gamepad1.dpad_right) {
-            actions.add(aimBot.getAction());
+        if (gamepad1.right_bumper && gamepad1.dpad_right && !didAddAimBotAction) {
+            driveActions.add(aimBot.getAction());
+            didAddAimBotAction = true;
+        } else {
+            didAddAimBotAction = false;
         }
 
 //        if (gamepad1.left_bumper) {
@@ -123,6 +130,15 @@ public class MainTeleOp extends OpMode {
         }
         actions = newActions;
 
+        ArrayList<Action> newDriveActions = new ArrayList<>();
+        for (Action action : driveActions) {
+            action.preview(packet.fieldOverlay());
+            if (action.run(packet)) {
+                newDriveActions.add(action);
+            }
+        }
+        driveActions = newDriveActions;
+
 //        telemetry.addData("left_stick_y", gamepad1.left_stick_y);
 //        telemetry.addData("right_stick_x", gamepad1.right_stick_x);
 //        telemetry.addData("left_stick_x", gamepad1.left_stick_x);
@@ -130,6 +146,14 @@ public class MainTeleOp extends OpMode {
         telemetry.update();
 
         // NOTE: Left stick y is negative when pushed forward (up)
-        bot.moveBotMecanum(-gamepad1.left_stick_y, gamepad1.right_stick_x, gamepad1.left_stick_x, DRIVE_FACTOR);
+        double drive = -gamepad1.left_stick_y;
+        double rotate = gamepad1.right_stick_x;
+        double strafe = gamepad1.left_stick_x;
+        if (drive != 0 || strafe != 0 || rotate != 0) {
+            driveActions.clear();
+        }
+        if (driveActions.isEmpty()) {
+            bot.moveBotMecanum(-gamepad1.left_stick_y, gamepad1.right_stick_x, gamepad1.left_stick_x, DRIVE_FACTOR);
+        }
     }
 }

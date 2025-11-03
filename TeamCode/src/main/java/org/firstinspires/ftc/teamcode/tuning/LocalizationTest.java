@@ -37,6 +37,8 @@ public class LocalizationTest extends LinearOpMode {
                 telemetry.addData("x", pose.position.x);
                 telemetry.addData("y", pose.position.y);
                 telemetry.addData("heading (deg)", Math.toDegrees(pose.heading.toDouble()));
+                telemetry.addData("raw x", drive.localizer.driver.getEncoderX());
+                telemetry.addData("raw y", drive.localizer.driver.getEncoderY());
                 telemetry.update();
 
                 TelemetryPacket packet = new TelemetryPacket();

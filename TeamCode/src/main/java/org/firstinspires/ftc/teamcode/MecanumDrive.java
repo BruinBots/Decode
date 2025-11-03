@@ -53,6 +53,9 @@ import java.util.List;
 
 @Config
 public final class MecanumDrive {
+
+    //                                     ticksPerRev / mmPerRev = ticksPerMm
+    public static double ENCODER_TICKS_PER_MM = 2000.0 / (30.0 * Math.PI);
     public static class Params {
         // IMU orientation
         // TODO: fill in these values based on
@@ -138,7 +141,8 @@ public final class MecanumDrive {
             imu = lazyImu.get();
 
             // TODO: reverse encoders if needed
-            //   leftFront.setDirection(DcMotorSimple.Direction.REVERSE);
+//               leftFront.setDirection(DcMotorSimple.Direction.REVERSE);
+//               leftBack.setDirection(DcMotorSimple.Direction.REVERSE);
 
             this.pose = pose;
         }
@@ -236,7 +240,8 @@ public final class MecanumDrive {
         rightFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         // TODO: reverse motor directions if needed
-        //   leftFront.setDirection(DcMotorSimple.Direction.REVERSE);
+           leftFront.setDirection(DcMotorSimple.Direction.REVERSE);
+           leftBack.setDirection(DcMotorSimple.Direction.REVERSE);
 
         // TODO: make sure your config has an IMU with this name (can be BNO or BHI)
         //   see https://ftc-docs.firstinspires.org/en/latest/hardware_and_software_configuration/configuring/index.html
@@ -245,7 +250,7 @@ public final class MecanumDrive {
 
         voltageSensor = hardwareMap.voltageSensor.iterator().next();
 
-        localizer = new PinpointLocalizer(hardwareMap, PARAMS.inPerTick, pose);
+        localizer = new PinpointLocalizer(hardwareMap, ENCODER_TICKS_PER_MM, pose);
 
         FlightRecorder.write("MECANUM_PARAMS", PARAMS);
     }

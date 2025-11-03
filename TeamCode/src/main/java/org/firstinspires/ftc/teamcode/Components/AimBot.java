@@ -25,13 +25,13 @@ public class AimBot {
     public static double TIME_BUFFER = 500; // max time in ms from last found april tag to reading there's no april tag
 
     // Launcher power constants
-    public static double MIN_DISTANCE = 37.0;
+    public static double MIN_DISTANCE = 30.0;
 
-    public static double CLOSE_POWER = 0.65;
-    public static double CLOSE_DISTANCE = 51.0;
+    public static double CLOSE_POWER = 0.70;
+    public static double CLOSE_DISTANCE = 63.0;
 
     public static double FAR_POWER = 0.80;
-    public static double FAR_DISTANCE = 82.0;
+    public static double FAR_DISTANCE = 90.0;
 
     // Turn bot P controller constants
     public static double TURN_kP = 0.005;
