@@ -3,11 +3,9 @@ package org.firstinspires.ftc.teamcode.Autonomous;
 import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.Pose2d;
-import com.acmerobotics.roadrunner.Pose2dDual;
 import com.acmerobotics.roadrunner.SequentialAction;
 import com.acmerobotics.roadrunner.TrajectoryActionBuilder;
 import com.acmerobotics.roadrunner.Vector2d;
-import com.sun.tools.javac.Main;
 
 import org.firstinspires.ftc.teamcode.Components.AimBot;
 import org.firstinspires.ftc.teamcode.Components.Intake;
@@ -47,7 +45,7 @@ public class BaseAuto {
 
     public TrajectoryEnd launch(Pose2d startPose, boolean isFirstLaunch) {
         TrajectoryActionBuilder builder = drive.actionBuilder(startPose)
-                .afterTime(0, bot.launcher.getSpinUpAction(Launcher.LAUNCH_POWER, Launcher.MIN_LAUNCH_SPEED));
+                .afterTime(0, bot.launcher.getSpinUpAction(Launcher.LAUNCH_POWER, Launcher.LAUNCH_SPEED));
         if (isFirstLaunch) {
                 builder = builder
                         .splineTo(new Vector2d(-42, -36), Math.toRadians(225));
@@ -60,7 +58,7 @@ public class BaseAuto {
                         builder.build(),
                         new ParallelAction(
                                 aimBot.getAction(),
-                                bot.launcher.getSpinUpAction(Launcher.LAUNCH_POWER, Launcher.MIN_LAUNCH_SPEED)
+                                bot.launcher.getSpinUpAction(Launcher.LAUNCH_POWER, Launcher.LAUNCH_SPEED)
                         ),
                         bot.launcher.getServoAction(Launcher.SERVO_UP_POS),
                         new WaitAction(1000),
@@ -88,7 +86,7 @@ public class BaseAuto {
     // TODO: Replace Action with TrajectoryEnd
     public TrajectoryEnd GPPIntake(TrajectoryActionBuilder builder) {
         builder = builder
-                .afterDisp(1, bot.intake.getServoAction(Intake.INTAKE_IN_POS))
+                .afterDisp(1, bot.intake.getSpinUpAction(Intake.INTAKE_POWER, Intake.INTAKE_SPEED))
                 .splineTo(new Vector2d(36, -36), Math.toRadians(270))
                 .lineToY(-48)
                 .setReversed(true)
@@ -103,7 +101,7 @@ public class BaseAuto {
 
     public TrajectoryEnd PGPIntake(TrajectoryActionBuilder builder) {
         builder = builder
-                .afterDisp(1, bot.intake.getServoAction(Intake.INTAKE_IN_POS))
+                .afterDisp(1, bot.intake.getSpinUpAction(Intake.INTAKE_POWER, Intake.INTAKE_SPEED))
                 .splineTo(new Vector2d(-12, -36), Math.toRadians(270))
                 .lineToY(-48)
                 .setReversed(true)
@@ -117,7 +115,7 @@ public class BaseAuto {
 
     public TrajectoryEnd PPGIntake(TrajectoryActionBuilder builder) {
         builder = builder
-                .afterDisp(1, bot.intake.getServoAction(Intake.INTAKE_IN_POS))
+                .afterDisp(1, bot.intake.getSpinUpAction(Intake.INTAKE_POWER, Intake.INTAKE_SPEED))
                 .splineTo(new Vector2d(12, -36), Math.toRadians(270))
                 .lineToY(-48)
                 .setReversed(true)

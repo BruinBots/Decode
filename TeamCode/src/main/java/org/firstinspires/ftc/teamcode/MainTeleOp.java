@@ -29,6 +29,7 @@ public class MainTeleOp extends OpMode {
     public FtcDashboard dash;
 
     private boolean didAddAimBotAction = false;
+    private boolean isLaunching = false;
 
     @Override
     public void init() {
@@ -54,23 +55,30 @@ public class MainTeleOp extends OpMode {
         }
 
         if (gamepad1.dpad_up) {
-            bot.intake.kickUp();
+            bot.intake.setServo(Intake.SERVO_UP_POS);
         } else if (gamepad1.dpad_down) {
-            bot.intake.kickDown();
+            bot.intake.setServo(Intake.SERVO_DOWN_POS);
         }
 
-        if (gamepad1.a) {
-            bot.intake.spinUp();
-        } else if (gamepad1.b) {
-            bot.intake.reverse();
-        } else {
-            bot.intake.stop();
+        if (!isLaunching) {
+            if (gamepad1.a) {
+                bot.intake.spinUp(Intake.INTAKE_POWER);
+                bot.launcher.spinUp(-Launcher.REVERSE_POWER);
+            } else if (gamepad1.b) {
+                bot.intake.spinUp(-Intake.REVERSE_POWER);
+                bot.launcher.spinUp(Launcher.REVERSE_POWER);
+            } else {
+                bot.intake.doStop();
+                bot.launcher.doStop();
+            }
         }
 
         if (gamepad1.x) {
             bot.launcher.spinUp(Launcher.LAUNCH_POWER);
+            isLaunching = true;
         } else if (gamepad1.y) {
             bot.launcher.doStop();
+            isLaunching = false;
         }
 
         if (gamepad1.right_bumper && gamepad1.dpad_right && !didAddAimBotAction) {
@@ -114,6 +122,7 @@ public class MainTeleOp extends OpMode {
         bot.intake.doTelemetry();
 
         bot.launcher.cookedMotor.loop();
+        bot.intake.cookedMotor.loop();
 
         aimBot.readAprilTag();
         aimBot.doTelemetry();

@@ -146,7 +146,7 @@ public class AimBot {
             MainBot.shared.telemetry.addData("Turn Power", turnPower);
             MainBot.shared.moveBotMecanum(0, turnPower, 0, 1);
 
-            return !foundGoal || Math.abs(angleError) >= 2.0;
+            return foundGoal && Math.abs(angleError) >= 2.0;
         }
     }
 
