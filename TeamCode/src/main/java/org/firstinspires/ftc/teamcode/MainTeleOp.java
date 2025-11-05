@@ -55,20 +55,20 @@ public class MainTeleOp extends OpMode {
         }
 
         if (gamepad1.dpad_up) {
-            bot.intake.setServo(Intake.SERVO_UP_POS);
+            bot.intake.kickUp();
         } else if (gamepad1.dpad_down) {
-            bot.intake.setServo(Intake.SERVO_DOWN_POS);
+            bot.intake.kickDown();
         }
 
         if (!isLaunching) {
             if (gamepad1.a) {
-                bot.intake.spinUp(Intake.INTAKE_POWER);
+                bot.intake.spinUp();
                 bot.launcher.spinUp(-Launcher.REVERSE_POWER);
             } else if (gamepad1.b) {
-                bot.intake.spinUp(-Intake.REVERSE_POWER);
+                bot.intake.reverse();
                 bot.launcher.spinUp(Launcher.REVERSE_POWER);
             } else {
-                bot.intake.doStop();
+                bot.intake.stop();
                 bot.launcher.doStop();
             }
         }
@@ -122,7 +122,7 @@ public class MainTeleOp extends OpMode {
         bot.intake.doTelemetry();
 
         bot.launcher.cookedMotor.loop();
-        bot.intake.cookedMotor.loop();
+//        bot.intake.cookedMotor.loop();
 
         aimBot.readAprilTag();
         aimBot.doTelemetry();
@@ -147,10 +147,6 @@ public class MainTeleOp extends OpMode {
             }
         }
         driveActions = newDriveActions;
-
-//        telemetry.addData("left_stick_y", gamepad1.left_stick_y);
-//        telemetry.addData("right_stick_x", gamepad1.right_stick_x);
-//        telemetry.addData("left_stick_x", gamepad1.left_stick_x);
 
         telemetry.update();
 

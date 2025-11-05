@@ -83,10 +83,9 @@ public class BaseAuto {
     }
 
     // Intake paths
-    // TODO: Replace Action with TrajectoryEnd
     public TrajectoryEnd GPPIntake(TrajectoryActionBuilder builder) {
         builder = builder
-                .afterDisp(1, bot.intake.getSpinUpAction(Intake.INTAKE_POWER, Intake.INTAKE_SPEED))
+                .afterDisp(1, bot.intake.getServoAction(Intake.INTAKE_IN_POS))
                 .splineTo(new Vector2d(36, -36), Math.toRadians(270))
                 .lineToY(-48)
                 .setReversed(true)
@@ -101,7 +100,7 @@ public class BaseAuto {
 
     public TrajectoryEnd PGPIntake(TrajectoryActionBuilder builder) {
         builder = builder
-                .afterDisp(1, bot.intake.getSpinUpAction(Intake.INTAKE_POWER, Intake.INTAKE_SPEED))
+                .afterDisp(1, bot.intake.getServoAction(Intake.INTAKE_IN_POS))
                 .splineTo(new Vector2d(-12, -36), Math.toRadians(270))
                 .lineToY(-48)
                 .setReversed(true)
@@ -115,7 +114,7 @@ public class BaseAuto {
 
     public TrajectoryEnd PPGIntake(TrajectoryActionBuilder builder) {
         builder = builder
-                .afterDisp(1, bot.intake.getSpinUpAction(Intake.INTAKE_POWER, Intake.INTAKE_SPEED))
+                .afterDisp(1, bot.intake.getServoAction(Intake.INTAKE_IN_POS))
                 .splineTo(new Vector2d(12, -36), Math.toRadians(270))
                 .lineToY(-48)
                 .setReversed(true)
