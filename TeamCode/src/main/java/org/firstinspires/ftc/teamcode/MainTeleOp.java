@@ -60,21 +60,29 @@ public class MainTeleOp extends OpMode {
             bot.intake.kickDown();
         }
 
-        if (!isLaunching) {
-            if (gamepad1.a) {
-                bot.intake.spinUp();
+        if (gamepad1.a) {
+            bot.intake.spinUp();
+            if (!isLaunching) {
                 bot.launcher.spinUp(-Launcher.REVERSE_POWER);
-            } else if (gamepad1.b) {
-                bot.intake.reverse();
+            }
+        } else if (gamepad1.b) {
+            bot.intake.reverse();
+            if (!isLaunching) {
                 bot.launcher.spinUp(Launcher.REVERSE_POWER);
-            } else {
-                bot.intake.stop();
+            }
+        } else {
+            bot.intake.stop();
+            if (!isLaunching) {
                 bot.launcher.doStop();
             }
         }
 
         if (gamepad1.x) {
-            bot.launcher.spinUp(Launcher.LAUNCH_POWER);
+            double power = Launcher.LAUNCH_POWER;
+            if (aimBot.foundGoal) {
+                power = aimBot.getLaunchPower();
+            }
+            bot.launcher.spinUp(power);
             isLaunching = true;
         } else if (gamepad1.y) {
             bot.launcher.doStop();

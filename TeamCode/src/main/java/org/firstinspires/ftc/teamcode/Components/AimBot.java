@@ -31,12 +31,14 @@ public class AimBot {
     public static double CLOSE_DISTANCE = 63.0;
 
     public static double FAR_POWER = 0.80;
-    public static double FAR_DISTANCE = 90.0;
+    public static double FAR_DISTANCE = 80.0;
+
+    public static double MAX_DISTANCE = 95.0;
 
     // Turn bot P controller constants
-    public static double TURN_kP = 0.005;
+    public static double TURN_kP = 0.01;
     public static double TURN_MIN_POWER = 0.15;
-    public static double TURN_MAX_POWER = 0.35;
+    public static double TURN_MAX_POWER = 0.45;
 
     // More turning constants
     public static double ADJUST_kP = 0.04;
@@ -70,7 +72,7 @@ public class AimBot {
     }
 
     public double getLaunchPower() {
-        if (distance < MIN_DISTANCE || distance > FAR_DISTANCE) {
+        if (distance < MIN_DISTANCE || distance > MAX_DISTANCE) {
             return 0.0;
         } else if (distance < CLOSE_DISTANCE) {
             return CLOSE_POWER;
@@ -87,10 +89,11 @@ public class AimBot {
         if (Math.abs(angleError) < 5.0) {
             return 0.0;
         }
-        double power = -TURN_kP * angleError;
-        if (Math.abs(power) < TURN_MIN_POWER) {
-            return Math.copySign(TURN_MIN_POWER, power);
-        } else if (Math.abs(power) > TURN_MAX_POWER) {
+        double power = TURN_MIN_POWER + -TURN_kP * angleError;
+//        if (Math.abs(power) < TURN_MIN_POWER) {
+//            return Math.copySign(TURN_MIN_POWER, power);
+//        } else
+        if (Math.abs(power) > TURN_MAX_POWER) {
             return Math.copySign(TURN_MAX_POWER, power);
         } else {
             return power;
@@ -146,7 +149,7 @@ public class AimBot {
             MainBot.shared.telemetry.addData("Turn Power", turnPower);
             MainBot.shared.moveBotMecanum(0, turnPower, 0, 1);
 
-            return foundGoal && Math.abs(angleError) >= 2.0;
+            return foundGoal && Math.abs(angleError) >= 1.5;
         }
     }
 
