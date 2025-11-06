@@ -29,6 +29,7 @@ public class MainTeleOp extends OpMode {
     public FtcDashboard dash;
 
     private boolean didAddAimBotAction = false;
+    private boolean didAddSingleLaunchAction = false;
     private boolean isLaunching = false;
 
     @Override
@@ -94,6 +95,13 @@ public class MainTeleOp extends OpMode {
             didAddAimBotAction = true;
         } else {
             didAddAimBotAction = false;
+        }
+
+        if (gamepad1.right_trigger > 0.8 && !didAddSingleLaunchAction) {
+            actions.add(bot.singleLaunchAction());
+            didAddSingleLaunchAction = true;
+        } else {
+            didAddSingleLaunchAction = false;
         }
 
 //        if (gamepad1.left_bumper) {

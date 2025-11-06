@@ -28,6 +28,8 @@ public class Intake {
     public static double SERVO_DOWN_POS = 0.6;
     public static double SERVO_UP_POS = 0.4;
 
+    public static int REVERSE_WAIT_MS = 500;
+
     private Servo servo;
     private Servo kickServo;
 

@@ -2,6 +2,8 @@ package org.firstinspires.ftc.teamcode;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
+import com.acmerobotics.roadrunner.Action;
+import com.acmerobotics.roadrunner.SequentialAction;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -10,6 +12,7 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.Components.AprilTags;
 import org.firstinspires.ftc.teamcode.Components.Intake;
 import org.firstinspires.ftc.teamcode.Components.Launcher;
+import org.firstinspires.ftc.teamcode.Components.WaitAction;
 
 public class MainBot {
     public DcMotorEx leftFrontMotor;
@@ -70,5 +73,16 @@ public class MainBot {
         rightFrontMotor.setPower(wheelSpeeds[1] * scaleFactor);
         leftBackMotor.setPower(wheelSpeeds[2] * scaleFactor);
         rightBackMotor.setPower(wheelSpeeds[3] * scaleFactor);
+    }
+
+    public Action singleLaunchAction() {
+        return new SequentialAction(
+                launcher.getSpinUpAction(Launcher.LAUNCH_POWER, Launcher.LAUNCH_SPEED),
+                launcher.kickAction(),
+                new WaitAction(Launcher.POST_LAUNCH_WAIT_MS),
+                intake.getServoAction(Intake.INTAKE_REVERSE_POS),
+                new WaitAction(Intake.REVERSE_WAIT_MS),
+                intake.getServoAction(Intake.INTAKE_STOP_POS)
+        );
     }
 }
