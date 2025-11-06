@@ -19,6 +19,7 @@ import java.util.ArrayList;
 public class MainTeleOp extends OpMode {
     public MainBot bot;
     public ArrayList<Action> actions;
+    public ArrayList<Action> launchActions;
     public ArrayList<Action> driveActions;
 
     public static double DRIVE_FACTOR = 0.6;
@@ -43,15 +44,17 @@ public class MainTeleOp extends OpMode {
         dash = FtcDashboard.getInstance();
 
         actions = new ArrayList<>();
+        launchActions = new ArrayList<>();
         driveActions = new ArrayList<>();
     }
 
     @Override
     public void loop() {
         if (gamepad1.left_bumper) {
+            launchActions.clear();
             bot.launcher.setServo(Launcher.SERVO_UP_POS);
         }
-        else {
+        else if (launchActions.isEmpty()) {
             bot.launcher.setServo(Launcher.SERVO_DOWN_POS);
         }
 
@@ -62,23 +65,28 @@ public class MainTeleOp extends OpMode {
         }
 
         if (gamepad1.a) {
+            launchActions.clear();
             bot.intake.spinUp();
             if (!isLaunching) {
                 bot.launcher.spinUp(-Launcher.REVERSE_POWER);
             }
         } else if (gamepad1.b) {
+            launchActions.clear();
             bot.intake.reverse();
             if (!isLaunching) {
                 bot.launcher.spinUp(Launcher.REVERSE_POWER);
             }
         } else {
-            bot.intake.stop();
-            if (!isLaunching) {
-                bot.launcher.doStop();
+            if (launchActions.isEmpty()) {
+                bot.intake.stop();
+                if (!isLaunching) {
+                    bot.launcher.doStop();
+                }
             }
         }
 
         if (gamepad1.x) {
+            launchActions.clear();
             double power = Launcher.LAUNCH_POWER;
             if (aimBot.foundGoal) {
                 power = aimBot.getLaunchPower();
@@ -86,6 +94,7 @@ public class MainTeleOp extends OpMode {
             bot.launcher.spinUp(power);
             isLaunching = true;
         } else if (gamepad1.y) {
+            launchActions.clear();
             bot.launcher.doStop();
             isLaunching = false;
         }
@@ -98,7 +107,7 @@ public class MainTeleOp extends OpMode {
         }
 
         if (gamepad1.right_trigger > 0.8 && !didAddSingleLaunchAction) {
-            actions.add(bot.singleLaunchAction());
+            launchActions.add(bot.singleLaunchAction());
             didAddSingleLaunchAction = true;
         } else {
             didAddSingleLaunchAction = false;
@@ -145,24 +154,28 @@ public class MainTeleOp extends OpMode {
 
         telemetry.addData("Obelisk", obeliskReader.read().toString());
 
-        TelemetryPacket packet = new TelemetryPacket();
-        ArrayList<Action> newActions = new ArrayList<>();
-        for (Action action : actions) {
-            action.preview(packet.fieldOverlay());
-            if (action.run(packet)) {
-                newActions.add(action);
-            }
-        }
-        actions = newActions;
+        actions = actionLoop(actions);
+        launchActions = actionLoop(launchActions);
+        driveActions = actionLoop(driveActions);
 
-        ArrayList<Action> newDriveActions = new ArrayList<>();
-        for (Action action : driveActions) {
-            action.preview(packet.fieldOverlay());
-            if (action.run(packet)) {
-                newDriveActions.add(action);
-            }
-        }
-        driveActions = newDriveActions;
+//        TelemetryPacket packet = new TelemetryPacket();
+//        ArrayList<Action> newActions = new ArrayList<>();
+//        for (Action action : actions) {
+//            action.preview(packet.fieldOverlay());
+//            if (action.run(packet)) {
+//                newActions.add(action);
+//            }
+//        }
+//        actions = newActions;
+//
+//        ArrayList<Action> newDriveActions = new ArrayList<>();
+//        for (Action action : driveActions) {
+//            action.preview(packet.fieldOverlay());
+//            if (action.run(packet)) {
+//                newDriveActions.add(action);
+//            }
+//        }
+//        driveActions = newDriveActions;
 
         telemetry.update();
 
@@ -176,5 +189,17 @@ public class MainTeleOp extends OpMode {
         if (driveActions.isEmpty()) {
             bot.moveBotMecanum(-gamepad1.left_stick_y, gamepad1.right_stick_x, gamepad1.left_stick_x, DRIVE_FACTOR);
         }
+    }
+
+    public ArrayList<Action> actionLoop(ArrayList<Action> actionList) {
+        ArrayList<Action> newActions = new ArrayList<>();
+        TelemetryPacket packet = new TelemetryPacket();
+        for (Action action : actionList) {
+            action.preview(packet.fieldOverlay());
+            if (action.run(packet)) {
+                newActions.add(action);
+            }
+        }
+        return newActions;
     }
 }

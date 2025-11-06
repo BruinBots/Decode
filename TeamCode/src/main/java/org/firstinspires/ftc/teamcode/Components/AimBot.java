@@ -89,7 +89,7 @@ public class AimBot {
         if (Math.abs(angleError) < 5.0) {
             return 0.0;
         }
-        double power = TURN_MIN_POWER + -TURN_kP * angleError;
+        double power = Math.copySign(TURN_MIN_POWER, -angleError) + -TURN_kP * angleError;
 //        if (Math.abs(power) < TURN_MIN_POWER) {
 //            return Math.copySign(TURN_MIN_POWER, power);
 //        } else
@@ -149,7 +149,7 @@ public class AimBot {
             MainBot.shared.telemetry.addData("Turn Power", turnPower);
             MainBot.shared.moveBotMecanum(0, turnPower, 0, 1);
 
-            return foundGoal && Math.abs(angleError) >= 1.5;
+            return foundGoal && turnPower != 0;
         }
     }
 

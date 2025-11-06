@@ -82,6 +82,8 @@ public class MainBot {
                 new WaitAction(Launcher.POST_LAUNCH_WAIT_MS),
                 intake.getServoAction(Intake.INTAKE_REVERSE_POS),
                 new WaitAction(Intake.REVERSE_WAIT_MS),
+                intake.getServoAction(Intake.INTAKE_IN_POS),
+                new WaitAction(Intake.IN_WAIT_MS),
                 intake.getServoAction(Intake.INTAKE_STOP_POS)
         );
     }

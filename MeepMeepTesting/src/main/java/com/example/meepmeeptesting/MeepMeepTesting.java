@@ -84,6 +84,7 @@ public class MeepMeepTesting {
 //                        bot.getSingleLaunchAction(),
 //                        bot.getSingleLaunchAction()
 //                ))
+                .waitSeconds(5)
                 .strafeToLinearHeading(new Vector2d(-36, -16), Math.toRadians(175))
 //                .stopAndAdd(obeliskReader.readObeliskAction())
                 .setTangent(0)
@@ -99,6 +100,7 @@ public class MeepMeepTesting {
 //                        bot.getSingleLaunchAction(),
 //                        bot.getSingleLaunchAction()
 //                ))
+                .waitSeconds(5)
                 .build());
 
 //        meepMeep.setBackground(MeepMeep.Background.FIELD_POWERPLAY_OFFICIAL)
