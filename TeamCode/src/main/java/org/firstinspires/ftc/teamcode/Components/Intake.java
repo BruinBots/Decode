@@ -23,13 +23,13 @@ public class Intake {
 
     public static double INTAKE_STOP_POS = 0.5;
     public static double INTAKE_IN_POS = 1;
-    public static double INTAKE_REVERSE_POS = 0.4;
+    public static double INTAKE_REVERSE_POS = 0.3;
 
     public static double SERVO_DOWN_POS = 0.6;
     public static double SERVO_UP_POS = 0.4;
 
-    public static int REVERSE_WAIT_MS = 500;
-    public static int IN_WAIT_MS = 10;
+    public static int REVERSE_WAIT_MS = 300;
+    public static int IN_WAIT_MS = 300;
 
     private Servo servo;
     private Servo kickServo;

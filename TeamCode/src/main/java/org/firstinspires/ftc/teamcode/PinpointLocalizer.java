@@ -21,7 +21,7 @@ import java.util.Objects;
 public final class PinpointLocalizer implements Localizer {
     public static class Params {
         public double parXInches = -2.75;
-        public double perpYInches = 5.75;
+        public double perpYInches = -5.75;
     }
 
     public static Params PARAMS = new Params();

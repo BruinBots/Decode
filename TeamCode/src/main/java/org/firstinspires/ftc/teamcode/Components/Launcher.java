@@ -21,10 +21,17 @@ public class Launcher extends VelMotor {
     public static int SERVO_WAIT_MS = 1250;
     public static int POST_LAUNCH_WAIT_MS = 500;
 
+
+    public static double VPID_kP = 0.000035;
     public Launcher(HardwareMap hardwareMap) {
         super(hardwareMap, "launchMotor", "kickServo", 28);
 //        motor.setDirection(DcMotorSimple.Direction.REVERSE);
 
+    }
+
+    @Override
+    public double getVelKp() {
+        return VPID_kP;
     }
 
     public Action kickAction() {

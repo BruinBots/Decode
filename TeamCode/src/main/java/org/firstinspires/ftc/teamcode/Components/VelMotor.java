@@ -1,7 +1,5 @@
 package org.firstinspires.ftc.teamcode.Components;
 
-import android.annotation.SuppressLint;
-
 import androidx.annotation.NonNull;
 
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
@@ -12,7 +10,6 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.CookedMotor;
 import org.firstinspires.ftc.teamcode.MainBot;
 import org.firstinspires.ftc.teamcode.Utils.ServoAction;
@@ -40,6 +37,8 @@ public class VelMotor {
         this.servoName = servoName;
         this.ticksPerRev = ticksPerRev;
     }
+
+    public double getVelKp() { return 0.0; }
 
     public void spinUp(double power) {
         // Set motor target velocity to the desired speed
@@ -91,7 +90,15 @@ public class VelMotor {
         @Override
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
             if (firstLoop) {
-                motor.spinUp(power);
+                // Velocity P-controller
+                double curVel = motor.getCurrentVelocity();
+                double velError = speed - curVel;
+                double adjustedPower = power + (motor.getVelKp() * velError);
+                if (adjustedPower > 1.0) {
+                    motor.spinUp(1);
+                } else {
+                    motor.spinUp(adjustedPower);
+                }
                 firstLoop = false;
                 return true;
             }
