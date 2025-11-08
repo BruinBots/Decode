@@ -36,12 +36,13 @@ public class AimBot {
     public static double MAX_DISTANCE = 95.0;
 
     // Turn bot P controller constants
-    public static double TURN_kP = 0.01;
-    public static double TURN_MIN_POWER = 0.15;
-    public static double TURN_MAX_POWER = 0.45;
+//    public static double TURN_kP = 0.01;
+//    public static double TURN_MIN_POWER = 0.15;
+//    public static double TURN_MAX_POWER = 0.45;
+    public static double TURN_POWER = 0.2;
 
     // More turning constants
-    public static double ADJUST_kP = 0.04;
+    public static double ADJUST_kP = 0.03;
 
     public AimBot() {
         aprilTags = MainBot.shared.aprilTags;
@@ -89,15 +90,15 @@ public class AimBot {
         if (Math.abs(angleError) < 5.0) {
             return 0.0;
         }
-        double power = Math.copySign(TURN_MIN_POWER, -angleError) + -TURN_kP * angleError;
+        return Math.copySign(TURN_POWER, -angleError);
 //        if (Math.abs(power) < TURN_MIN_POWER) {
 //            return Math.copySign(TURN_MIN_POWER, power);
 //        } else
-        if (Math.abs(power) > TURN_MAX_POWER) {
-            return Math.copySign(TURN_MAX_POWER, power);
-        } else {
-            return power;
-        }
+//        if (Math.abs(power) > TURN_MAX_POWER) {
+//            return Math.copySign(TURN_MAX_POWER, power);
+//        } else {
+//            return power;
+//        }
     }
 
     public void doTelemetry() {
