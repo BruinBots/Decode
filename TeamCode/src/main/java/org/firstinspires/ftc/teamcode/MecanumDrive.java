@@ -475,6 +475,16 @@ public final class MecanumDrive {
     }
 
     public TrajectoryActionBuilder actionBuilder(Pose2d beginPose) {
+        return actionBuilder(beginPose, new PoseMap() {
+            @NonNull
+            @Override
+            public Pose2dDual<Arclength> map(@NonNull Pose2dDual<Arclength> pose2dDual) {
+                return pose2dDual;
+            }
+        });
+    }
+
+    public TrajectoryActionBuilder actionBuilder(Pose2d beginPose, PoseMap poseMap) {
         return new TrajectoryActionBuilder(
                 TurnAction::new,
                 FollowTrajectoryAction::new,
@@ -486,7 +496,8 @@ public final class MecanumDrive {
                 ),
                 beginPose, 0.0,
                 defaultTurnConstraints,
-                defaultVelConstraint, defaultAccelConstraint
+                defaultVelConstraint, defaultAccelConstraint,
+                poseMap
         );
     }
 }

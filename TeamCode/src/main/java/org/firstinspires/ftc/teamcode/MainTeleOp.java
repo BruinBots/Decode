@@ -32,6 +32,7 @@ public class MainTeleOp extends OpMode {
     private boolean didAddAimBotAction = false;
     private boolean didAddSingleLaunchAction = false;
     private boolean isLaunching = false;
+    private boolean isTestingLaunchPID = false;
 
     @Override
     public void init() {
@@ -58,27 +59,27 @@ public class MainTeleOp extends OpMode {
             bot.launcher.setServo(Launcher.SERVO_DOWN_POS);
         }
 
-        if (gamepad1.dpad_up) {
-            bot.intake.kickUp();
-        } else if (gamepad1.dpad_down) {
-            bot.intake.kickDown();
-        }
+//        if (gamepad1.dpad_up) {
+//            bot.intake.kickUp();
+//        } else if (gamepad1.dpad_down) {
+//            bot.intake.kickDown();
+//        }
 
         if (gamepad1.a) {
             launchActions.clear();
-            bot.intake.spinUp();
+            bot.intake.setPower(Intake.INTAKE_POWER);
             if (!isLaunching) {
                 bot.launcher.spinUp(-Launcher.REVERSE_POWER);
             }
         } else if (gamepad1.b) {
             launchActions.clear();
-            bot.intake.reverse();
+            bot.intake.setPower(-Intake.REVERSE_POWER);
             if (!isLaunching) {
                 bot.launcher.spinUp(Launcher.REVERSE_POWER);
             }
         } else {
             if (launchActions.isEmpty()) {
-                bot.intake.stop();
+                bot.intake.doStop();
                 if (!isLaunching) {
                     bot.launcher.doStop();
                 }
@@ -111,6 +112,13 @@ public class MainTeleOp extends OpMode {
             didAddSingleLaunchAction = true;
         } else {
             didAddSingleLaunchAction = false;
+        }
+
+        if (gamepad1.dpad_up && !isTestingLaunchPID) {
+            launchActions.add(bot.launcher.getSpinUpAction(Launcher.LAUNCH_SPEED, false));
+            isTestingLaunchPID = true;
+        } else {
+            isTestingLaunchPID = false;
         }
 
 //        if (gamepad1.left_bumper) {
@@ -146,13 +154,13 @@ public class MainTeleOp extends OpMode {
         bot.launcher.doTelemetry();
         bot.intake.doTelemetry();
 
-        bot.launcher.cookedMotor.loop();
-//        bot.intake.cookedMotor.loop();
+        bot.launcher.cookedMotor.loop(gamepad1);
+        bot.intake.cookedMotor.loop(gamepad1);
 
         aimBot.readAprilTag();
         aimBot.doTelemetry();
 
-        telemetry.addData("Obelisk", obeliskReader.read().toString());
+        bot.telemetry.addData("Obelisk", obeliskReader.read().toString());
 
         actions = actionLoop(actions);
         launchActions = actionLoop(launchActions);
@@ -178,6 +186,7 @@ public class MainTeleOp extends OpMode {
 //        driveActions = newDriveActions;
 
         telemetry.update();
+        bot.telemetry.update();
 
         // NOTE: Left stick y is negative when pushed forward (up)
         double drive = -gamepad1.left_stick_y;

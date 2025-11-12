@@ -7,6 +7,7 @@ import com.acmerobotics.roadrunner.Action;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.PIDCoefficients;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
@@ -23,6 +24,8 @@ public class VelMotor {
     private String servoName;
 
     private double ticksPerRev;
+    private double targetVelocity;
+    private PIDController pidController;
 
     public VelMotor(HardwareMap hardwareMap, String motorName, String servoName, double ticksPerRev) {
         motor = hardwareMap.get(DcMotorEx.class, motorName);
@@ -36,13 +39,31 @@ public class VelMotor {
         this.motorName = motorName;
         this.servoName = servoName;
         this.ticksPerRev = ticksPerRev;
+
+        pidController = new PIDController(0,0,0);
     }
 
     public double getVelKp() { return 0.0; }
 
+    public PIDCoefficients getVelPIDCoefficients() { return new PIDCoefficients(0,0,0); }
+
     public void spinUp(double power) {
         // Set motor target velocity to the desired speed
         motor.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
+        motor.setPower(power);
+    }
+
+    public void setTargetVelocity(double velocity) {
+        targetVelocity = velocity;
+        PIDCoefficients coeffs = getVelPIDCoefficients();
+        pidController.setPID(coeffs);
+
+        motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        motor.setPower(pidController.calculate(getCurrentVelocity(), velocity));
+    }
+
+    public void setPower(double power) {
+        motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         motor.setPower(power);
     }
 
@@ -99,6 +120,9 @@ public class VelMotor {
                 } else {
                     motor.spinUp(adjustedPower);
                 }
+                telemetryPacket.addLine("curVel="+curVel);
+                telemetryPacket.addLine("adjustedPower="+adjustedPower);
+//                motor.setTargetVelocity(speed);
                 firstLoop = false;
                 return true;
             }
@@ -108,6 +132,27 @@ public class VelMotor {
                 return !motor.isStopped();
             }
         }
+    }
+
+    class PowerAction implements Action {
+        private VelMotor motor;
+        private double power;
+
+        public PowerAction(VelMotor motor, double power) {
+            this.motor = motor;
+            this.power = power;
+        }
+
+        @Override
+        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+            motor.motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            motor.motor.setPower(power);
+            return false; // end instantly
+        }
+    }
+
+    public PowerAction getPowerAction(double power) {
+        return new PowerAction(this, power);
     }
 
     public SpinUpAction getSpinUpAction(double power, double speed) {

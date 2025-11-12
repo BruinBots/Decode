@@ -53,6 +53,7 @@ import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.SequentialAction;
+import com.acmerobotics.roadrunner.TranslationalVelConstraint;
 import com.acmerobotics.roadrunner.Vector2d;
 import com.noahbres.meepmeep.MeepMeep;
 import com.noahbres.meepmeep.roadrunner.DefaultBotBuilder;
@@ -76,31 +77,32 @@ public class MeepMeepTesting {
                 .setConstraints(60, 60, Math.toRadians(180), Math.toRadians(180), 15)
                 .build();
 
-        myBot.runAction(myBot.getDrive().actionBuilder(new Pose2d(-60, -12, 0))
-                .strafeToLinearHeading(new Vector2d(-42, -36), Math.toRadians(225))
-//                .stopAndAdd(new SequentialAction(
-//                        aimBot.getAimAction(),
-//                        bot.getSingleLaunchAction(),
-//                        bot.getSingleLaunchAction(),
-//                        bot.getSingleLaunchAction()
-//                ))
-                .waitSeconds(5)
-                .strafeToLinearHeading(new Vector2d(-36, -16), Math.toRadians(175))
-//                .stopAndAdd(obeliskReader.readObeliskAction())
-                .setTangent(0)
-                .splineToSplineHeading(new Pose2d(-12, -36, Math.toRadians(270)), Math.toRadians(270))
-//                .afterDisp(12, bot.intake.getServoAction(Intake.INTAKE_IN_POS))
-                .lineToY(-48)
-                .lineToY(-36)
-//                .afterDisp(2, bot.intake.getServoAction(Intake.INTAKE_STOP_POS))
-                .splineToSplineHeading(new Pose2d(-42, -36, Math.toRadians(225)), Math.toRadians(225))
-//                .stopAndAdd(new SequentialAction(
-//                        aimBot.getAimAction(),
-//                        bot.getSingleLaunchAction(),
-//                        bot.getSingleLaunchAction(),
-//                        bot.getSingleLaunchAction()
-//                ))
-                .waitSeconds(5)
+        myBot.runAction(myBot.getDrive().actionBuilder(new Pose2d(0, 0, 0))
+                .lineToX(24, new TranslationalVelConstraint(10))
+//                .strafeToLinearHeading(new Vector2d(-42, -36), Math.toRadians(225))
+////                .stopAndAdd(new SequentialAction(
+////                        aimBot.getAimAction(),
+////                        bot.getSingleLaunchAction(),
+////                        bot.getSingleLaunchAction(),
+////                        bot.getSingleLaunchAction()
+////                ))
+//                .waitSeconds(5)
+//                .strafeToLinearHeading(new Vector2d(-36, -16), Math.toRadians(175))
+////                .stopAndAdd(obeliskReader.readObeliskAction())
+//                .setTangent(0)
+//                .splineToSplineHeading(new Pose2d(-12, -36, Math.toRadians(270)), Math.toRadians(270))
+////                .afterDisp(12, bot.intake.getServoAction(Intake.INTAKE_IN_POS))
+//                .lineToY(-48)
+//                .lineToY(-36)
+////                .afterDisp(2, bot.intake.getServoAction(Intake.INTAKE_STOP_POS))
+//                .splineToSplineHeading(new Pose2d(-42, -36, Math.toRadians(225)), Math.toRadians(225))
+////                .stopAndAdd(new SequentialAction(
+////                        aimBot.getAimAction(),
+////                        bot.getSingleLaunchAction(),
+////                        bot.getSingleLaunchAction(),
+////                        bot.getSingleLaunchAction()
+////                ))
+//                .waitSeconds(5)
                 .build());
 
 //        meepMeep.setBackground(MeepMeep.Background.FIELD_POWERPLAY_OFFICIAL)

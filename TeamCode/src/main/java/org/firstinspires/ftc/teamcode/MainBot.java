@@ -28,7 +28,7 @@ public class MainBot {
     public static MainBot shared;
 
     public MultipleTelemetry telemetry;
-    FtcDashboard dashboard = FtcDashboard.getInstance();
+    public FtcDashboard dashboard = FtcDashboard.getInstance();
 
     public HardwareMap hardwareMap;
     public AprilTags aprilTags;
@@ -77,24 +77,36 @@ public class MainBot {
     }
 
     public Action singleLaunchAction() {
+//        return new SequentialAction(
+//                // Spin up and launch
+//                launcher.getSpinUpAction(Launcher.LAUNCH_SPEED), // Launcher.LAUNCH_POWER,
+////                launcher.getSpinUpAction(Launcher.LAUNCH_SPEED),
+//                launcher.kickAction(),
+//                new WaitAction(Launcher.POST_LAUNCH_WAIT_MS),
+//
+//                // move next ball down
+//                intake.getPowerAction(Intake.INTAKE_POWER),
+//                // move Jordan up so ball doesn't come down too fast
+////                launcher.getServoAction(Launcher.SERVO_UP_POS),
+////                new WaitAction(Launcher.SERVO_WAIT_MS / 2),
+//                new WaitAction(Intake.IN_WAIT_MS),
+//
+//                // kick ball in
+//                intake.getPowerAction(-Intake.REVERSE_POWER),
+//                new WaitAction(Intake.REVERSE_WAIT_MS),
+////                launcher.getServoAction(Launcher.SERVO_DOWN_POS),
+//                intake.getPowerAction(0)
+//        );
         return new SequentialAction(
-                // Spin up and launch
-                launcher.getSpinUpAction(Launcher.LAUNCH_POWER, Launcher.LAUNCH_SPEED),
+                launcher.getPowerAction(Launcher.LAUNCH_POWER),
+                new WaitAction(Launcher.LAUNCH_WAIT_MS),
                 launcher.kickAction(),
                 new WaitAction(Launcher.POST_LAUNCH_WAIT_MS),
-
-                // move next ball down
-                intake.getServoAction(Intake.INTAKE_IN_POS),
-                // move Jordan up so ball doesn't come down too fast
-//                launcher.getServoAction(Launcher.SERVO_UP_POS),
-//                new WaitAction(Launcher.SERVO_WAIT_MS / 2),
+                intake.getPowerAction(Intake.INTAKE_POWER),
                 new WaitAction(Intake.IN_WAIT_MS),
-
-                // kick ball in
-                intake.getServoAction(Intake.INTAKE_REVERSE_POS),
+                intake.getPowerAction(-Intake.REVERSE_POWER),
                 new WaitAction(Intake.REVERSE_WAIT_MS),
-//                launcher.getServoAction(Launcher.SERVO_DOWN_POS),
-                intake.getServoAction(Intake.INTAKE_STOP_POS)
+                intake.getPowerAction(0)
         );
     }
 }

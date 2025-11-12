@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.Gamepad;
 
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 
@@ -19,9 +20,16 @@ public class CookedMotor {
     }
 
     public void loop() {
+        loop(null);
+    }
+
+    public void loop(Gamepad gamepad) {
         if (isCooked()) {
             motor.setPower(0.0);
             motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            if (!gamepad.isRumbling()) {
+                gamepad.rumble(500);
+            }
         }
     }
 }
