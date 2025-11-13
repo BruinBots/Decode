@@ -50,6 +50,8 @@ public class Launcher { // extends VelMotor {
     private DcMotorEx motor;
     private Servo servo;
 
+    public static double ACCEL_INTERVAL = 500; // ms between accel reads
+
     private double accel;
     private double lastVel;
     private double lastVelTime;
@@ -121,8 +123,19 @@ public class Launcher { // extends VelMotor {
     }
 
     public double getCurrentVelocity() {
-        lastVel = motor.getVelocity() * 60.0 / TICKS_PER_REV;
-        return lastVel;
+        double curVel = motor.getVelocity() * 60.0 / TICKS_PER_REV;
+        double curTime = System.currentTimeMillis();
+
+        if (curTime - lastVelTime > ACCEL_INTERVAL) {
+            double dv = curVel - lastVel;
+            double dt = curTime - lastVelTime;
+            accel = dv / dt;
+
+            lastVel = curVel;
+            lastVelTime = curTime;
+        }
+
+        return curVel;
     }
 
     public double getCurrentAcceleration() {
