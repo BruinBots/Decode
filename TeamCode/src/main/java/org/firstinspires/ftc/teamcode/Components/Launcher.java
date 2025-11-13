@@ -49,31 +49,19 @@ public class Launcher { // extends VelMotor {
 
     private DcMotorEx motor;
     private Servo servo;
-    private PIDController pidController;
 
-    public static PIDCoefficients pidCoefficients = new PIDCoefficients(1, 0, 0); // pidCoefficients
-
-
-//    public static double VPID_kP = 0.000035;
-//    public Launcher(HardwareMap hardwareMap) {
-//        super(hardwareMap, "launchMotor", "kickServo", 28);
-////        motor.setDirection(DcMotorSimple.Direction.REVERSE);
-//
-//    }
-//
-//    @Override
-//    public double getVelKp() {
-//        return VPID_kP;
-//    }
+    private double accel;
+    private double lastVel;
+    private double lastVelTime;
 
     public Launcher(HardwareMap hardwareMap) {
         motor = hardwareMap.get(DcMotorEx.class, "launchMotor");
         servo = hardwareMap.get(Servo.class, "kickServo");
-        pidController = new PIDController(0, 0, 0);
         cookedMotor = new CookedMotor(motor, 6);
 
-        lastAccelTime = System.currentTimeMillis();
+        lastVelTime = System.currentTimeMillis();
         lastVel = 0;
+        accel = 0;
     }
 
     public class AccelerationAction implements Action {
@@ -103,28 +91,24 @@ public class Launcher { // extends VelMotor {
 
     public class SpinUpAction implements Action {
         private Launcher launcher;
-        private double targetVelocity;
-        private boolean exitAtPosition;
+        private double power;
+        private double speed;
 
-        public SpinUpAction(Launcher launcher, double speed, boolean exitAtPosition) {
+        public SpinUpAction(Launcher launcher, double power, double speed) {
             this.launcher = launcher;
-            targetVelocity = speed;
-            this.exitAtPosition = exitAtPosition;
+            this.power = power;
+            this.speed = speed;
         }
 
         @Override
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-            // PID control
-            launcher.pidController.setPID(Launcher.pidCoefficients);
-            double power = launcher.pidController.calculate(launcher.getCurrentVelocity(), targetVelocity);
-
             // Move the motor
             launcher.motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
             launcher.motor.setPower(power);
 
             // Check if within bounds
-            double error = Math.abs(launcher.getCurrentVelocity() - targetVelocity);
-            if (error < 30 && exitAtPosition) {
+            double error = Math.abs(launcher.getCurrentVelocity() - speed);
+            if (error < 30) {
                 launcher.motor.setPower(0);
                 return false; // stop
             }
@@ -132,12 +116,8 @@ public class Launcher { // extends VelMotor {
         }
     }
 
-    public Action getSpinUpAction(double speed) {
-        return getSpinUpAction(speed, true);
-    }
-
-    public Action getSpinUpAction(double speed, boolean exitAtPosition) {
-        return new SpinUpAction(this, speed, exitAtPosition);
+    public Action getSpinUpAction(double power, double speed) {
+        return getSpinUpAction(power, speed);
     }
 
     public double getCurrentVelocity() {
@@ -145,23 +125,8 @@ public class Launcher { // extends VelMotor {
         return lastVel;
     }
 
-    private double lastAccelTime;
-    private double lastVel;
-
     public double getCurrentAcceleration() {
-        double v1 = lastVel;
-        double v2 = getCurrentVelocity();
-        double dv = v2 - v1;
-
-        double t1 = lastAccelTime;
-        double t2 = System.currentTimeMillis();
-        lastAccelTime = t2;
-        double dt = (t2 - t1) / 1000.0; // convert to seconds
-
-        MainBot.shared.telemetry.addData("Launcher dV", dv);
-        MainBot.shared.telemetry.addData("Launcher dT (s)", dt);
-
-        return dv / dt; // acceleration in rpm/s
+        return accel;
     }
 
     public void setServo(double position) {

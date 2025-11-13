@@ -114,13 +114,6 @@ public class MainTeleOp extends OpMode {
             didAddSingleLaunchAction = false;
         }
 
-        if (gamepad1.dpad_up && !isTestingLaunchPID) {
-            launchActions.add(bot.launcher.getSpinUpAction(Launcher.LAUNCH_SPEED, false));
-            isTestingLaunchPID = true;
-        } else {
-            isTestingLaunchPID = false;
-        }
-
 //        if (gamepad1.left_bumper) {
 //            bot.intake.spinUp(-Intake.REVERSE_POWER);
 //        } else if (gamepad1.right_bumper) {
