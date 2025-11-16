@@ -23,6 +23,7 @@ public class AimBot {
     public double angleError = 180.0;
 
     public static double MIN_FOUND_TIME = 750; // ms
+    public static double ANGLE_TOLERANCE = 2.5;
 
 
     public static double TIME_BUFFER = 500; // max time in ms from last found april tag to reading there's no april tag
@@ -91,7 +92,7 @@ public class AimBot {
         if (Math.abs(angleError) > 30.0) {
             return 0.0;
         }
-        if (Math.abs(angleError) < 5.0) {
+        if (Math.abs(angleError) < ANGLE_TOLERANCE) {
             return 0.0;
         }
         return Math.copySign(TURN_POWER, -angleError);

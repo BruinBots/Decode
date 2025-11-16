@@ -29,15 +29,18 @@ public class Launcher { // extends VelMotor {
     Far: 0.9
      */
 
-    public static double LAUNCH_POWER = 0.7;
-    public static double LAUNCH_SPEED = 3800; // rpm
+    public static double LAUNCH_POWER = AimBot.CLOSE_POWER;
+    public static double ACTIVE_SPEED = 50; // rpm
+    public static double MAX_LAUNCH_ACCEL = 0.25; // rpm/s^2
 
     public static double REVERSE_POWER = 0.075;
 
     public static double SERVO_DOWN_POS = 0.25;
     public static double SERVO_UP_POS = 0.35;
 
-    public static int LAUNCH_WAIT_MS = 3000;
+    // time to wait after spin up to initiate accel check
+    // give the motor a little time to accelerate
+    public static int LAUNCH_WAIT_MS = 750;
 
     public static int SERVO_WAIT_MS = 1250;
     public static int POST_LAUNCH_WAIT_MS = 500;
@@ -141,6 +144,10 @@ public class Launcher { // extends VelMotor {
         return accel;
     }
 
+    public boolean isActive() {
+        return getCurrentVelocity() > ACTIVE_SPEED || motor.getPower() > 0;
+    }
+
     public void setServo(double position) {
         servo.setPosition(position);
     }
@@ -187,5 +194,23 @@ public class Launcher { // extends VelMotor {
 
     public Launcher.PowerAction getPowerAction(double power) {
         return new Launcher.PowerAction(motor, power);
+    }
+
+    public class AccelWaitAction implements Action {
+        private Launcher launcher;
+
+        public AccelWaitAction(Launcher launcher) {
+            this.launcher = launcher;
+        }
+
+        @Override
+        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+            double accel = launcher.getCurrentAcceleration();
+            return accel > launcher.MAX_LAUNCH_ACCEL;
+        }
+    }
+
+    public AccelWaitAction getAccelWaitAction() {
+        return new AccelWaitAction(this);
     }
 }

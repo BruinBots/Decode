@@ -3,12 +3,15 @@ package org.firstinspires.ftc.teamcode;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.acmerobotics.roadrunner.Action;
+import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.SequentialAction;
+import com.acmerobotics.roadrunner.TranslationalVelConstraint;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.Autonomous.OpModes.IntakeAuto;
 import org.firstinspires.ftc.teamcode.Components.AprilTags;
 import org.firstinspires.ftc.teamcode.Components.Intake;
 import org.firstinspires.ftc.teamcode.Components.Launcher;
@@ -29,6 +32,7 @@ public class MainBot {
 
     public MultipleTelemetry telemetry;
     public FtcDashboard dashboard = FtcDashboard.getInstance();
+    public MecanumDrive drive;
 
     public HardwareMap hardwareMap;
     public AprilTags aprilTags;
@@ -50,6 +54,8 @@ public class MainBot {
         this.hardwareMap = hardwareMap;
 
         aprilTags = new AprilTags(hardwareMap);
+
+        drive = new MecanumDrive(hardwareMap, new Pose2d(0, 0, 0));
     }
 
     public void moveBotMecanum(double drive, double rotate, double strafe, double scaleFactor) {
@@ -100,12 +106,22 @@ public class MainBot {
         return new SequentialAction(
                 launcher.getPowerAction(Launcher.LAUNCH_POWER),
                 new WaitAction(Launcher.LAUNCH_WAIT_MS),
+                launcher.getAccelWaitAction(),
                 launcher.kickAction(),
                 new WaitAction(Launcher.POST_LAUNCH_WAIT_MS),
                 intake.getPowerAction(Intake.INTAKE_POWER),
                 new WaitAction(Intake.IN_WAIT_MS),
-                intake.getPowerAction(-Intake.REVERSE_POWER),
-                new WaitAction(Intake.REVERSE_WAIT_MS),
+                intake.getPowerAction(0)
+        );
+    }
+
+    public Action intakeDriveAction() {
+        drive.localizer.setPose(new Pose2d(0, 0, 0));
+        return new SequentialAction(
+                intake.getPowerAction(Intake.INTAKE_POWER),
+                drive.actionBuilder(new Pose2d(0, 0, 0))
+                        .lineToX(IntakeAuto.DISTANCE, new TranslationalVelConstraint(IntakeAuto.VELOCITY))
+                        .build(),
                 intake.getPowerAction(0)
         );
     }

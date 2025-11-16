@@ -31,8 +31,9 @@ public class MainTeleOp extends OpMode {
 
     private boolean didAddAimBotAction = false;
     private boolean didAddSingleLaunchAction = false;
+    private boolean didAddIntakeDriveAction = false;
     private boolean isLaunching = false;
-    private boolean isTestingLaunchPID = false;
+//    private boolean isTestingLaunchPID = false;
 
     @Override
     public void init() {
@@ -68,17 +69,17 @@ public class MainTeleOp extends OpMode {
         if (gamepad1.a) {
             launchActions.clear();
             bot.intake.setPower(Intake.INTAKE_POWER);
-            if (!isLaunching) {
+            if (!bot.launcher.isActive()) {
                 bot.launcher.spinUp(-Launcher.REVERSE_POWER);
             }
         } else if (gamepad1.b) {
             launchActions.clear();
             bot.intake.setPower(-Intake.REVERSE_POWER);
-            if (!isLaunching) {
+            if (!bot.launcher.isActive()) {
                 bot.launcher.spinUp(Launcher.REVERSE_POWER);
             }
         } else {
-            if (launchActions.isEmpty()) {
+            if (launchActions.isEmpty() && driveActions.isEmpty()) {
                 bot.intake.doStop();
                 if (!isLaunching) {
                     bot.launcher.doStop();
@@ -112,6 +113,13 @@ public class MainTeleOp extends OpMode {
             didAddSingleLaunchAction = true;
         } else {
             didAddSingleLaunchAction = false;
+        }
+
+        if (gamepad1.dpad_left && !didAddIntakeDriveAction) {
+            driveActions.add(bot.intakeDriveAction());
+            didAddIntakeDriveAction = true;
+        } else {
+            didAddIntakeDriveAction = false;
         }
 
 //        if (gamepad1.left_bumper) {
