@@ -22,18 +22,25 @@ public class AimBot {
     public double rawAngleError = 180.0;
     public double angleError = 180.0;
 
+    public static double MIN_FOUND_TIME = 750; // ms
+
+
     public static double TIME_BUFFER = 500; // max time in ms from last found april tag to reading there's no april tag
 
     // Launcher power constants
-    public static double MIN_DISTANCE = 30.0;
+//    public static double MIN_DISTANCE = 30.0;
+//
+//    public static double CLOSE_POWER = 0.70;
+//    public static double CLOSE_DISTANCE = 63.0;
+//
+//    public static double FAR_POWER = 0.80;
+//    public static double FAR_DISTANCE = 80.0;
+//
+//    public static double MAX_DISTANCE = 95.0;
 
-    public static double CLOSE_POWER = 0.70;
-    public static double CLOSE_DISTANCE = 63.0;
-
-    public static double FAR_POWER = 0.80;
-    public static double FAR_DISTANCE = 80.0;
-
-    public static double MAX_DISTANCE = 95.0;
+    public static double CLOSE_POWER = 0.74;
+    public static double THRESHOLD_DISTANCE = 72.0;
+    public static double FAR_POWER = 0.9;
 
     // Turn bot P controller constants
 //    public static double TURN_kP = 0.01;
@@ -73,13 +80,10 @@ public class AimBot {
     }
 
     public double getLaunchPower() {
-        if (distance < MIN_DISTANCE || distance > MAX_DISTANCE) {
-            return 0.0;
-        } else if (distance < CLOSE_DISTANCE) {
+        if (distance < THRESHOLD_DISTANCE) {
             return CLOSE_POWER;
         } else {
-            double slope = (FAR_POWER - CLOSE_POWER) / (FAR_DISTANCE - CLOSE_DISTANCE);
-            return CLOSE_POWER + slope * (distance - CLOSE_DISTANCE);
+            return FAR_POWER;
         }
     }
 
@@ -150,7 +154,7 @@ public class AimBot {
             MainBot.shared.telemetry.addData("Turn Power", turnPower);
             MainBot.shared.moveBotMecanum(0, turnPower, 0, 1);
 
-            return foundGoal && turnPower != 0;
+            return (System.currentTimeMillis() - aimBot.foundGoalTime < AimBot.MIN_FOUND_TIME) && turnPower != 0;
         }
     }
 

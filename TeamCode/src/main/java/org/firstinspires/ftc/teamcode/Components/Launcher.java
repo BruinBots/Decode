@@ -27,7 +27,6 @@ public class Launcher { // extends VelMotor {
     (35, 0.74)
     Near: 0.75
     Far: 0.9
-     vbb
      */
 
     public static double LAUNCH_POWER = 0.7;
