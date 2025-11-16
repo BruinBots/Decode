@@ -82,7 +82,7 @@ public class MainBot {
         rightBackMotor.setPower(wheelSpeeds[3] * scaleFactor);
     }
 
-    public Action singleLaunchAction() {
+    public Action singleLaunchAction(double power) {
 //        return new SequentialAction(
 //                // Spin up and launch
 //                launcher.getSpinUpAction(Launcher.LAUNCH_SPEED), // Launcher.LAUNCH_POWER,
@@ -104,7 +104,10 @@ public class MainBot {
 //                intake.getPowerAction(0)
 //        );
         return new SequentialAction(
-                launcher.getPowerAction(Launcher.LAUNCH_POWER),
+//                intake.getPowerAction(Intake.REVERSE_POWER),
+//                new WaitAction(Intake.REVERSE_WAIT_MS),
+//                intake.getPowerAction(0),
+                launcher.getPowerAction(power),
                 new WaitAction(Launcher.LAUNCH_WAIT_MS),
                 launcher.getAccelWaitAction(),
                 launcher.kickAction(),
@@ -116,10 +119,12 @@ public class MainBot {
     }
 
     public Action intakeDriveAction() {
+        drive.updatePoseEstimate();
         drive.localizer.setPose(new Pose2d(0, 0, 0));
+        drive.updatePoseEstimate();
         return new SequentialAction(
                 intake.getPowerAction(Intake.INTAKE_POWER),
-                drive.actionBuilder(new Pose2d(0, 0, 0))
+                drive.actionBuilder(drive.localizer.getPose())
                         .lineToX(IntakeAuto.DISTANCE, new TranslationalVelConstraint(IntakeAuto.VELOCITY))
                         .build(),
                 intake.getPowerAction(0)

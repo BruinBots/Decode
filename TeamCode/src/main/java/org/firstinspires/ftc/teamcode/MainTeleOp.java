@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.canvas.Canvas;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
@@ -84,7 +85,7 @@ public class MainTeleOp extends OpMode {
                 if (!isLaunching) {
                     bot.launcher.doStop();
                 }
-            }
+             }
         }
 
         if (gamepad1.x) {
@@ -109,7 +110,7 @@ public class MainTeleOp extends OpMode {
         }
 
         if (gamepad1.right_trigger > 0.8 && !didAddSingleLaunchAction) {
-            launchActions.add(bot.singleLaunchAction());
+            launchActions.add(bot.singleLaunchAction(aimBot.getLaunchPower()));
             didAddSingleLaunchAction = true;
         } else {
             didAddSingleLaunchAction = false;
@@ -189,7 +190,17 @@ public class MainTeleOp extends OpMode {
         telemetry.update();
         bot.telemetry.update();
 
-        // NOTE: Left stick y is negative when pushed forward (up)
+        bot.drive.updatePoseEstimate();
+
+        TelemetryPacket packet = new TelemetryPacket();
+        Canvas c = packet.fieldOverlay();
+        bot.drive.drawPoseHistory(c);
+
+        c.setStroke("#3F51B5");
+        Drawing.drawRobot(c, bot.drive.localizer.getPose());
+        bot.dashboard.sendTelemetryPacket(packet);
+
+        // NOTE: Left stick y is negative when pushed forward (up) on PS4 controller
         double drive = -gamepad1.left_stick_y;
         double rotate = gamepad1.right_stick_x;
         double strafe = gamepad1.left_stick_x;
@@ -210,6 +221,7 @@ public class MainTeleOp extends OpMode {
                 newActions.add(action);
             }
         }
+        bot.dashboard.sendTelemetryPacket(packet);
         return newActions;
     }
 }

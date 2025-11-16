@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.Autonomous.OpModes;
 
 import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.Pose2d;
@@ -18,6 +19,8 @@ import org.firstinspires.ftc.teamcode.MecanumDrive;
 
 import java.util.ArrayList;
 
+@Config
+@Autonomous(name="ThreeAuto")
 public class ThreeAuto extends OpMode {
     private enum State {
         INIT,
@@ -36,8 +39,11 @@ public class ThreeAuto extends OpMode {
     private ArrayList<Action> actions = new ArrayList<>();
     private FtcDashboard dashboard;
 
+    public static double GOAL_X = -26;
+    public static double GOAL_Y = -24;
+
     private Pose2d getStartPose() {
-        return new Pose2d(-60, 12, 0);
+        return new Pose2d(-60, -36, Math.toRadians(270));
     }
 
     @Override
@@ -53,13 +59,18 @@ public class ThreeAuto extends OpMode {
         // State machine
         if (currentState == State.INIT) {
             builder = drive.actionBuilder(getStartPose())
-                    .splineTo(new Vector2d(-42, -36), Math.toRadians(225));
+                    .strafeToLinearHeading(new Vector2d(GOAL_X, GOAL_Y), Math.toRadians(225));
             actions.add(builder.build());
             currentState = State.DRIVING_TO_LAUNCH;
         } else if (currentState == State.DRIVING_TO_LAUNCH) {
-            if (actions.size() == 0) {
+            if (actions.isEmpty()) {
                 actions.add(aimBot.getAction());
                 currentState = State.AIMING;
+            }
+        } else if (currentState == State.AIMING) {
+            if (actions.isEmpty()) {
+                actions.add(bot.singleLaunchAction(aimBot.getLaunchPower()));
+                currentState = State.LAUNCHING;
             }
         }
         // TODO: launching
@@ -75,5 +86,7 @@ public class ThreeAuto extends OpMode {
         }
         actions = newActions;
         dashboard.sendTelemetryPacket(packet);
+        bot.telemetry.addData("State", currentState);
+        bot.telemetry.update();
     }
 }

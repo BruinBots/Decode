@@ -9,11 +9,13 @@ import com.qualcomm.robotcore.hardware.Servo;
 import org.firstinspires.ftc.teamcode.MainBot;
 import org.firstinspires.ftc.teamcode.Utils.ServoAction;
 
+import java.util.concurrent.locks.Lock;
+
 
 @Config
 public class Intake extends VelMotor {
 
-    public static double INTAKE_POWER = 0.4;
+    public static double INTAKE_POWER = 0.5;
     public static double INTAKE_SPEED = 1000; // rpm
 
     public static double SERVO_DOWN_POS = 0.6;
@@ -28,7 +30,7 @@ public class Intake extends VelMotor {
 //    public static double SERVO_DOWN_POS = 0.6;
 //    public static double SERVO_UP_POS = 0.4;
 //
-    public static int REVERSE_WAIT_MS = 500;
+    public static int REVERSE_WAIT_MS = 250;
     public static int IN_WAIT_MS = 300;
 //
 //    private Servo servo;

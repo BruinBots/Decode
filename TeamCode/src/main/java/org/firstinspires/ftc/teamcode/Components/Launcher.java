@@ -31,12 +31,12 @@ public class Launcher { // extends VelMotor {
 
     public static double LAUNCH_POWER = AimBot.CLOSE_POWER;
     public static double ACTIVE_SPEED = 50; // rpm
-    public static double MAX_LAUNCH_ACCEL = 0.25; // rpm/s^2
+    public static double MAX_LAUNCH_ACCEL = 0.15; // rpm/s^2
 
     public static double REVERSE_POWER = 0.075;
 
     public static double SERVO_DOWN_POS = 0.25;
-    public static double SERVO_UP_POS = 0.35;
+    public static double SERVO_UP_POS = 0.42;
 
     // time to wait after spin up to initiate accel check
     // give the motor a little time to accelerate

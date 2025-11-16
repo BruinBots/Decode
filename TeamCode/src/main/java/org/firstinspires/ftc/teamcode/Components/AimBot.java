@@ -23,7 +23,7 @@ public class AimBot {
     public double angleError = 180.0;
 
     public static double MIN_FOUND_TIME = 750; // ms
-    public static double ANGLE_TOLERANCE = 2.5;
+    public static double ANGLE_TOLERANCE = 3.5;
 
 
     public static double TIME_BUFFER = 500; // max time in ms from last found april tag to reading there's no april tag
@@ -47,10 +47,11 @@ public class AimBot {
 //    public static double TURN_kP = 0.01;
 //    public static double TURN_MIN_POWER = 0.15;
 //    public static double TURN_MAX_POWER = 0.45;
-    public static double TURN_POWER = 0.2;
+    public static double TURN_POWER = 0.15;
 
     // More turning constants
-    public static double ADJUST_kP = 0.03;
+    public static double ADJUST_kP = 1;
+    public static double STATIC_ANGLE_OFFSET = 2;
 
     public AimBot() {
         aprilTags = MainBot.shared.aprilTags;
@@ -71,7 +72,7 @@ public class AimBot {
                 // https://discord.com/channels/775043247802286080/775048219465220128/1427015590161420450
                 double yaw = detection.ftcPose.yaw;
                 double angleAdjust = -yaw * ADJUST_kP;
-                angleError = rawAngleError - angleAdjust;
+                angleError = rawAngleError - angleAdjust - STATIC_ANGLE_OFFSET;
 
                 foundGoalTime = System.currentTimeMillis();
             }
@@ -83,8 +84,10 @@ public class AimBot {
     public double getLaunchPower() {
         if (distance < THRESHOLD_DISTANCE) {
             return CLOSE_POWER;
-        } else {
+        } else if (distance > THRESHOLD_DISTANCE) {
             return FAR_POWER;
+        } else {
+            return CLOSE_POWER;
         }
     }
 
@@ -140,22 +143,27 @@ public class AimBot {
             aimBot.readAprilTag();
             double launchPower = getLaunchPower();
             double turnPower = getTurnPower();
-            if (aimBot.foundGoal) {
+//            if (aimBot.foundGoal) {
                 MainBot.shared.telemetry.addData("Goal Distance", distance);
                 MainBot.shared.telemetry.addData("Goal Horizontal Distance", horizontal);
                 MainBot.shared.telemetry.addData("Goal RAW Angle Error", rawAngleError);
                 MainBot.shared.telemetry.addData("Goal Angle Error", angleError);
-            } else {
-                MainBot.shared.telemetry.addData("Goal Distance", "N/A");
-                MainBot.shared.telemetry.addData("Goal Horizontal Distance", "N/A");
-                MainBot.shared.telemetry.addData("Goal RAW Angle Error", "N/A");
-                MainBot.shared.telemetry.addData("Goal Angle Error", "N/A");
-            }
+//            } else {
+//                MainBot.shared.telemetry.addData("Goal Distance", "N/A");
+//                MainBot.shared.telemetry.addData("Goal Horizontal Distance", "N/A");
+//                MainBot.shared.telemetry.addData("Goal RAW Angle Error", "N/A");
+//                MainBot.shared.telemetry.addData("Goal Angle Error", "N/A");
+//            }
             MainBot.shared.telemetry.addData("Launch Power", launchPower);
             MainBot.shared.telemetry.addData("Turn Power", turnPower);
             MainBot.shared.moveBotMecanum(0, turnPower, 0, 1);
 
-            return (System.currentTimeMillis() - aimBot.foundGoalTime < AimBot.MIN_FOUND_TIME) && turnPower != 0;
+            MainBot.shared.telemetry.addData("Time Action", (System.currentTimeMillis() - aimBot.foundGoalTime < AimBot.MIN_FOUND_TIME));
+            MainBot.shared.telemetry.addData("Turn Power Condition", turnPower != 0);
+            telemetryPacket.addLine("Time Condition " + (System.currentTimeMillis() - aimBot.foundGoalTime < AimBot.MIN_FOUND_TIME));
+            telemetryPacket.addLine("Turn Power Condition " + (turnPower != 0));
+
+            return (System.currentTimeMillis() - aimBot.foundGoalTime < AimBot.MIN_FOUND_TIME) || turnPower != 0;
         }
     }
 

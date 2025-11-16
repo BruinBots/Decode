@@ -77,8 +77,9 @@ public class MeepMeepTesting {
                 .setConstraints(60, 60, Math.toRadians(180), Math.toRadians(180), 15)
                 .build();
 
-        myBot.runAction(myBot.getDrive().actionBuilder(new Pose2d(0, 0, 0))
-                .lineToX(24, new TranslationalVelConstraint(10))
+        myBot.runAction(myBot.getDrive().actionBuilder(new Pose2d(-60, -36, Math.toRadians(270)))
+                .strafeToLinearHeading(new Vector2d(-42, -36), Math.toRadians(225))
+//                .lineToX(24, new TranslationalVelConstraint(10))
 //                .strafeToLinearHeading(new Vector2d(-42, -36), Math.toRadians(225))
 ////                .stopAndAdd(new SequentialAction(
 ////                        aimBot.getAimAction(),
