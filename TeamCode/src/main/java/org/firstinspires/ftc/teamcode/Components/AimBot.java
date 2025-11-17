@@ -68,7 +68,7 @@ public class AimBot {
                 horizontal = detection.ftcPose.x;
                 rawAngleError = -Math.toDegrees(Math.atan(horizontal / distance)); // detection.ftcPose.yaw;
 
-                // Angle-adjusted aimng algorithm
+                // Angle-adjusted aiming algorithm
                 // https://discord.com/channels/775043247802286080/775048219465220128/1427015590161420450
                 double yaw = detection.ftcPose.yaw;
                 double angleAdjust = -yaw * ADJUST_kP;
@@ -92,10 +92,9 @@ public class AimBot {
     }
 
     public double getTurnPower() {
-        if (Math.abs(angleError) > 30.0) {
-            return 0.0;
-        }
-        if (Math.abs(angleError) < ANGLE_TOLERANCE) {
+        if (!foundGoal || Math.abs(angleError) > 30.0) {
+            return 0;
+        } else if (Math.abs(angleError) < ANGLE_TOLERANCE) {
             return 0.0;
         }
         return Math.copySign(TURN_POWER, -angleError);
@@ -123,9 +122,11 @@ public class AimBot {
 
         private AimBot aimBot;
         private boolean firstLoop = true;
+        private long lastNotAlignedTime;
 
         private AimBotAction(AimBot aimBot) {
             this.aimBot = aimBot;
+            lastNotAlignedTime = System.currentTimeMillis();
         }
 
         @Override
@@ -160,10 +161,25 @@ public class AimBot {
 
             MainBot.shared.telemetry.addData("Time Action", (System.currentTimeMillis() - aimBot.foundGoalTime < AimBot.MIN_FOUND_TIME));
             MainBot.shared.telemetry.addData("Turn Power Condition", turnPower != 0);
-            telemetryPacket.addLine("Time Condition " + (System.currentTimeMillis() - aimBot.foundGoalTime < AimBot.MIN_FOUND_TIME));
-            telemetryPacket.addLine("Turn Power Condition " + (turnPower != 0));
+            // TRUE if aiming
+            // FALSE if stopping
+            boolean turnCondition = turnPower != 0;
 
-            return (System.currentTimeMillis() - aimBot.foundGoalTime < AimBot.MIN_FOUND_TIME) || turnPower != 0;
+            if (turnCondition) {
+                // we're still aligning
+                lastNotAlignedTime = System.currentTimeMillis();
+            }
+
+            // TRUE if it's been too soon since we were last misaligned
+            // FALSE if it's been long enough since we were last misaligned
+            boolean timeCondition = (System.currentTimeMillis() - lastNotAlignedTime) < AimBot.MIN_FOUND_TIME;
+
+            telemetryPacket.addLine("Time Condition " + timeCondition);
+            telemetryPacket.addLine("Turn Power Condition " + turnCondition);
+
+            // TRUE if still aiming
+            // FALSE if properly aimed
+            return timeCondition || turnCondition;
         }
     }
 
