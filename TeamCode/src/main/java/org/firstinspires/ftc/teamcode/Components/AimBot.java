@@ -25,28 +25,11 @@ public class AimBot {
     public static double MIN_FOUND_TIME = 750; // ms
     public static double ANGLE_TOLERANCE = 3.5;
 
-
     public static double TIME_BUFFER = 500; // max time in ms from last found april tag to reading there's no april tag
-
-    // Launcher power constants
-//    public static double MIN_DISTANCE = 30.0;
-//
-//    public static double CLOSE_POWER = 0.70;
-//    public static double CLOSE_DISTANCE = 63.0;
-//
-//    public static double FAR_POWER = 0.80;
-//    public static double FAR_DISTANCE = 80.0;
-//
-//    public static double MAX_DISTANCE = 95.0;
 
     public static double CLOSE_POWER = 0.74;
     public static double THRESHOLD_DISTANCE = 72.0;
     public static double FAR_POWER = 0.9;
-
-    // Turn bot P controller constants
-//    public static double TURN_kP = 0.01;
-//    public static double TURN_MIN_POWER = 0.15;
-//    public static double TURN_MAX_POWER = 0.45;
     public static double TURN_POWER = 0.15;
 
     // More turning constants
@@ -64,7 +47,7 @@ public class AimBot {
             if (detection.metadata != null && (detection.id == 20 || detection.id == 24)) {
                 distance = detection.ftcPose.y;
 
-                // compute raw angle
+                // compute raw angle from trig
                 horizontal = detection.ftcPose.x;
                 rawAngleError = -Math.toDegrees(Math.atan(horizontal / distance)); // detection.ftcPose.yaw;
 
@@ -79,6 +62,11 @@ public class AimBot {
         }
 
         foundGoal = (System.currentTimeMillis() - foundGoalTime) < TIME_BUFFER;
+        if (!foundGoal) {
+            distance = 0;
+            angleError = 0;
+            rawAngleError = 0;
+        }
     }
 
     public double getLaunchPower() {
@@ -98,24 +86,20 @@ public class AimBot {
             return 0.0;
         }
         return Math.copySign(TURN_POWER, -angleError);
-//        if (Math.abs(power) < TURN_MIN_POWER) {
-//            return Math.copySign(TURN_MIN_POWER, power);
-//        } else
-//        if (Math.abs(power) > TURN_MAX_POWER) {
-//            return Math.copySign(TURN_MAX_POWER, power);
-//        } else {
-//            return power;
-//        }
     }
 
     public void doTelemetry() {
-        if (foundGoal) {
+//        if (foundGoal) {
             MainBot.shared.telemetry.addData("AimBot Read", distance + "in, " + angleError + "º");
             MainBot.shared.telemetry.addData("AimBot Result", getLaunchPower() + "L, " + getTurnPower() + "T");
-        } else {
-            MainBot.shared.telemetry.addData("AimBot Read", "N/A");
-            MainBot.shared.telemetry.addData("AimBot Result", "N/A");
-        }
+//        } else {
+//            MainBot.shared.telemetry.addData("AimBot Read", "N/A");
+//            MainBot.shared.telemetry.addData("AimBot Result", "N/A");
+//        }
+        MainBot.shared.telemetry.addData("Goal Distance", distance);
+        MainBot.shared.telemetry.addData("Goal Horizontal Distance", horizontal);
+        MainBot.shared.telemetry.addData("Goal RAW Angle Error", rawAngleError);
+        MainBot.shared.telemetry.addData("Goal Angle Error", angleError);
     }
 
     public class AimBotAction implements Action {
@@ -144,23 +128,9 @@ public class AimBot {
             aimBot.readAprilTag();
             double launchPower = getLaunchPower();
             double turnPower = getTurnPower();
-//            if (aimBot.foundGoal) {
-                MainBot.shared.telemetry.addData("Goal Distance", distance);
-                MainBot.shared.telemetry.addData("Goal Horizontal Distance", horizontal);
-                MainBot.shared.telemetry.addData("Goal RAW Angle Error", rawAngleError);
-                MainBot.shared.telemetry.addData("Goal Angle Error", angleError);
-//            } else {
-//                MainBot.shared.telemetry.addData("Goal Distance", "N/A");
-//                MainBot.shared.telemetry.addData("Goal Horizontal Distance", "N/A");
-//                MainBot.shared.telemetry.addData("Goal RAW Angle Error", "N/A");
-//                MainBot.shared.telemetry.addData("Goal Angle Error", "N/A");
-//            }
-            MainBot.shared.telemetry.addData("Launch Power", launchPower);
-            MainBot.shared.telemetry.addData("Turn Power", turnPower);
+
             MainBot.shared.moveBotMecanum(0, turnPower, 0, 1);
 
-            MainBot.shared.telemetry.addData("Time Action", (System.currentTimeMillis() - aimBot.foundGoalTime < AimBot.MIN_FOUND_TIME));
-            MainBot.shared.telemetry.addData("Turn Power Condition", turnPower != 0);
             // TRUE if aiming
             // FALSE if stopping
             boolean turnCondition = turnPower != 0;
