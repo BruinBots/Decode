@@ -7,12 +7,9 @@ import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.TrajectoryActionBuilder;
 import com.acmerobotics.roadrunner.Vector2d;
-import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
-import com.sun.tools.javac.Main;
 
-import org.firstinspires.ftc.teamcode.Autonomous.BaseAuto;
 import org.firstinspires.ftc.teamcode.Components.AimBot;
 import org.firstinspires.ftc.teamcode.MainBot;
 import org.firstinspires.ftc.teamcode.MecanumDrive;
@@ -50,7 +47,8 @@ public class ThreeAuto extends OpMode {
     public void init() {
         bot = MainBot.shared = new MainBot(hardwareMap, telemetry);
         aimBot = new AimBot();
-        drive = new MecanumDrive(hardwareMap, getStartPose());
+        drive = bot.drive;
+        drive.localizer.setPose(getStartPose());
         dashboard = FtcDashboard.getInstance();
     }
 
@@ -58,16 +56,19 @@ public class ThreeAuto extends OpMode {
     public void loop() {
         // State machine
         if (currentState == State.INIT) {
+            // Drive to launcher
             builder = drive.actionBuilder(getStartPose())
                     .strafeToLinearHeading(new Vector2d(GOAL_X, GOAL_Y), Math.toRadians(225));
             actions.add(builder.build());
             currentState = State.DRIVING_TO_LAUNCH;
         } else if (currentState == State.DRIVING_TO_LAUNCH) {
+            // Aimbot
             if (actions.isEmpty()) {
                 actions.add(aimBot.getAction());
                 currentState = State.AIMING;
             }
         } else if (currentState == State.AIMING) {
+            // Launch
             if (actions.isEmpty()) {
                 actions.add(bot.singleLaunchAction(aimBot.getLaunchPower()));
                 currentState = State.LAUNCHING;
@@ -85,8 +86,8 @@ public class ThreeAuto extends OpMode {
             }
         }
         actions = newActions;
-        dashboard.sendTelemetryPacket(packet);
         bot.telemetry.addData("State", currentState);
+        dashboard.sendTelemetryPacket(packet);
         bot.telemetry.update();
     }
 }

@@ -12,7 +12,6 @@ public class DoNothing extends OpMode {
     @Override
     public void init() {
         MainBot.shared = new MainBot(hardwareMap, telemetry);
-//        MainBot.shared.init();
     }
 
     @Override
