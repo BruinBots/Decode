@@ -15,8 +15,7 @@ import org.firstinspires.ftc.teamcode.Autonomous.OpModes.IntakeAuto;
 import org.firstinspires.ftc.teamcode.Components.AprilTags;
 import org.firstinspires.ftc.teamcode.Components.Intake;
 import org.firstinspires.ftc.teamcode.Components.Launcher;
-import org.firstinspires.ftc.teamcode.Components.WaitAction;
-import org.firstinspires.ftc.teamcode.Utils.ServoAction;
+import org.firstinspires.ftc.teamcode.Utils.WaitAction;
 
 public class MainBot {
     public DcMotorEx leftFrontMotor;
@@ -83,33 +82,10 @@ public class MainBot {
     }
 
     public Action singleLaunchAction(double power) {
-//        return new SequentialAction(
-//                // Spin up and launch
-//                launcher.getSpinUpAction(Launcher.LAUNCH_SPEED), // Launcher.LAUNCH_POWER,
-////                launcher.getSpinUpAction(Launcher.LAUNCH_SPEED),
-//                launcher.kickAction(),
-//                new WaitAction(Launcher.POST_LAUNCH_WAIT_MS),
-//
-//                // move next ball down
-//                intake.getPowerAction(Intake.INTAKE_POWER),
-//                // move Jordan up so ball doesn't come down too fast
-////                launcher.getServoAction(Launcher.SERVO_UP_POS),
-////                new WaitAction(Launcher.SERVO_WAIT_MS / 2),
-//                new WaitAction(Intake.IN_WAIT_MS),
-//
-//                // kick ball in
-//                intake.getPowerAction(-Intake.REVERSE_POWER),
-//                new WaitAction(Intake.REVERSE_WAIT_MS),
-////                launcher.getServoAction(Launcher.SERVO_DOWN_POS),
-//                intake.getPowerAction(0)
-//        );
         return new SequentialAction(
-//                intake.getPowerAction(Intake.REVERSE_POWER),
-//                new WaitAction(Intake.REVERSE_WAIT_MS),
-//                intake.getPowerAction(0),
                 launcher.getPowerAction(power),
                 new WaitAction(Launcher.LAUNCH_WAIT_MS),
-                launcher.getAccelWaitAction(),
+                launcher.getAccelWaitAction(Launcher.MAX_LAUNCH_ACCEL),
                 launcher.kickAction(),
                 new WaitAction(Launcher.POST_LAUNCH_WAIT_MS),
                 intake.getPowerAction(Intake.INTAKE_POWER),

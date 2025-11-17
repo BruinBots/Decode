@@ -1,20 +1,5 @@
 package org.firstinspires.ftc.teamcode.Autonomous;
 
-import com.acmerobotics.roadrunner.Action;
-import com.acmerobotics.roadrunner.ParallelAction;
-import com.acmerobotics.roadrunner.Pose2d;
-import com.acmerobotics.roadrunner.SequentialAction;
-import com.acmerobotics.roadrunner.TrajectoryActionBuilder;
-import com.acmerobotics.roadrunner.Vector2d;
-
-import org.firstinspires.ftc.teamcode.Components.AimBot;
-import org.firstinspires.ftc.teamcode.Components.Intake;
-import org.firstinspires.ftc.teamcode.Components.Launcher;
-import org.firstinspires.ftc.teamcode.Components.ObeliskReader;
-import org.firstinspires.ftc.teamcode.Components.WaitAction;
-import org.firstinspires.ftc.teamcode.MainBot;
-import org.firstinspires.ftc.teamcode.MecanumDrive;
-
 public class BaseAuto {
 //    private MecanumDrive drive;
 //

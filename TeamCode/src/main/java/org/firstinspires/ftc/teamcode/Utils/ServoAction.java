@@ -6,8 +6,6 @@ import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
 import com.qualcomm.robotcore.hardware.Servo;
 
-import org.firstinspires.ftc.teamcode.Components.VelMotor;
-
 public class ServoAction implements Action {
     private Servo servo;
     private double position;

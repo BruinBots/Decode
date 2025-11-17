@@ -2,74 +2,59 @@ package org.firstinspires.ftc.teamcode.Components;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.PIDCoefficients;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.CookedMotor;
 import org.firstinspires.ftc.teamcode.MainBot;
-import org.firstinspires.ftc.teamcode.Utils.ServoAction;
-
-import java.util.concurrent.locks.Lock;
+import org.firstinspires.ftc.teamcode.Utils.EnhancedMotor;
+import org.firstinspires.ftc.teamcode.Utils.PowerAction;
 
 
 @Config
-public class Intake extends VelMotor {
+public class Intake {
 
     public static double INTAKE_POWER = 0.5;
-    public static double INTAKE_SPEED = 1000; // rpm
-
-    public static double SERVO_DOWN_POS = 0.6;
-    public static double SERVO_UP_POS = 0.4;
 
     public static double REVERSE_POWER = 0.4;
 
-//    public static double INTAKE_STOP_POS = 0.5;
-//    public static double INTAKE_IN_POS = 1;
-//    public static double INTAKE_REVERSE_POS = 0.3;
-//
-//    public static double SERVO_DOWN_POS = 0.6;
-//    public static double SERVO_UP_POS = 0.4;
-//
-    public static int REVERSE_WAIT_MS = 250;
     public static int IN_WAIT_MS = 300;
-//
-//    private Servo servo;
-//    private Servo kickServo;
+
+    public EnhancedMotor motor;
+    public CookedMotor cookedMotor;
+
 
     public Intake(HardwareMap hardwareMap) {
-//        servo = hardwareMap.get(Servo.class, "intakeServo");
-//        kickServo = hardwareMap.get(Servo.class, "intakeKickServo");
-        super(hardwareMap, "intakeMotor", "kickServo", 145.1);
+        motor = new EnhancedMotor(hardwareMap, "intakeMotor");
+        motor.setTicksPerRev(145.1);
+        motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         motor.setDirection(DcMotorSimple.Direction.REVERSE);
         motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        cookedMotor = new CookedMotor(motor.motor, 6);
     }
 
-//    public void doTelemetry() {
-//        MainBot.shared.telemetry.addData("intakeServo", servo.getPosition());
-//        MainBot.shared.telemetry.addData("intakeKickServo", kickServo.getPosition());
-//    }
 
-//    public void spinUp() {
-//        servo.setPosition(INTAKE_IN_POS);
-//    }
-//
-//    public void reverse() {
-//        servo.setPosition(INTAKE_REVERSE_POS);
-//    }
-//
-//    public void stop() {
-//        servo.setPosition(INTAKE_STOP_POS);
-//    }
-//
-//    public void kickUp() {
-//        kickServo.setPosition(SERVO_UP_POS);
-//    }
-//
-//    public void kickDown() {
-//        kickServo.setPosition(SERVO_DOWN_POS);
-//    }
-//
-//    public ServoAction getServoAction(double pos) {
-//        return new ServoAction(servo, pos);
-//    }
+    public void setPower(double power) {
+        motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        motor.setPower(power);
+    }
+
+    public void doStop() {
+        // Stop the motor
+        motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        motor.setPower(0);
+    }
+
+    public void doTelemetry() {
+        Telemetry telemetry = MainBot.shared.telemetry;
+        telemetry.addData("intakeMotor Velocity", String.format("%.2f", motor.getRPM())); // getCurrentVelocity()
+        telemetry.addData("intakeMotor Power", String.format("%.2f", motor.getPower()));
+    }
+
+    public PowerAction getPowerAction(double power) {
+        return new PowerAction(motor.motor, power);
+    }
 }

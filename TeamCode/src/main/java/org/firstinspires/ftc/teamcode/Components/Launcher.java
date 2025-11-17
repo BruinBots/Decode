@@ -1,7 +1,5 @@
 package org.firstinspires.ftc.teamcode.Components;
 
-import android.app.Notification;
-
 import androidx.annotation.NonNull;
 
 import com.acmerobotics.dashboard.config.Config;
@@ -11,17 +9,22 @@ import com.acmerobotics.roadrunner.SequentialAction;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.hardware.PIDCoefficients;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.teamcode.CookedMotor;
 import org.firstinspires.ftc.teamcode.MainBot;
+import org.firstinspires.ftc.teamcode.Utils.AccelWaitAction;
+import org.firstinspires.ftc.teamcode.Utils.EnhancedMotor;
+import org.firstinspires.ftc.teamcode.Utils.PowerAction;
 import org.firstinspires.ftc.teamcode.Utils.ServoAction;
+import org.firstinspires.ftc.teamcode.Utils.WaitAction;
 
 @Config
 public class Launcher { // extends VelMotor {
 
     /*
+    Launch powers:
+    (distance, power)
     (117, 0.9)
     (64, 0.74)
     (35, 0.74)
@@ -45,107 +48,20 @@ public class Launcher { // extends VelMotor {
     public static int SERVO_WAIT_MS = 1250;
     public static int POST_LAUNCH_WAIT_MS = 500;
 
-    public static double TICKS_PER_REV = 28;
-
     public CookedMotor cookedMotor;
 
-    private DcMotorEx motor;
+    private EnhancedMotor motor;
     private Servo servo;
 
-    public static double ACCEL_INTERVAL = 500; // ms between accel reads
-
-    private double accel;
-    private double lastVel;
-    private double lastVelTime;
-
     public Launcher(HardwareMap hardwareMap) {
-        motor = hardwareMap.get(DcMotorEx.class, "launchMotor");
+        motor = new EnhancedMotor(hardwareMap, "launchMotor");
+        motor.setTicksPerRev(28);
         servo = hardwareMap.get(Servo.class, "kickServo");
-        cookedMotor = new CookedMotor(motor, 6);
-
-        lastVelTime = System.currentTimeMillis();
-        lastVel = 0;
-        accel = 0;
-    }
-
-    public class AccelerationAction implements Action {
-        private Launcher launcher;
-        private double power;
-        private double maxAccel;
-        private boolean firstLoop = true;
-        private double startTime;
-        public AccelerationAction(Launcher launcher, double power, double maxAccel) {
-            this.launcher = launcher;
-            this.power = power;
-            this.maxAccel = maxAccel;
-        }
-
-        @Override
-        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-            if (firstLoop) {
-                launcher.motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-                launcher.motor.setPower(power);
-
-                firstLoop = false;
-            }
-            double accel = launcher.getCurrentAcceleration();
-            return accel > maxAccel;
-        }
-    }
-
-    public class SpinUpAction implements Action {
-        private Launcher launcher;
-        private double power;
-        private double speed;
-
-        public SpinUpAction(Launcher launcher, double power, double speed) {
-            this.launcher = launcher;
-            this.power = power;
-            this.speed = speed;
-        }
-
-        @Override
-        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-            // Move the motor
-            launcher.motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-            launcher.motor.setPower(power);
-
-            // Check if within bounds
-            double error = Math.abs(launcher.getCurrentVelocity() - speed);
-            if (error < 30) {
-                launcher.motor.setPower(0);
-                return false; // stop
-            }
-            return true; // keep going
-        }
-    }
-
-    public Action getSpinUpAction(double power, double speed) {
-        return getSpinUpAction(power, speed);
-    }
-
-    public double getCurrentVelocity() {
-        double curVel = motor.getVelocity() * 60.0 / TICKS_PER_REV;
-        double curTime = System.currentTimeMillis();
-
-        if (curTime - lastVelTime > ACCEL_INTERVAL) {
-            double dv = curVel - lastVel;
-            double dt = curTime - lastVelTime;
-            accel = dv / dt;
-
-            lastVel = curVel;
-            lastVelTime = curTime;
-        }
-
-        return curVel;
-    }
-
-    public double getCurrentAcceleration() {
-        return accel;
+        cookedMotor = new CookedMotor(motor.motor, 6);
     }
 
     public boolean isActive() {
-        return getCurrentVelocity() > ACTIVE_SPEED || motor.getPower() > 0;
+        return motor.getRPM() > ACTIVE_SPEED || motor.getPower() > 0;
     }
 
     public void setServo(double position) {
@@ -159,8 +75,8 @@ public class Launcher { // extends VelMotor {
 
     public void doTelemetry() {
         MainBot.shared.telemetry.addData("Launcher Power", motor.getPower());
-        MainBot.shared.telemetry.addData("Launcher Speed", getCurrentVelocity());
-        MainBot.shared.telemetry.addData("Launcher Acceleration", getCurrentAcceleration());
+        MainBot.shared.telemetry.addData("Launcher Speed", motor.getRPM()); // getCurrentVelocity()
+        MainBot.shared.telemetry.addData("Launcher Acceleration", motor.getAcceleration()); // getCurrentAcceleration()
     }
 
     public void doStop() {
@@ -175,42 +91,11 @@ public class Launcher { // extends VelMotor {
         );
     }
 
-    class PowerAction implements Action {
-        private DcMotorEx motor;
-        private double power;
-
-        public PowerAction(DcMotorEx motor, double power) {
-            this.motor = motor;
-            this.power = power;
-        }
-
-        @Override
-        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-            motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-            motor.setPower(power);
-            return false; // end instantly
-        }
+    public PowerAction getPowerAction(double power) {
+        return new PowerAction(motor.motor, power);
     }
 
-    public Launcher.PowerAction getPowerAction(double power) {
-        return new Launcher.PowerAction(motor, power);
-    }
-
-    public class AccelWaitAction implements Action {
-        private Launcher launcher;
-
-        public AccelWaitAction(Launcher launcher) {
-            this.launcher = launcher;
-        }
-
-        @Override
-        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-            double accel = launcher.getCurrentAcceleration();
-            return accel > launcher.MAX_LAUNCH_ACCEL;
-        }
-    }
-
-    public AccelWaitAction getAccelWaitAction() {
-        return new AccelWaitAction(this);
+    public AccelWaitAction getAccelWaitAction(double maxAccel) {
+        return new AccelWaitAction(motor, maxAccel);
     }
 }

@@ -168,25 +168,6 @@ public class MainTeleOp extends OpMode {
         launchActions = actionLoop(launchActions);
         driveActions = actionLoop(driveActions);
 
-//        TelemetryPacket packet = new TelemetryPacket();
-//        ArrayList<Action> newActions = new ArrayList<>();
-//        for (Action action : actions) {
-//            action.preview(packet.fieldOverlay());
-//            if (action.run(packet)) {
-//                newActions.add(action);
-//            }
-//        }
-//        actions = newActions;
-//
-//        ArrayList<Action> newDriveActions = new ArrayList<>();
-//        for (Action action : driveActions) {
-//            action.preview(packet.fieldOverlay());
-//            if (action.run(packet)) {
-//                newDriveActions.add(action);
-//            }
-//        }
-//        driveActions = newDriveActions;
-
         telemetry.update();
         bot.telemetry.update();
 
