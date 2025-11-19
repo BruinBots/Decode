@@ -22,8 +22,8 @@ public class IntakeAuto extends OpMode {
     private MecanumDrive drive;
     private Action action;
 
-    public static double DISTANCE = 24;
-    public static double VELOCITY = 10;
+    public static double DISTANCE = 28;
+    public static double VELOCITY = 8;
 
     @Override
     public void init() {

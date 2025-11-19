@@ -27,7 +27,7 @@ public class AimBot {
 
     public static double TIME_BUFFER = 500; // max time in ms from last found april tag to reading there's no april tag
 
-    public static double CLOSE_POWER = 0.72;
+    public static double CLOSE_POWER = 0.71;
     public static double THRESHOLD_DISTANCE = 72.0;
     public static double FAR_POWER = 0.9;
     public static double TURN_POWER = 0.11;

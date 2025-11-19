@@ -117,7 +117,7 @@ public class MainTeleOp extends OpMode {
         }
 
         if (gamepad1.dpad_left && !didAddIntakeDriveAction) {
-            driveActions.add(bot.intakeDriveAction());
+            driveActions.add(bot.intakeDriveAction(true));
             didAddIntakeDriveAction = true;
         } else {
             didAddIntakeDriveAction = false;

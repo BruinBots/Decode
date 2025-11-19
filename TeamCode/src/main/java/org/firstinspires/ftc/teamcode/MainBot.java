@@ -96,9 +96,11 @@ public class MainBot {
         );
     }
 
-    public Action intakeDriveAction() {
+    public Action intakeDriveAction(boolean resetPose) {
         drive.updatePoseEstimate();
-        drive.localizer.setPose(new Pose2d(0, 0, 0));
+        if (resetPose) {
+            drive.localizer.setPose(new Pose2d(0, 0, 0));
+        }
         drive.updatePoseEstimate();
         return new SequentialAction(
                 intake.getPowerAction(Intake.INTAKE_POWER),

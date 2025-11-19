@@ -90,13 +90,13 @@ public class MeepMeepTesting {
 //                .waitSeconds(5)
 //                .strafeToLinearHeading(new Vector2d(-36, -16), Math.toRadians(175))
 ////                .stopAndAdd(obeliskReader.readObeliskAction())
-//                .setTangent(0)
-//                .splineToSplineHeading(new Pose2d(-12, -36, Math.toRadians(270)), Math.toRadians(270))
-////                .afterDisp(12, bot.intake.getServoAction(Intake.INTAKE_IN_POS))
-//                .lineToY(-48)
-//                .lineToY(-36)
+                .setTangent(0)
+                .splineToSplineHeading(new Pose2d(-12, -36, Math.toRadians(270)), Math.toRadians(270))
+//                .afterDisp(12, bot.intake.getServoAction(Intake.INTAKE_IN_POS))
+                .lineToY(-48)
+                .lineToY(-36)
 ////                .afterDisp(2, bot.intake.getServoAction(Intake.INTAKE_STOP_POS))
-//                .splineToSplineHeading(new Pose2d(-42, -36, Math.toRadians(225)), Math.toRadians(225))
+                .splineToSplineHeading(new Pose2d(-42, -36, Math.toRadians(225)), Math.toRadians(225))
 ////                .stopAndAdd(new SequentialAction(
 ////                        aimBot.getAimAction(),
 ////                        bot.getSingleLaunchAction(),

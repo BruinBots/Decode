@@ -34,7 +34,7 @@ public class Launcher { // extends VelMotor {
 
     public static double LAUNCH_POWER = AimBot.CLOSE_POWER;
     public static double ACTIVE_SPEED = 50; // rpm
-    public static double MAX_LAUNCH_ACCEL = 0.15; // rpm/s^2
+    public static double MAX_LAUNCH_ACCEL = 0.01; // rpm/s^2
 
     public static double REVERSE_POWER = 0.075;
 
@@ -51,7 +51,7 @@ public class Launcher { // extends VelMotor {
     public CookedMotor cookedMotor;
 
     private EnhancedMotor motor;
-    private Servo servo;
+    public Servo servo;
 
     public Launcher(HardwareMap hardwareMap) {
         motor = new EnhancedMotor(hardwareMap, "launchMotor");
