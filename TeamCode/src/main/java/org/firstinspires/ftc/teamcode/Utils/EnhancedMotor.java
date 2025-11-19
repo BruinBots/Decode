@@ -19,6 +19,7 @@ import org.firstinspires.ftc.ftccommon.internal.manualcontrol.exceptions.FailedT
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import org.firstinspires.ftc.teamcode.Components.Launcher;
+import org.firstinspires.ftc.teamcode.MainBot;
 
 @Config
 public class EnhancedMotor {
@@ -40,7 +41,7 @@ public class EnhancedMotor {
     }
 
     public void setPower(double power) {
-        motor.setPower(power);
+        motor.setPower(MainBot.shared.voltageCompensator.getAdjustedPower(power));
     }
 
     public void setDirection(DcMotorSimple.Direction direction) {

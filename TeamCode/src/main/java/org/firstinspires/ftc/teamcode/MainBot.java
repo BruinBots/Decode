@@ -15,6 +15,7 @@ import org.firstinspires.ftc.teamcode.Autonomous.OpModes.IntakeAuto;
 import org.firstinspires.ftc.teamcode.Components.AprilTags;
 import org.firstinspires.ftc.teamcode.Components.Intake;
 import org.firstinspires.ftc.teamcode.Components.Launcher;
+import org.firstinspires.ftc.teamcode.Utils.BatteryVoltageCompensator;
 import org.firstinspires.ftc.teamcode.Utils.WaitAction;
 
 public class MainBot {
@@ -35,6 +36,7 @@ public class MainBot {
 
     public HardwareMap hardwareMap;
     public AprilTags aprilTags;
+    public BatteryVoltageCompensator voltageCompensator;
 
     public MainBot(HardwareMap hardwareMap, Telemetry telemetry) {
         leftFrontMotor = hardwareMap.get(DcMotorEx.class, "leftFront");
@@ -55,6 +57,7 @@ public class MainBot {
         aprilTags = new AprilTags(hardwareMap);
 
         drive = new MecanumDrive(hardwareMap, new Pose2d(0, 0, 0));
+        voltageCompensator = new BatteryVoltageCompensator(hardwareMap);
     }
 
     public void moveBotMecanum(double drive, double rotate, double strafe, double scaleFactor) {
