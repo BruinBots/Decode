@@ -6,6 +6,8 @@ import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
 import com.qualcomm.robotcore.hardware.Servo;
 
+import org.firstinspires.ftc.teamcode.MainBot;
+
 public class ServoAction implements Action {
     private Servo servo;
     private double position;
@@ -18,6 +20,7 @@ public class ServoAction implements Action {
     @Override
     public boolean run(@NonNull TelemetryPacket telemetryPacket) {
         servo.setPosition(position);
+        telemetryPacket.addLine("ServoAction "+position);
         return false;
     }
 }

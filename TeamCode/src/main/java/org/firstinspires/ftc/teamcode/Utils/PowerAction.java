@@ -7,6 +7,8 @@ import com.acmerobotics.roadrunner.Action;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 
+import org.firstinspires.ftc.teamcode.MainBot;
+
 public class PowerAction implements Action {
     private DcMotorEx motor;
     private double power;
@@ -20,6 +22,7 @@ public class PowerAction implements Action {
     public boolean run(@NonNull TelemetryPacket telemetryPacket) {
         motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         motor.setPower(power);
+        telemetryPacket.addLine("PowerAction "+power);
         return false; // end instantly
     }
 }

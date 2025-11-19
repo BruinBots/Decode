@@ -5,6 +5,8 @@ import androidx.annotation.NonNull;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
 
+import org.firstinspires.ftc.teamcode.MainBot;
+
 public class AccelWaitAction implements Action {
     private EnhancedMotor motor;
     private double maxAccel;
@@ -17,6 +19,7 @@ public class AccelWaitAction implements Action {
     @Override
     public boolean run(@NonNull TelemetryPacket telemetryPacket) {
         double accel = motor.getAcceleration();
+        telemetryPacket.addLine("AccelWaitAction "+accel+"("+maxAccel+")");
         return accel > maxAccel;
     }
 }

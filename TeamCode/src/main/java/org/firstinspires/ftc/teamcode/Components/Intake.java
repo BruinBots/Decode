@@ -22,6 +22,7 @@ public class Intake {
     public static double REVERSE_POWER = 0.4;
 
     public static int IN_WAIT_MS = 300;
+    public static int REVERSE_WAIT_MS = 250;
 
     public EnhancedMotor motor;
     public CookedMotor cookedMotor;

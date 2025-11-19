@@ -90,6 +90,8 @@ public class MainBot {
                 new WaitAction(Launcher.POST_LAUNCH_WAIT_MS),
                 intake.getPowerAction(Intake.INTAKE_POWER),
                 new WaitAction(Intake.IN_WAIT_MS),
+                intake.getPowerAction(Intake.REVERSE_POWER),
+                new WaitAction(Intake.REVERSE_WAIT_MS),
                 intake.getPowerAction(0)
         );
     }

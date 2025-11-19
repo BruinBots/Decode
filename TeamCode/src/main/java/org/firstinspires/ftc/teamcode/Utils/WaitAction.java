@@ -5,6 +5,8 @@ import androidx.annotation.NonNull;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
 
+import org.firstinspires.ftc.teamcode.MainBot;
+
 public class WaitAction implements Action {
     private int waitMs;
     private long startTime = 0;
@@ -17,6 +19,7 @@ public class WaitAction implements Action {
     public boolean run(@NonNull TelemetryPacket telemetryPacket) {
         if (startTime == 0) {
             startTime = System.currentTimeMillis();
+            telemetryPacket.addLine("WaitAction "+waitMs+"ms");
             return true;
         }
         return System.currentTimeMillis() <= startTime + waitMs;
