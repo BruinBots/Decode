@@ -116,7 +116,7 @@ public class SixAuto extends OpMode {
                                 bot.launcher.getPowerAction(-LAUNCH_BRAKE_POWER)))
                         .lineToY(PICK_Y-IntakeAuto.DISTANCE, new TranslationalVelConstraint(IntakeAuto.VELOCITY))
 //                        .lineToY(PICK_Y)
-                        .splineToLinearHeading(new Pose2d(GOAL_X, GOAL_Y, Math.toRadians(225)), Math.toRadians(225))
+                        .strafeToLinearHeading(new Vector2d(GOAL_X, GOAL_Y), Math.toRadians(225))
                         .afterDisp(1, new ParallelAction(
                                 bot.intake.getPowerAction(0),
                                 bot.launcher.getPowerAction(AimBot.CLOSE_POWER)
