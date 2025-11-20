@@ -120,5 +120,14 @@ public class QuickAimBot {
         }
     }
 
-    // TODO: Aim action to read then feed to RR
+    public Action aimAction() {
+        // Returns a RR action to turn to the goal
+        readAprilTag();
+        if (didFindGoal()) {
+            return MainBot.shared.drive.actionBuilder(MainBot.shared.drive.localizer.getPose())
+                .turnTo(getAngleToGoal())
+                .build();
+        }
+        return null;
+    }
 }
