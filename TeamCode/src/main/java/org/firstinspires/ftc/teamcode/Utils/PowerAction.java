@@ -11,6 +11,7 @@ import org.firstinspires.ftc.teamcode.MainBot;
 
 public class PowerAction implements Action {
     private DcMotorEx motor;
+    private EnhancedMotor emotor;
     private double power;
 
     public PowerAction(DcMotorEx motor, double power) {
@@ -18,10 +19,20 @@ public class PowerAction implements Action {
         this.power = power;
     }
 
+    public PowerAction(EnhancedMotor emotor, double power) {
+        this.emotor = emotor;
+        this.power = power;
+    }
+
     @Override
     public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-        motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        motor.setPower(power);
+        if (motor != null) {
+            motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            motor.setPower(power);
+        } else {
+            emotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            emotor.setPower(power);
+        }
         telemetryPacket.addLine("PowerAction "+power);
         return false; // end instantly
     }

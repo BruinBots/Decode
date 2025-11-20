@@ -17,12 +17,14 @@ public class BatteryVoltageCompensator {
      */
 
     public static boolean ENABLED = true;
-    public static double FULL_BATTERY_VOLTAGE = 12.8;
+    public static double FULL_BATTERY_VOLTAGE = 12.75;
 
     private VoltageSensor sensor;
+    public double lastVoltage;
 
     public BatteryVoltageCompensator(HardwareMap hardwareMap) {
         sensor = hardwareMap.get(VoltageSensor.class, "Control Hub");
+        lastVoltage = getCurrentVoltage();
     }
 
     public double getCurrentVoltage() {
@@ -30,12 +32,12 @@ public class BatteryVoltageCompensator {
     }
 
     public void doTelemetry() {
-        MainBot.shared.telemetry.addData("Battery Voltage", getCurrentVoltage()+"/"+FULL_BATTERY_VOLTAGE+"V");
+        MainBot.shared.telemetry.addData("Battery Voltage", lastVoltage+"/"+FULL_BATTERY_VOLTAGE+"V");
     }
 
     public double getAdjustedPower(double origPower) {
         if (!ENABLED) { return origPower; }
-        double adjustedPower = origPower * (FULL_BATTERY_VOLTAGE / getCurrentVoltage()); // adjust power
+        double adjustedPower = origPower * (FULL_BATTERY_VOLTAGE / lastVoltage); // adjust power
         if (adjustedPower > 1) { return 1; }
         return adjustedPower;
     }

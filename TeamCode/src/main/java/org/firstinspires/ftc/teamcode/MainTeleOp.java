@@ -11,7 +11,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.firstinspires.ftc.teamcode.Components.Intake;
 import org.firstinspires.ftc.teamcode.Components.Launcher;
 import org.firstinspires.ftc.teamcode.Components.ObeliskReader;
-import org.firstinspires.ftc.teamcode.Components.QuickAimBot;
+import org.firstinspires.ftc.teamcode.Components.AimBot;
 
 import java.util.ArrayList;
 
@@ -25,7 +25,7 @@ public class MainTeleOp extends OpMode {
 
     public static double DRIVE_FACTOR = 0.6;
 
-    public QuickAimBot aimBot;
+    public AimBot aimBot;
     public ObeliskReader obeliskReader;
 
     public FtcDashboard dash;
@@ -41,7 +41,7 @@ public class MainTeleOp extends OpMode {
         MainBot.shared = new MainBot(hardwareMap, telemetry);
         bot = MainBot.shared;
 
-        aimBot = new QuickAimBot();
+        aimBot = new AimBot();
         obeliskReader = new ObeliskReader();
 
         dash = FtcDashboard.getInstance();
@@ -91,7 +91,7 @@ public class MainTeleOp extends OpMode {
         if (gamepad1.x) {
             launchActions.clear();
             double power = Launcher.LAUNCH_POWER;
-            if (aimBot.didFindGoal()) {
+            if (aimBot.foundGoal) {
                 power = aimBot.getLaunchPower();
             }
             bot.launcher.spinUp(power);
@@ -103,7 +103,7 @@ public class MainTeleOp extends OpMode {
         }
 
         if (gamepad1.right_bumper && gamepad1.dpad_right && !didAddAimBotAction) {
-            driveActions.add(aimBot.aimAction());
+            driveActions.add(aimBot.getAction());
             didAddAimBotAction = true;
         } else {
             didAddAimBotAction = false;
@@ -160,7 +160,8 @@ public class MainTeleOp extends OpMode {
         bot.intake.cookedMotor.loop(gamepad1);
 
         aimBot.readAprilTag();
-//        aimBot.doTelemetry();
+        aimBot.doTelemetry();
+        bot.voltageCompensator.doTelemetry();
 
         bot.telemetry.addData("Obelisk", obeliskReader.read().toString());
 

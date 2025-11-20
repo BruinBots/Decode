@@ -10,7 +10,7 @@ import com.acmerobotics.roadrunner.Vector2d;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
-import org.firstinspires.ftc.teamcode.Components.QuickAimBot;
+import org.firstinspires.ftc.teamcode.Components.AimBot;
 import org.firstinspires.ftc.teamcode.MainBot;
 import org.firstinspires.ftc.teamcode.MecanumDrive;
 
@@ -32,7 +32,7 @@ public class ThreeAuto extends OpMode {
 
     private State currentState = State.INIT;
     private MainBot bot;
-    private QuickAimBot aimBot;
+    private AimBot aimBot;
     private MecanumDrive drive;
     private TrajectoryActionBuilder builder;
     private ArrayList<Action> actions = new ArrayList<>();
@@ -50,7 +50,7 @@ public class ThreeAuto extends OpMode {
     @Override
     public void init() {
         bot = MainBot.shared = new MainBot(hardwareMap, telemetry);
-        aimBot = new QuickAimBot();
+        aimBot = new AimBot();
         drive = bot.drive;
         drive.localizer.setPose(getStartPose());
         dashboard = FtcDashboard.getInstance();
@@ -62,15 +62,15 @@ public class ThreeAuto extends OpMode {
         if (currentState == State.INIT) {
             // Drive to launcher
             builder = drive.actionBuilder(getStartPose())
-                    .afterDisp(1, bot.launcher.getPowerAction(QuickAimBot.CLOSE_POWER))
-                    .afterDisp(1, bot.launcher.getPowerAction(QuickAimBot.CLOSE_POWER))
+                    .afterDisp(1, bot.launcher.getPowerAction(AimBot.CLOSE_POWER))
+                    .afterDisp(1, bot.launcher.getPowerAction(AimBot.CLOSE_POWER))
                     .strafeToLinearHeading(new Vector2d(GOAL_X, GOAL_Y), Math.toRadians(225));
             actions.add(builder.build());
             currentState = State.DRIVING_TO_LAUNCH;
         } else if (currentState == State.DRIVING_TO_LAUNCH) {
             // Aimbot
             if (actions.isEmpty()) {
-                actions.add(aimBot.aimAction());
+                actions.add(aimBot.getAction());
                 currentState = State.AIMING;
             }
         } else if (currentState == State.AIMING) {

@@ -42,8 +42,10 @@ public class CookedMotor {
         if (isCooked() && System.currentTimeMillis() - lastNotCookedTime > COOK_DURATION) {
             motor.setPower(0.0);
             motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-            if (!gamepad.isRumbling()) {
-                gamepad.rumble(500);
+            if (gamepad != null) {
+                if (!gamepad.isRumbling()) {
+                    gamepad.rumble(500);
+                }
             }
         }
     }

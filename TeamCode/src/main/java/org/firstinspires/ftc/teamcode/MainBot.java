@@ -84,13 +84,19 @@ public class MainBot {
         rightBackMotor.setPower(wheelSpeeds[3] * scaleFactor);
     }
 
-    public Action singleLaunchAction(double power) {
+    public Action singleLaunchActionNoPreload(double power) {
         return new SequentialAction(
                 launcher.getPowerAction(power),
                 new WaitAction(Launcher.LAUNCH_WAIT_MS),
                 launcher.getAccelWaitAction(Launcher.MAX_LAUNCH_ACCEL),
                 launcher.kickAction(),
-                new WaitAction(Launcher.POST_LAUNCH_WAIT_MS),
+                new WaitAction(Launcher.POST_LAUNCH_WAIT_MS)
+        );
+    }
+
+    public Action singleLaunchAction(double power) {
+        return new SequentialAction(
+                singleLaunchActionNoPreload(power),
                 intake.getPowerAction(Intake.INTAKE_POWER),
                 new WaitAction(Intake.IN_WAIT_MS),
                 intake.getPowerAction(Intake.REVERSE_POWER),

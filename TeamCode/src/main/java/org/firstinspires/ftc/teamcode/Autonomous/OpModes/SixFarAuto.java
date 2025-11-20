@@ -9,24 +9,25 @@ import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.Rotation2d;
+import com.acmerobotics.roadrunner.SequentialAction;
 import com.acmerobotics.roadrunner.TrajectoryActionBuilder;
 import com.acmerobotics.roadrunner.TranslationalVelConstraint;
-import com.acmerobotics.roadrunner.TurnConstraints;
 import com.acmerobotics.roadrunner.Vector2d;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
-import org.firstinspires.ftc.teamcode.Components.Intake;
 import org.firstinspires.ftc.teamcode.Components.AimBot;
+import org.firstinspires.ftc.teamcode.Components.Intake;
 import org.firstinspires.ftc.teamcode.MainBot;
 import org.firstinspires.ftc.teamcode.MecanumDrive;
+import org.firstinspires.ftc.teamcode.Utils.ServoAction;
 
 import java.util.ArrayList;
 
 @Config
-@Autonomous(name="SixAuto")
-public class SixAuto extends OpMode {
+@Autonomous(name="SixFarAuto")
+public class SixFarAuto extends OpMode {
     private enum State {
         INIT,
         DRIVING_TO_LAUNCH,
@@ -51,13 +52,14 @@ public class SixAuto extends OpMode {
     private ArrayList<Action> actions = new ArrayList<>();
     private FtcDashboard dashboard;
 
-    public static double GOAL_X = -26;
-    public static double GOAL_Y = -24;
+    public static double GOAL_X = 54;
+    public static double GOAL_Y = -18;
+    public static double GOAL_HEADING = 205; // degrees
 
-    public static double PICK_X = -12;
+    public static double PICK_X = -36;
     public static double PICK_Y = -24;
-    public static double PARK_X = -38;
-    public static double PARK_Y = -24;
+    public static double PARK_X = -48;
+    public static double PARK_Y = -18;
 
     public static double HYBRID_BRAKE_TIME = 2;
     public static double EVERY_X_BRAKE = 2;
@@ -65,7 +67,7 @@ public class SixAuto extends OpMode {
     private Rotation2d lastLaunchAngle;
 
     private Pose2d getStartPose() {
-        return new Pose2d(-60, -36, Math.toRadians(270));
+        return new Pose2d(60, -12, Math.toRadians(180));
     }
 
     @Override
@@ -82,11 +84,10 @@ public class SixAuto extends OpMode {
         // State machine
         if (currentState == State.INIT) {
             // Drive to launcher
-            builder = drive.actionBuilder(getStartPose())
-                    .afterDisp(1, bot.launcher.getPowerAction(AimBot.CLOSE_POWER))
-                    .afterDisp(1, bot.launcher.getPowerAction(AimBot.CLOSE_POWER))
-                    .strafeToLinearHeading(new Vector2d(GOAL_X, GOAL_Y), Math.toRadians(225));
-            actions.add(builder.build());
+            actions.add(bot.drive.actionBuilder(getStartPose())
+                .strafeToLinearHeading(new Vector2d(GOAL_X, GOAL_Y), Math.toRadians(GOAL_HEADING))
+                .afterTime(0.1, bot.launcher.getPowerAction(AimBot.FAR_POWER))
+                .build());
             currentState = State.DRIVING_TO_LAUNCH;
         } else if (currentState == State.DRIVING_TO_LAUNCH) {
             // Aimbot
@@ -110,7 +111,10 @@ public class SixAuto extends OpMode {
         } else if (currentState == State.LAUNCH1) {
             // Launch
             if (actions.isEmpty()) {
-                actions.add(bot.singleLaunchAction(aimBot.getLaunchPower()));
+                actions.add(new SequentialAction(
+                        bot.singleLaunchAction(aimBot.getLaunchPower()),
+                        bot.launcher.getPowerAction(0)
+                ));
                 currentState = State.LAUNCH2;
             }
         } else if (currentState == State.LAUNCH2) {
@@ -140,10 +144,12 @@ public class SixAuto extends OpMode {
                                     }
                                 }))
                         .lineToY(PICK_Y-IntakeAuto.DISTANCE, new TranslationalVelConstraint(IntakeAuto.VELOCITY))
-                        .afterTime(0.1, bot.launcher.getPowerAction(AimBot.CLOSE_POWER))
-                        .afterDisp(6, bot.intake.getPowerAction(0))
+                        .afterTime(0.1, new ParallelAction(
+                                bot.intake.getPowerAction(0),
+                                bot.launcher.getPowerAction(AimBot.FAR_POWER)
+                        ))
 //                        .lineToY(PICK_Y)
-                        .strafeToLinearHeading(new Vector2d(GOAL_X, GOAL_Y), Math.toRadians(225))
+                        .strafeToLinearHeading(getStartPose().position, Math.toRadians(225))
                         .build()
                 );
                 currentState = State.PICKING;

@@ -28,7 +28,7 @@ public class Launcher { // extends VelMotor {
     Far: 0.9
      */
 
-    public static double LAUNCH_POWER = QuickAimBot.CLOSE_POWER;
+    public static double LAUNCH_POWER = AimBot.CLOSE_POWER;
     public static double ACTIVE_SPEED = 50; // rpm
     public static double MAX_LAUNCH_ACCEL = 0.01; // rpm/s^2
 
@@ -88,7 +88,7 @@ public class Launcher { // extends VelMotor {
     }
 
     public PowerAction getPowerAction(double power) {
-        return new PowerAction(motor.motor, power);
+        return new PowerAction(motor, power);
     }
 
     public AccelWaitAction getAccelWaitAction(double maxAccel) {
