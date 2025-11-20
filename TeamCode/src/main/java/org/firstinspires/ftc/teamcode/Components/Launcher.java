@@ -1,17 +1,13 @@
 package org.firstinspires.ftc.teamcode.Components;
 
-import androidx.annotation.NonNull;
-
 import com.acmerobotics.dashboard.config.Config;
-import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.SequentialAction;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
-import org.firstinspires.ftc.teamcode.CookedMotor;
+import org.firstinspires.ftc.teamcode.Utils.CookedMotor;
 import org.firstinspires.ftc.teamcode.MainBot;
 import org.firstinspires.ftc.teamcode.Utils.AccelWaitAction;
 import org.firstinspires.ftc.teamcode.Utils.EnhancedMotor;
@@ -50,7 +46,7 @@ public class Launcher { // extends VelMotor {
 
     public CookedMotor cookedMotor;
 
-    private EnhancedMotor motor;
+    public EnhancedMotor motor;
     public Servo servo;
 
     public Launcher(HardwareMap hardwareMap) {

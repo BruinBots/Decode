@@ -2,13 +2,11 @@ package org.firstinspires.ftc.teamcode.Components;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.hardware.PIDCoefficients;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.teamcode.CookedMotor;
+import org.firstinspires.ftc.teamcode.Utils.CookedMotor;
 import org.firstinspires.ftc.teamcode.MainBot;
 import org.firstinspires.ftc.teamcode.Utils.EnhancedMotor;
 import org.firstinspires.ftc.teamcode.Utils.PowerAction;

@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.Autonomous.OpModes;
 
+import androidx.annotation.NonNull;
+
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
@@ -11,6 +13,7 @@ import com.acmerobotics.roadrunner.TranslationalVelConstraint;
 import com.acmerobotics.roadrunner.Vector2d;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.hardware.DcMotor;
 
 import org.firstinspires.ftc.teamcode.Components.Intake;
 import org.firstinspires.ftc.teamcode.Components.QuickAimBot;
@@ -54,7 +57,9 @@ public class SixAuto extends OpMode {
     public static double PARK_X = -38;
     public static double PARK_Y = -24;
 
-    public static double LAUNCH_BRAKE_POWER = 0;
+    public static double HYBRID_BRAKE_TIME = 2;
+    public static double EVERY_X_BRAKE = 5;
+    public static double REVERSE_BRAKE_POWER = 0;
 
     private Pose2d getStartPose() {
         return new Pose2d(-60, -36, Math.toRadians(270));
@@ -111,7 +116,25 @@ public class SixAuto extends OpMode {
                         .splineToSplineHeading(new Pose2d(PICK_X, PICK_Y, Math.toRadians(270)), Math.toRadians(270))
                         .afterDisp(1, new ParallelAction(
                                 bot.intake.getPowerAction(Intake.INTAKE_POWER),
-                                bot.launcher.getPowerAction(-LAUNCH_BRAKE_POWER)))
+                                new Action() {
+                                    private int iter = 0;
+                                    private long startTime;
+                                    @Override
+                                    public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+                                        if (iter == 0) {
+                                            startTime = System.currentTimeMillis();
+                                        }
+                                        if (iter % EVERY_X_BRAKE == 0) {
+                                            bot.launcher.motor.motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+                                            bot.launcher.spinUp(-REVERSE_BRAKE_POWER);
+                                        } else {
+                                            bot.launcher.spinUp(0);
+                                        }
+                                        bot.launcher.motor.motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+                                        iter ++;
+                                        return System.currentTimeMillis() - startTime < HYBRID_BRAKE_TIME;
+                                    }
+                                }))
                         .lineToY(PICK_Y-IntakeAuto.DISTANCE, new TranslationalVelConstraint(IntakeAuto.VELOCITY))
 //                        .lineToY(PICK_Y)
                         .strafeToLinearHeading(new Vector2d(GOAL_X, GOAL_Y), Math.toRadians(225))
