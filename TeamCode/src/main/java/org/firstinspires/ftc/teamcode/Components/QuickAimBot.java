@@ -128,6 +128,12 @@ public class QuickAimBot {
                 .turnTo(getAngleToGoal())
                 .build();
         }
-        return null;
+        return new Action() {
+            @Override
+            public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+                telemetryPacket.addLine("Not performing QuickAimBot");
+                return false;
+            }
+        };
     }
 }
