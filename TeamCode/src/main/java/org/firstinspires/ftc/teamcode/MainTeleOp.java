@@ -12,6 +12,7 @@ import org.firstinspires.ftc.teamcode.Components.Intake;
 import org.firstinspires.ftc.teamcode.Components.Launcher;
 import org.firstinspires.ftc.teamcode.Components.ObeliskReader;
 import org.firstinspires.ftc.teamcode.Components.AimBot;
+import org.firstinspires.ftc.teamcode.Utils.AllLaunchAction;
 
 import java.util.ArrayList;
 
@@ -23,7 +24,7 @@ public class MainTeleOp extends OpMode {
     public ArrayList<Action> launchActions;
     public ArrayList<Action> driveActions;
 
-    public static double DRIVE_FACTOR = 0.6;
+    public static double DRIVE_FACTOR = 1.0;
 
     public AimBot aimBot;
     public ObeliskReader obeliskReader;
@@ -82,9 +83,9 @@ public class MainTeleOp extends OpMode {
         } else {
             if (launchActions.isEmpty() && driveActions.isEmpty()) {
                 bot.intake.doStop();
-                if (!isLaunching) {
-                    bot.launcher.doStop();
-                }
+//                if (!isLaunching) {
+//                    bot.launcher.doStop();
+//                }
              }
         }
 
@@ -110,7 +111,8 @@ public class MainTeleOp extends OpMode {
         }
 
         if (gamepad1.right_trigger > 0.8 && !didAddSingleLaunchAction) {
-            launchActions.add(bot.singleLaunchAction(aimBot.getLaunchPower()));
+//            launchActions.add(bot.singleLaunchAction(aimBot.getLaunchPower()));
+            launchActions.add(new AllLaunchAction(aimBot));
             didAddSingleLaunchAction = true;
         } else {
             didAddSingleLaunchAction = false;

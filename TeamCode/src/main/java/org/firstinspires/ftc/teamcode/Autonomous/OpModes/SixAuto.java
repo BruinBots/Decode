@@ -59,10 +59,14 @@ public class SixAuto extends OpMode {
     public static double PARK_X = -38;
     public static double PARK_Y = -24;
 
+    public static double GOAL_ANGLE = 225;
+
     public static double HYBRID_BRAKE_TIME = 2;
     public static double EVERY_X_BRAKE = 2;
     public static double REVERSE_BRAKE_POWER = 0;
     private Rotation2d lastLaunchAngle;
+
+    // TODO: Test skipping AimBot entirely and doing a set angle from the start for launching
 
     private Pose2d getStartPose() {
         return new Pose2d(-60, -36, Math.toRadians(270));
@@ -85,16 +89,18 @@ public class SixAuto extends OpMode {
             builder = drive.actionBuilder(getStartPose())
                     .afterDisp(1, bot.launcher.getPowerAction(AimBot.CLOSE_POWER))
                     .afterDisp(1, bot.launcher.getPowerAction(AimBot.CLOSE_POWER))
-                    .strafeToLinearHeading(new Vector2d(GOAL_X, GOAL_Y), Math.toRadians(225));
+                    .strafeToLinearHeading(new Vector2d(GOAL_X, GOAL_Y), Math.toRadians(GOAL_ANGLE));
             actions.add(builder.build());
             currentState = State.DRIVING_TO_LAUNCH;
-        } else if (currentState == State.DRIVING_TO_LAUNCH) {
-            // Aimbot
-            if (actions.isEmpty()) {
-                actions.add(aimBot.getAction());
-                currentState = State.AIMING;
-            }
-        } else if (currentState == State.AIMING) {
+        }
+//        else if (currentState == State.DRIVING_TO_LAUNCH) {
+//            // Aimbot
+//            if (actions.isEmpty()) {
+//                actions.add(aimBot.getAction());
+//                currentState = State.AIMING;
+//            }
+//        }
+        else if (currentState == State.DRIVING_TO_LAUNCH) {
             // Launch
             if (actions.isEmpty()) {
                 lastLaunchAngle = bot.drive.localizer.getPose().heading;
@@ -110,7 +116,7 @@ public class SixAuto extends OpMode {
         } else if (currentState == State.LAUNCH1) {
             // Launch
             if (actions.isEmpty()) {
-                actions.add(bot.singleLaunchAction(aimBot.getLaunchPower()));
+                actions.add(bot.singleLaunchActionNoPreload(aimBot.getLaunchPower()));
                 currentState = State.LAUNCH2;
             }
         } else if (currentState == State.LAUNCH2) {
@@ -143,21 +149,23 @@ public class SixAuto extends OpMode {
                         .afterTime(0.1, bot.launcher.getPowerAction(AimBot.CLOSE_POWER))
                         .afterDisp(6, bot.intake.getPowerAction(0))
 //                        .lineToY(PICK_Y)
-                        .strafeToLinearHeading(new Vector2d(GOAL_X, GOAL_Y), Math.toRadians(225))
+                        .strafeToLinearHeading(new Vector2d(GOAL_X, GOAL_Y), Math.toRadians(GOAL_ANGLE))
                         .build()
                 );
                 currentState = State.PICKING;
             }
-        } else if (currentState == State.PICKING) {
-            if (actions.isEmpty()) {
-                actions.add(aimBot.getAction());
-                actions.add(drive.actionBuilder(drive.localizer.getPose())
-                        .turnTo(lastLaunchAngle) // fast adjust
-//                        .turnTo(lastLaunchAngle, new TurnConstraints(Math.PI / 2, -Math.PI / 2, Math.PI / 2)) // slow fine tune
-                        .build());
-                currentState = State.AIMING2;
-            }
-        } else if (currentState == State.AIMING2) {
+        }
+//        else if (currentState == State.PICKING) {
+//            if (actions.isEmpty()) {
+//                actions.add(aimBot.getAction());
+//                actions.add(drive.actionBuilder(drive.localizer.getPose())
+//                        .turnTo(lastLaunchAngle) // fast adjust
+////                        .turnTo(lastLaunchAngle, new TurnConstraints(Math.PI / 2, -Math.PI / 2, Math.PI / 2)) // slow fine tune
+//                        .build());
+//                currentState = State.AIMING2;
+//            }
+//        }
+        else if (currentState == State.PICKING) {
             if (actions.isEmpty()) {
                 actions.add(bot.singleLaunchAction(aimBot.getLaunchPower()));
                 currentState = State.LAUNCH3;
@@ -169,7 +177,7 @@ public class SixAuto extends OpMode {
             }
         } else if (currentState == State.LAUNCH4) {
             if (actions.isEmpty()) {
-                actions.add(bot.singleLaunchAction(aimBot.getLaunchPower()));
+                actions.add(bot.singleLaunchActionNoPreload(aimBot.getLaunchPower()));
                 currentState = State.LAUNCH5;
             }
         } else if (currentState == State.LAUNCH5) {

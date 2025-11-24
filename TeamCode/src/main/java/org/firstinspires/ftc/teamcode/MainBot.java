@@ -1,7 +1,10 @@
 package org.firstinspires.ftc.teamcode;
 
+import androidx.annotation.NonNull;
+
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
+import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.SequentialAction;
@@ -85,24 +88,44 @@ public class MainBot {
     }
 
     public Action singleLaunchActionNoPreload(double power) {
-        return new SequentialAction(
-                launcher.getPowerAction(power),
-                new WaitAction(Launcher.LAUNCH_WAIT_MS),
-                launcher.getAccelWaitAction(Launcher.MAX_LAUNCH_ACCEL),
-                launcher.kickAction(),
-                new WaitAction(Launcher.POST_LAUNCH_WAIT_MS)
-        );
+        if (launcher.artifactPresent) {
+            return new SequentialAction(
+                    launcher.getPowerAction(power),
+//                    new WaitAction(Launcher.LAUNCH_WAIT_MS),
+                    new WaitAction(Launcher.LAUNCH_WAIT_TIME),
+                    launcher.getVeloWaitAction(Launcher.MIN_LAUNCH_SPEED),
+                    launcher.getAccelWaitAction(Launcher.MAX_LAUNCH_ACCEL),
+                    launcher.kickAction(),
+                    new WaitAction(Launcher.POST_LAUNCH_WAIT_MS)
+            );
+        } else {
+            return new Action() {
+                @Override
+                public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+                    return false;
+                }
+            };
+        }
     }
 
     public Action singleLaunchAction(double power) {
-        return new SequentialAction(
-                singleLaunchActionNoPreload(power),
-                intake.getPowerAction(Intake.INTAKE_POWER),
-                new WaitAction(Intake.IN_WAIT_MS),
-                intake.getPowerAction(Intake.REVERSE_POWER),
-                new WaitAction(Intake.REVERSE_WAIT_MS),
-                intake.getPowerAction(0)
-        );
+        if (launcher.artifactPresent) {
+            return new SequentialAction(
+                    singleLaunchActionNoPreload(power),
+                    intake.getPowerAction(Intake.INTAKE_POWER),
+                    new WaitAction(Intake.IN_WAIT_MS),
+                    intake.getPowerAction(Intake.REVERSE_POWER),
+                    new WaitAction(Intake.REVERSE_WAIT_MS),
+                    intake.getPowerAction(0)
+            );
+        } else {
+            return new Action() {
+                @Override
+                public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+                    return false;
+                }
+            };
+        }
     }
 
     public Action intakeDriveAction(boolean resetPose) {
