@@ -29,28 +29,9 @@ import java.util.ArrayList;
 @Config
 @Autonomous(name="SixAuto")
 public class SixAuto extends OpMode {
-    private enum State {
-        INIT,
-        DRIVING_TO_LAUNCH,
-//        AIMING,
-        LAUNCH0,
-        LAUNCH1,
-//        LAUNCH2,
-        PICKING,
-//        AIMING2,
-//        LAUNCH3,
-//        LAUNCH4,
-//        LAUNCH5,
-        PARKING,
-        END,
-    }
-
-    private State currentState = State.INIT;
     private MainBot bot;
     private AimBot aimBot;
     private MecanumDrive drive;
-//    private TrajectoryActionBuilder builder;
-//    private ArrayList<Action> actions = new ArrayList<>();
     private FtcDashboard dashboard;
 
     public static double GOAL_X = -18;
@@ -68,9 +49,6 @@ public class SixAuto extends OpMode {
     public static double REVERSE_BRAKE_POWER = 0;
 
     public Action action;
-//    private Rotation2d lastLaunchAngle;
-
-    // TODO: Test skipping AimBot entirely and doing a set angle from the start for launching
 
     private Pose2d getStartPose() {
         return new Pose2d(-60, -36, Math.toRadians(270));
@@ -134,114 +112,11 @@ public class SixAuto extends OpMode {
 
     @Override
     public void loop() {
-        // State machine
-//        if (currentState == State.INIT) {
-//            // Drive to launcher
-//            builder = drive.actionBuilder(getStartPose())
-//                    .afterDisp(1, bot.launcher.getPowerAction(AimBot.CLOSE_POWER))
-//                    .afterDisp(1, bot.launcher.getPowerAction(AimBot.CLOSE_POWER))
-//                    .strafeToLinearHeading(new Vector2d(GOAL_X, GOAL_Y), Math.toRadians(GOAL_ANGLE));
-//            actions.add(builder.build());
-//            currentState = State.DRIVING_TO_LAUNCH;
-//        }
-////        else if (currentState == State.DRIVING_TO_LAUNCH) {
-////            // Aimbot
-////            if (actions.isEmpty()) {
-////                actions.add(aimBot.getAction());
-////                currentState = State.AIMING;
-////            }
-////        }
-//        else if (currentState == State.DRIVING_TO_LAUNCH) {
-//            // Launch
-//            if (actions.isEmpty()) {
-////                lastLaunchAngle = bot.drive.localizer.getPose().heading;
-//                actions.add(new AllLaunchAction(aimBot));
-//                currentState = State.LAUNCH0;
-//            }
-//        }
-////        else if (currentState == State.LAUNCH0) {
-////            // Launch
-////            if (actions.isEmpty()) {
-////                actions.add(bot.singleLaunchAction(aimBot.getLaunchPower()));
-////                currentState = State.LAUNCH1;
-////            }
-////        } else if (currentState == State.LAUNCH1) {
-////            // Launch
-////            if (actions.isEmpty()) {
-////                actions.add(bot.singleLaunchActionNoPreload(aimBot.getLaunchPower()));
-////                currentState = State.LAUNCH2;
-////            }
-////        }
-//        else if (currentState == State.LAUNCH0) {
-//            if (actions.isEmpty()) {
-//                actions.add(drive.actionBuilder(drive.localizer.getPose())
-//                        .setTangent(0)
-//                        .splineToSplineHeading(new Pose2d(PICK_X, PICK_Y, Math.toRadians(270)), Math.toRadians(270))
-//                        .afterTime(0.1, new ParallelAction(
-//                                bot.intake.getPowerAction(Intake.INTAKE_POWER),
-//                                new Action() {
-//                                    private int iter = 0;
-//                                    private long startTime;
-//                                    @Override
-//                                    public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-//                                        if (iter == 0) {
-//                                            startTime = System.currentTimeMillis();
-//                                        }
-//                                        if (iter % EVERY_X_BRAKE == 0) {
-//                                            bot.launcher.motor.motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-//                                            bot.launcher.spinUp(-REVERSE_BRAKE_POWER);
-//                                        } else {
-//                                            bot.launcher.spinUp(0);
-//                                        }
-//                                        bot.launcher.motor.motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-//                                        iter ++;
-//                                        return System.currentTimeMillis() - startTime < HYBRID_BRAKE_TIME;
-//                                    }
-//                                }))
-//                        .lineToY(PICK_Y-IntakeAuto.DISTANCE, new TranslationalVelConstraint(IntakeAuto.VELOCITY))
-//                        .afterTime(0.1, bot.launcher.getPowerAction(AimBot.CLOSE_POWER))
-//                        .afterDisp(6, bot.intake.getPowerAction(0))
-////                        .lineToY(PICK_Y)
-//                        .strafeToLinearHeading(new Vector2d(GOAL_X, GOAL_Y), Math.toRadians(GOAL_ANGLE))
-//                        .build()
-//                );
-//                currentState = State.PICKING;
-//            }
-//        }
-//        else if (currentState == State.PICKING) {
-//            if (actions.isEmpty()) {
-//                actions.add(new AllLaunchAction(aimBot));
-//                currentState = State.LAUNCH1;
-//            }
-//        }
-//        else if (currentState == State.LAUNCH1) {
-//            if (actions.isEmpty()) {
-//                builder = drive.actionBuilder(drive.localizer.getPose())
-//                        .afterDisp(1, bot.launcher.getPowerAction(0))
-//                        .strafeToLinearHeading(new Vector2d(PARK_X, PARK_Y), Math.toRadians(225));
-//                actions.add(builder.build());
-//                currentState = State.PARKING;
-//            }
-//        } else if (currentState == State.PARKING) {
-//            if (actions.isEmpty()) {
-//                currentState = State.END;
-//                requestOpModeStop();
-//                return;
-//            }
-//        }
-        // Loop actions
+        // Loop action
         TelemetryPacket packet = new TelemetryPacket();
-//        ArrayList<Action> newActions = new ArrayList<>();
-//        for (Action action: actions) {
-//            if (action.run(packet)) {
-//                newActions.add(action);
-//            }
-//        }
-//        actions = newActions;
         if (!action.run(packet)) {
             requestOpModeStop();
         }
-        bot.telemetry.addData("State", currentState);
         bot.launcher.doTelemetry();
         bot.intake.doTelemetry();
         aimBot.readAprilTag();
