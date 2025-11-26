@@ -12,6 +12,7 @@ import com.acmerobotics.roadrunner.Rotation2d;
 import com.acmerobotics.roadrunner.SequentialAction;
 import com.acmerobotics.roadrunner.TrajectoryActionBuilder;
 import com.acmerobotics.roadrunner.TranslationalVelConstraint;
+import com.acmerobotics.roadrunner.TurnConstraints;
 import com.acmerobotics.roadrunner.Vector2d;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
@@ -25,42 +26,29 @@ import org.firstinspires.ftc.teamcode.Utils.AllLaunchAction;
 import org.firstinspires.ftc.teamcode.Utils.ServoAction;
 
 import java.util.ArrayList;
+import java.util.Vector;
 
 @Config
-@Autonomous(name="SixFarAuto")
+@Autonomous(name="SixFarBlue")
 public class SixFarAuto extends OpMode {
-    private enum State {
-        INIT,
-        DRIVING_TO_LAUNCH,
-        LAUNCH0,
-        PICKING,
-        LAUNCH1,
-        PARKING,
-        END,
-    }
-
-    private State currentState = State.INIT;
     private MainBot bot;
-    private AimBot aimBot;
     private MecanumDrive drive;
-    private TrajectoryActionBuilder builder;
-    private ArrayList<Action> actions = new ArrayList<>();
     private FtcDashboard dashboard;
 
     public static double GOAL_X = 54;
     public static double GOAL_Y = -18;
-    public static double GOAL_HEADING = 208; // degrees
+    public static double GOAL_HEADING = 195; // degrees
 
-    public static double PICK_X = 36;
-    public static double PICK_Y = -24;
+    public static double PICK_X = 42;
+    public static double PICK_Y = -18;
     public static double PARK_X = 48;
     public static double PARK_Y = -18;
 
     public static double HYBRID_BRAKE_TIME = 2;
     public static double EVERY_X_BRAKE = 2;
     public static double REVERSE_BRAKE_POWER = 0;
-    private Rotation2d lastLaunchAngle;
 
+    private Action action;
     private Pose2d getStartPose() {
         return new Pose2d(60, -12, Math.toRadians(180));
     }
@@ -68,95 +56,60 @@ public class SixFarAuto extends OpMode {
     @Override
     public void init() {
         bot = MainBot.shared = new MainBot(hardwareMap, telemetry);
-        aimBot = new AimBot();
         drive = bot.drive;
         drive.localizer.setPose(getStartPose());
         dashboard = FtcDashboard.getInstance();
+
+        TrajectoryActionBuilder driveToLaunch1 = drive.actionBuilder(getStartPose())
+                .strafeToLinearHeading(new Vector2d(GOAL_X, GOAL_Y), Math.toRadians(GOAL_HEADING));
+
+        TrajectoryActionBuilder pick = driveToLaunch1.endTrajectory().fresh()
+                .setTangent(0)
+                .splineToSplineHeading(new Pose2d(PICK_X, PICK_Y, Math.toRadians(270)), Math.toRadians(270))
+                .afterTime(0.1, new ParallelAction(
+                        bot.intake.getPowerAction(Intake.INTAKE_POWER),
+                        telemetryPacket -> {
+                            bot.launcher.motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+                            bot.launcher.spinUp(0);
+                            return false;
+                        }))
+                .lineToY(PICK_Y-IntakeAuto.DISTANCE, new TranslationalVelConstraint(IntakeAuto.VELOCITY))
+                .afterTime(0.1, new ParallelAction(
+                        bot.intake.getPowerAction(0),
+                        bot.launcher.getPowerAction(AimBot.FAR_POWER),
+                        telemetryPacket -> {
+                            bot.launcher.motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+                            return false;
+                        }
+                ))
+//                        .lineToY(PICK_Y)
+                .setTangent(Math.toRadians(90))
+                .splineToSplineHeading(new Pose2d(GOAL_X, GOAL_Y, Math.toRadians(GOAL_HEADING)), Math.toRadians(2));
+
+        TrajectoryActionBuilder park = pick.endTrajectory().fresh()
+                .afterDisp(1, bot.launcher.getPowerAction(0))
+                .strafeToLinearHeading(new Vector2d(PARK_X, PARK_Y), Math.toRadians(225));
+
+        action = new SequentialAction(
+                bot.launcher.getPowerAction(AimBot.FAR_POWER),
+                driveToLaunch1.build(),
+                new AllLaunchAction(AimBot.FAR_POWER),
+                pick.build(),
+                pick.endTrajectory().fresh().turnTo(Math.toRadians(GOAL_HEADING), new TurnConstraints(Math.PI/2, -Math.PI/2, Math.PI/2)).build(),
+                new AllLaunchAction(AimBot.FAR_POWER),
+                park.build()
+        );
+
     }
 
     @Override
     public void loop() {
-        // State machine
-        if (currentState == State.INIT) {
-            // Drive to launcher
-            actions.add(bot.drive.actionBuilder(getStartPose())
-                .strafeToLinearHeading(new Vector2d(GOAL_X, GOAL_Y), Math.toRadians(GOAL_HEADING))
-                .afterTime(0.1, bot.launcher.getPowerAction(AimBot.FAR_POWER))
-                .build());
-            currentState = State.DRIVING_TO_LAUNCH;
-        } else if (currentState == State.DRIVING_TO_LAUNCH) {
-            // Aimbot
-            if (actions.isEmpty()) {
-                actions.add(new AllLaunchAction(aimBot));
-                currentState = State.LAUNCH0;
-            }
-        } else if (currentState == State.LAUNCH0) {
-            if (actions.isEmpty()) {
-                actions.add(drive.actionBuilder(drive.localizer.getPose())
-                        .setTangent(0)
-                        .splineToSplineHeading(new Pose2d(PICK_X, PICK_Y, Math.toRadians(270)), Math.toRadians(270))
-                        .afterTime(0.1, new ParallelAction(
-                                bot.intake.getPowerAction(Intake.INTAKE_POWER),
-                                new Action() {
-                                    private int iter = 0;
-                                    private long startTime;
-                                    @Override
-                                    public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-                                        if (iter == 0) {
-                                            startTime = System.currentTimeMillis();
-                                        }
-                                        if (iter % EVERY_X_BRAKE == 0) {
-                                            bot.launcher.motor.motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-                                            bot.launcher.spinUp(-REVERSE_BRAKE_POWER);
-                                        } else {
-                                            bot.launcher.spinUp(0);
-                                        }
-                                        bot.launcher.motor.motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-                                        iter ++;
-                                        return System.currentTimeMillis() - startTime < HYBRID_BRAKE_TIME;
-                                    }
-                                }))
-                        .lineToY(PICK_Y-IntakeAuto.DISTANCE, new TranslationalVelConstraint(IntakeAuto.VELOCITY))
-                        .afterTime(0.1, new ParallelAction(
-                                bot.intake.getPowerAction(0),
-                                bot.launcher.getPowerAction(AimBot.FAR_POWER)
-                        ))
-//                        .lineToY(PICK_Y)
-                        .strafeToLinearHeading(getStartPose().position, Math.toRadians(GOAL_HEADING))
-                        .build()
-                );
-                currentState = State.PICKING;
-            }
-        } else if (currentState == State.PICKING) {
-            if (actions.isEmpty()) {
-                actions.add(new AllLaunchAction(aimBot));
-                currentState = State.LAUNCH1;
-            }
-        } else if (currentState == State.LAUNCH1) {
-            if (actions.isEmpty()) {
-                builder = drive.actionBuilder(drive.localizer.getPose())
-                        .afterDisp(1, bot.launcher.getPowerAction(0))
-                        .strafeToLinearHeading(new Vector2d(PARK_X, PARK_Y), Math.toRadians(225));
-                actions.add(builder.build());
-                currentState = State.PARKING;
-            }
-        } else if (currentState == State.PARKING) {
-            if (actions.isEmpty()) {
-                currentState = State.END;
-                requestOpModeStop();
-                return;
-            }
-        }
         // Loop actions
         TelemetryPacket packet = new TelemetryPacket();
-        ArrayList<Action> newActions = new ArrayList<>();
-        for (Action action: actions) {
-            if (action.run(packet)) {
-                newActions.add(action);
-            }
+        if (!action.run(packet)) {
+            requestOpModeStop();
         }
-        actions = newActions;
-        bot.telemetry.addData("State", currentState);
+        drive.updatePoseEstimate();
         bot.launcher.doTelemetry();
         bot.intake.doTelemetry();
         dashboard.sendTelemetryPacket(packet);

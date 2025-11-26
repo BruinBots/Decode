@@ -51,6 +51,7 @@ package com.example.meepmeeptesting;
 
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
+import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.SequentialAction;
 import com.acmerobotics.roadrunner.TranslationalVelConstraint;
@@ -77,24 +78,12 @@ public class MeepMeepTesting {
                 .setConstraints(60, 60, Math.toRadians(180), Math.toRadians(180), 15)
                 .build();
 
-        myBot.runAction(myBot.getDrive().actionBuilder(new Pose2d(-60, -36, Math.toRadians(270)))
-                .strafeToLinearHeading(new Vector2d(-42, -36), Math.toRadians(225))
-//                .lineToX(24, new TranslationalVelConstraint(10))
-//                .strafeToLinearHeading(new Vector2d(-42, -36), Math.toRadians(225))
-////                .stopAndAdd(new SequentialAction(
-////                        aimBot.getAimAction(),
-////                        bot.getSingleLaunchAction(),
-////                        bot.getSingleLaunchAction(),
-////                        bot.getSingleLaunchAction()
-////                ))
-//                .waitSeconds(5)
-//                .strafeToLinearHeading(new Vector2d(-36, -16), Math.toRadians(175))
-////                .stopAndAdd(obeliskReader.readObeliskAction())
-                .setTangent(0)
-                .splineToSplineHeading(new Pose2d(-12, -36, Math.toRadians(270)), Math.toRadians(270))
-//                .afterDisp(12, bot.intake.getServoAction(Intake.INTAKE_IN_POS))
-                .lineToY(-48)
-                .strafeToLinearHeading(new Vector2d(-26, -24), Math.toRadians(225))
+        myBot.runAction(myBot.getDrive().actionBuilder(new Pose2d(60, -12, Math.toRadians(180)))
+                .splineToSplineHeading(new Pose2d(42, -18, Math.toRadians(270)), Math.toRadians(270))
+                .lineToY(-42-18, new TranslationalVelConstraint(10))
+//                        .lineToY(PICK_Y)
+                .setTangent(Math.toRadians(90))
+                .splineToSplineHeading(new Pose2d(54, -18, Math.toRadians(195)), Math.toRadians(2))
                 .build());
 
 //        meepMeep.setBackground(MeepMeep.Background.FIELD_POWERPLAY_OFFICIAL)

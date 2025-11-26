@@ -41,7 +41,7 @@ public class MainTeleOp extends OpMode {
     public void init() {
         MainBot.shared = new MainBot(hardwareMap, telemetry);
         bot = MainBot.shared;
-        bot.launcherGamepad = gamepad1;
+        bot.launcherGamepad = gamepad2;
 
         aimBot = new AimBot();
         obeliskReader = new ObeliskReader();
@@ -61,7 +61,7 @@ public class MainTeleOp extends OpMode {
 
          */
 
-        if (gamepad1.left_bumper) {
+        if (gamepad1.left_bumper || gamepad2.dpad_down) {
             launchActions.clear();
             bot.launcher.setServo(Launcher.SERVO_UP_POS);
         }
@@ -75,13 +75,13 @@ public class MainTeleOp extends OpMode {
 //            bot.intake.kickDown();
 //        }
 
-        if (gamepad1.a) {
+        if (gamepad1.a || gamepad2.right_trigger > 0.8) {
             launchActions.clear();
             bot.intake.setPower(Intake.INTAKE_POWER);
             if (!bot.launcher.isActive()) {
                 bot.launcher.spinUp(-Launcher.REVERSE_POWER);
             }
-        } else if (gamepad1.b) {
+        } else if (gamepad1.b || gamepad2.b) {
             launchActions.clear();
             bot.intake.setPower(-Intake.REVERSE_POWER);
             if (!bot.launcher.isActive()) {
@@ -96,7 +96,7 @@ public class MainTeleOp extends OpMode {
              }
         }
 
-        if (gamepad1.x) {
+        if (gamepad1.x || gamepad2.dpad_up) {
             launchActions.clear();
             double power = Launcher.LAUNCH_POWER;
             if (aimBot.foundGoal) {
@@ -104,20 +104,20 @@ public class MainTeleOp extends OpMode {
             }
             bot.launcher.spinUp(power);
             isLaunching = true;
-        } else if (gamepad1.y) {
+        } else if (gamepad1.y || gamepad2.y) {
             launchActions.clear();
             bot.launcher.doStop();
             isLaunching = false;
         }
 
-        if (gamepad1.right_bumper && gamepad1.dpad_right && !didAddAimBotAction) {
+        if (((gamepad1.right_bumper && gamepad1.dpad_right) || gamepad2.a) && !didAddAimBotAction) {
             driveActions.add(aimBot.getAction());
             didAddAimBotAction = true;
         } else {
             didAddAimBotAction = false;
         }
 
-        if (gamepad1.right_trigger > 0.8 && !didAddSingleLaunchAction) {
+        if ((gamepad1.right_trigger > 0.8 || gamepad2.right_bumper) && !didAddSingleLaunchAction) {
 //            launchActions.add(bot.singleLaunchAction(aimBot.getLaunchPower()));
             launchActions.add(new AllLaunchAction(aimBot));
             didAddSingleLaunchAction = true;
@@ -125,11 +125,17 @@ public class MainTeleOp extends OpMode {
             didAddSingleLaunchAction = false;
         }
 
-        if (gamepad1.dpad_left && !didAddIntakeDriveAction) {
+        if ((gamepad1.dpad_left || gamepad2.x) && !didAddIntakeDriveAction) {
             driveActions.add(bot.intakeDriveAction(true));
             didAddIntakeDriveAction = true;
         } else {
             didAddIntakeDriveAction = false;
+        }
+
+        if (gamepad2.left_stick_button) {
+            DRIVE_FACTOR = 0.5;
+        } else if (gamepad2.right_stick_button) {
+            DRIVE_FACTOR = 1.0;
         }
 
 //        if (gamepad1.left_bumper) {
@@ -165,8 +171,8 @@ public class MainTeleOp extends OpMode {
         bot.launcher.doTelemetry();
         bot.intake.doTelemetry();
 
-        bot.launcher.cookedMotor.loop(gamepad1);
-        bot.intake.cookedMotor.loop(gamepad1);
+        bot.launcher.cookedMotor.loop(gamepad2);
+        bot.intake.cookedMotor.loop(gamepad2);
 
         aimBot.readAprilTag();
         aimBot.doTelemetry();
@@ -192,14 +198,14 @@ public class MainTeleOp extends OpMode {
         bot.dashboard.sendTelemetryPacket(packet);
 
         // NOTE: Left stick y is negative when pushed forward (up) on PS4 controller
-        double drive = -gamepad1.left_stick_y;
-        double rotate = gamepad1.right_stick_x;
-        double strafe = gamepad1.left_stick_x;
-        if (drive != 0 || strafe != 0 || rotate != 0) {
+        double drive = -gamepad1.left_stick_y - gamepad2.left_stick_y;
+        double rotate = gamepad1.right_stick_x + gamepad2.right_stick_x;
+        double strafe = gamepad1.left_stick_x + gamepad2.left_stick_x;
+        if (drive != 0) {
             driveActions.clear();
         }
         if (driveActions.isEmpty()) {
-            bot.moveBotMecanum(-gamepad1.left_stick_y, gamepad1.right_stick_x, gamepad1.left_stick_x, DRIVE_FACTOR);
+            bot.moveBotMecanum(drive, rotate, strafe, DRIVE_FACTOR);
         }
     }
 

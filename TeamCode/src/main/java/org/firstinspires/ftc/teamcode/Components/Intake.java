@@ -31,7 +31,7 @@ public class Intake {
         motor.setTicksPerRev(145.1);
         motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         motor.setDirection(DcMotorSimple.Direction.REVERSE);
-        motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         cookedMotor = new CookedMotor(motor.motor, 6);
     }
 

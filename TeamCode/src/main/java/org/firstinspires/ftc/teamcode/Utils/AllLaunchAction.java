@@ -19,10 +19,28 @@ public class AllLaunchAction implements Action {
     private Action launchAction = null;
     private boolean firstLoop = true;
     private AimBot aimBot;
+    private double launchPower;
+    private int maxLaunches;
+    private int numLaunches = 0;
 
     public AllLaunchAction(AimBot aimBot) {
-//        lastArtifactTime = System.currentTimeMillis();
         this.aimBot = aimBot;
+        maxLaunches = 3;
+    }
+
+    public AllLaunchAction(AimBot aimBot, int maxLaunches) {
+        this.aimBot = aimBot;
+        this.maxLaunches = maxLaunches;
+    }
+
+    public AllLaunchAction(double launchPower) {
+        this.launchPower = launchPower;
+        this.maxLaunches = 3;
+    }
+
+    public AllLaunchAction(double launchPower, int maxLaunches) {
+        this.launchPower = launchPower;
+        this.maxLaunches = maxLaunches;
     }
 
     @Override
@@ -42,12 +60,26 @@ public class AllLaunchAction implements Action {
             lastArtifactTime = curTime;
         }
         if (launchAction == null && MainBot.shared.launcher.artifactPresent) {
-            launchAction = MainBot.shared.singleLaunchAction(aimBot.getLaunchPower());
+            double power;
+            if (aimBot != null) {
+                power = aimBot.getLaunchPower();
+            } else {
+                power = launchPower;
+            }
+            if (numLaunches == maxLaunches - 1) { // last launch}
+                launchAction = MainBot.shared.singleLaunchActionNoPreload(power);
+            } else {
+                launchAction = MainBot.shared.singleLaunchAction(power);
+            }
         } else if (launchAction != null) {
             if (!launchAction.run(telemetryPacket)) {
                 // launch done, continue
                 launchAction = null;
                 lastArtifactTime = curTime;
+                numLaunches ++;
+                if (numLaunches >= maxLaunches) {
+                    return false; // done
+                }
             }
         }
 

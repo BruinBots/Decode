@@ -27,10 +27,9 @@ import org.firstinspires.ftc.teamcode.Utils.AllLaunchAction;
 import java.util.ArrayList;
 
 @Config
-@Autonomous(name="SixAuto")
+@Autonomous(name="SixBlue")
 public class SixAuto extends OpMode {
     private MainBot bot;
-    private AimBot aimBot;
     private MecanumDrive drive;
     private FtcDashboard dashboard;
 
@@ -57,7 +56,6 @@ public class SixAuto extends OpMode {
     @Override
     public void init() {
         bot = MainBot.shared = new MainBot(hardwareMap, telemetry);
-        aimBot = new AimBot();
         drive = bot.drive;
         drive.localizer.setPose(getStartPose());
         dashboard = FtcDashboard.getInstance();
@@ -72,28 +70,14 @@ public class SixAuto extends OpMode {
                 .splineToSplineHeading(new Pose2d(PICK_X, PICK_Y, Math.toRadians(270)), Math.toRadians(270))
                 .afterTime(0.1, new ParallelAction(
                         bot.intake.getPowerAction(Intake.INTAKE_POWER),
-                        new Action() {
-                            private int iter = 0;
-                            private long startTime;
-                            @Override
-                            public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-                                if (iter == 0) {
-                                    startTime = System.currentTimeMillis();
-                                }
-                                if (Math.random() < BRAKE_PERCENT) {
-                                    bot.launcher.motor.motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-                                    bot.launcher.spinUp(-REVERSE_BRAKE_POWER);
-                                } else {
-                                    bot.launcher.spinUp(0);
-                                }
-                                bot.launcher.motor.motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-                                iter ++;
-                                return System.currentTimeMillis() - startTime < HYBRID_BRAKE_TIME;
-                            }
+                        telemetryPacket -> {
+                            bot.launcher.motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+                            bot.launcher.spinUp(0);
+                            return false;
                         }))
                 .lineToY(PICK_Y-IntakeAuto.DISTANCE, new TranslationalVelConstraint(IntakeAuto.VELOCITY))
                 .afterTime(0.1, bot.launcher.getPowerAction(AimBot.CLOSE_POWER))
-                .afterTime(3, bot.intake.getPowerAction(0))
+                .afterTime(1.5, bot.intake.getPowerAction(0))
 //                        .lineToY(PICK_Y)
                 .strafeToLinearHeading(new Vector2d(GOAL_X, GOAL_Y), Math.toRadians(GOAL_ANGLE));
 
@@ -103,9 +87,13 @@ public class SixAuto extends OpMode {
 
         action = new SequentialAction(
                 driveToLaunch1.build(),
-                new AllLaunchAction(aimBot),
+                new AllLaunchAction(AimBot.CLOSE_POWER),
                 pick.build(),
-                new AllLaunchAction(aimBot),
+                telemetryPacket -> {
+                    bot.launcher.motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+                    return false;
+                },
+                new AllLaunchAction(AimBot.CLOSE_POWER),
                 park.build()
         );
     }
@@ -119,8 +107,6 @@ public class SixAuto extends OpMode {
         }
         bot.launcher.doTelemetry();
         bot.intake.doTelemetry();
-        aimBot.readAprilTag();
-        aimBot.doTelemetry();
         bot.voltageCompensator.doTelemetry();
         bot.drive.updatePoseEstimate();
         dashboard.sendTelemetryPacket(packet);
