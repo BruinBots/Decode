@@ -64,7 +64,7 @@ public class SixAuto extends OpMode {
     public static double GOAL_ANGLE = 231;
 
     public static double HYBRID_BRAKE_TIME = 2;
-    public static double EVERY_X_BRAKE = 2;
+    public static double BRAKE_PERCENT = 0.85;
     public static double REVERSE_BRAKE_POWER = 0;
 
     public Action action;
@@ -102,7 +102,7 @@ public class SixAuto extends OpMode {
                                 if (iter == 0) {
                                     startTime = System.currentTimeMillis();
                                 }
-                                if (iter % EVERY_X_BRAKE == 0) {
+                                if (Math.random() < BRAKE_PERCENT) {
                                     bot.launcher.motor.motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
                                     bot.launcher.spinUp(-REVERSE_BRAKE_POWER);
                                 } else {
@@ -115,7 +115,7 @@ public class SixAuto extends OpMode {
                         }))
                 .lineToY(PICK_Y-IntakeAuto.DISTANCE, new TranslationalVelConstraint(IntakeAuto.VELOCITY))
                 .afterTime(0.1, bot.launcher.getPowerAction(AimBot.CLOSE_POWER))
-//                .afterDisp(6, bot.intake.getPowerAction(0))
+                .afterTime(3, bot.intake.getPowerAction(0))
 //                        .lineToY(PICK_Y)
                 .strafeToLinearHeading(new Vector2d(GOAL_X, GOAL_Y), Math.toRadians(GOAL_ANGLE));
 
