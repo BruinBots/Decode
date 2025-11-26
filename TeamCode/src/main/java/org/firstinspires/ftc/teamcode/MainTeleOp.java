@@ -41,6 +41,7 @@ public class MainTeleOp extends OpMode {
     public void init() {
         MainBot.shared = new MainBot(hardwareMap, telemetry);
         bot = MainBot.shared;
+        bot.launcherGamepad = gamepad1;
 
         aimBot = new AimBot();
         obeliskReader = new ObeliskReader();
@@ -54,6 +55,12 @@ public class MainTeleOp extends OpMode {
 
     @Override
     public void loop() {
+        /*
+        right_trigger -> intake power
+        left_trigger -> intake reverse power
+
+         */
+
         if (gamepad1.left_bumper) {
             launchActions.clear();
             bot.launcher.setServo(Launcher.SERVO_UP_POS);
@@ -83,9 +90,9 @@ public class MainTeleOp extends OpMode {
         } else {
             if (launchActions.isEmpty() && driveActions.isEmpty()) {
                 bot.intake.doStop();
-//                if (!isLaunching) {
-//                    bot.launcher.doStop();
-//                }
+                if (!isLaunching) {
+                    bot.launcher.doStop();
+                }
              }
         }
 

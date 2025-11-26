@@ -21,6 +21,7 @@ import org.firstinspires.ftc.teamcode.Components.AimBot;
 import org.firstinspires.ftc.teamcode.Components.Intake;
 import org.firstinspires.ftc.teamcode.MainBot;
 import org.firstinspires.ftc.teamcode.MecanumDrive;
+import org.firstinspires.ftc.teamcode.Utils.AllLaunchAction;
 import org.firstinspires.ftc.teamcode.Utils.ServoAction;
 
 import java.util.ArrayList;
@@ -31,15 +32,9 @@ public class SixFarAuto extends OpMode {
     private enum State {
         INIT,
         DRIVING_TO_LAUNCH,
-        AIMING,
         LAUNCH0,
-        LAUNCH1,
-        LAUNCH2,
         PICKING,
-        AIMING2,
-        LAUNCH3,
-        LAUNCH4,
-        LAUNCH5,
+        LAUNCH1,
         PARKING,
         END,
     }
@@ -54,11 +49,11 @@ public class SixFarAuto extends OpMode {
 
     public static double GOAL_X = 54;
     public static double GOAL_Y = -18;
-    public static double GOAL_HEADING = 205; // degrees
+    public static double GOAL_HEADING = 208; // degrees
 
-    public static double PICK_X = -36;
+    public static double PICK_X = 36;
     public static double PICK_Y = -24;
-    public static double PARK_X = -48;
+    public static double PARK_X = 48;
     public static double PARK_Y = -18;
 
     public static double HYBRID_BRAKE_TIME = 2;
@@ -92,32 +87,10 @@ public class SixFarAuto extends OpMode {
         } else if (currentState == State.DRIVING_TO_LAUNCH) {
             // Aimbot
             if (actions.isEmpty()) {
-                actions.add(aimBot.getAction());
-                currentState = State.AIMING;
-            }
-        } else if (currentState == State.AIMING) {
-            // Launch
-            if (actions.isEmpty()) {
-                lastLaunchAngle = bot.drive.localizer.getPose().heading;
-                actions.add(bot.singleLaunchAction(aimBot.getLaunchPower()));
+                actions.add(new AllLaunchAction(aimBot));
                 currentState = State.LAUNCH0;
             }
         } else if (currentState == State.LAUNCH0) {
-            // Launch
-            if (actions.isEmpty()) {
-                actions.add(bot.singleLaunchAction(aimBot.getLaunchPower()));
-                currentState = State.LAUNCH1;
-            }
-        } else if (currentState == State.LAUNCH1) {
-            // Launch
-            if (actions.isEmpty()) {
-                actions.add(new SequentialAction(
-                        bot.singleLaunchAction(aimBot.getLaunchPower()),
-                        bot.launcher.getPowerAction(0)
-                ));
-                currentState = State.LAUNCH2;
-            }
-        } else if (currentState == State.LAUNCH2) {
             if (actions.isEmpty()) {
                 actions.add(drive.actionBuilder(drive.localizer.getPose())
                         .setTangent(0)
@@ -149,36 +122,17 @@ public class SixFarAuto extends OpMode {
                                 bot.launcher.getPowerAction(AimBot.FAR_POWER)
                         ))
 //                        .lineToY(PICK_Y)
-                        .strafeToLinearHeading(getStartPose().position, Math.toRadians(225))
+                        .strafeToLinearHeading(getStartPose().position, Math.toRadians(GOAL_HEADING))
                         .build()
                 );
                 currentState = State.PICKING;
             }
         } else if (currentState == State.PICKING) {
             if (actions.isEmpty()) {
-                actions.add(aimBot.getAction());
-                actions.add(drive.actionBuilder(drive.localizer.getPose())
-                        .turnTo(lastLaunchAngle) // fast adjust
-//                        .turnTo(lastLaunchAngle, new TurnConstraints(Math.PI / 2, -Math.PI / 2, Math.PI / 2)) // slow fine tune
-                        .build());
-                currentState = State.AIMING2;
+                actions.add(new AllLaunchAction(aimBot));
+                currentState = State.LAUNCH1;
             }
-        } else if (currentState == State.AIMING2) {
-            if (actions.isEmpty()) {
-                actions.add(bot.singleLaunchAction(aimBot.getLaunchPower()));
-                currentState = State.LAUNCH3;
-            }
-        } else if (currentState == State.LAUNCH3) {
-            if (actions.isEmpty()) {
-                actions.add(bot.singleLaunchAction(aimBot.getLaunchPower()));
-                currentState = State.LAUNCH4;
-            }
-        } else if (currentState == State.LAUNCH4) {
-            if (actions.isEmpty()) {
-                actions.add(bot.singleLaunchAction(aimBot.getLaunchPower()));
-                currentState = State.LAUNCH5;
-            }
-        } else if (currentState == State.LAUNCH5) {
+        } else if (currentState == State.LAUNCH1) {
             if (actions.isEmpty()) {
                 builder = drive.actionBuilder(drive.localizer.getPose())
                         .afterDisp(1, bot.launcher.getPowerAction(0))

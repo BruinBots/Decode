@@ -17,15 +17,20 @@ public class AllLaunchAction implements Action {
 
     private long lastArtifactTime;
     private Action launchAction = null;
+    private boolean firstLoop = true;
     private AimBot aimBot;
 
     public AllLaunchAction(AimBot aimBot) {
-        lastArtifactTime = System.currentTimeMillis();
+//        lastArtifactTime = System.currentTimeMillis();
         this.aimBot = aimBot;
     }
 
     @Override
     public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+        if (firstLoop) {
+            lastArtifactTime = System.currentTimeMillis();
+            firstLoop = false;
+        }
         long curTime = System.currentTimeMillis();
         if (launchAction == null) {
             if (curTime - lastArtifactTime > WAIT_BETWEEN_DURATION) {
@@ -42,6 +47,7 @@ public class AllLaunchAction implements Action {
             if (!launchAction.run(telemetryPacket)) {
                 // launch done, continue
                 launchAction = null;
+                lastArtifactTime = curTime;
             }
         }
 

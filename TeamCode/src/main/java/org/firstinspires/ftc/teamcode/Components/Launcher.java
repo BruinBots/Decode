@@ -63,6 +63,7 @@ public class Launcher { // extends VelMotor {
     public static int SENSOR_RUNNING_AVERAGE_SIZE = 10;
     public static double SENSOR_THREHSOLD_DISTANCE = 4.5; // inches
     public boolean artifactPresent = false;
+    private double maxTicksPerSec;
 
     public Launcher(HardwareMap hardwareMap) {
         motor = new EnhancedMotor(hardwareMap, "launchMotor");
@@ -71,6 +72,7 @@ public class Launcher { // extends VelMotor {
         indicatorLight = hardwareMap.get(Servo.class, "indicator");
         sensor = hardwareMap.get(Rev2mDistanceSensor.class, "sensor");
         cookedMotor = new CookedMotor(motor.motor, 6);
+        maxTicksPerSec = motor.motor.getMotorType().getAchieveableMaxTicksPerSecond();
     }
 
     public void updateSensorState() {
@@ -90,6 +92,9 @@ public class Launcher { // extends VelMotor {
             indicatorLight.setPosition(0);
         } else {
             // artifact present
+            if (!this.artifactPresent && MainBot.shared.launcherGamepad != null) {
+                MainBot.shared.launcherGamepad.rumbleBlips(1);
+            }
             artifactPresent = true;
             indicatorLight.setPosition(1);
         }
