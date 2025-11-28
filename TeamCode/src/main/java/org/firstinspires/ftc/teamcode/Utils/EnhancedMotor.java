@@ -56,6 +56,14 @@ public class EnhancedMotor {
         motor.setMode(mode);
     }
 
+    public int setTargetPositionRelative(double dist) { // set target position (relative) in units of rotation (1 = one full rotation)
+        int curPosTicks = motor.getCurrentPosition();
+        int deltaPosTicks = (int)(dist * ticksPerRev);
+        int targetPosTicks = curPosTicks + deltaPosTicks;
+        motor.setTargetPosition((int)targetPosTicks);
+        return targetPosTicks;
+    }
+
     private double lastVelTime = 0;
     private double lastVel = 0;
     private double accel = 0;
