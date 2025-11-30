@@ -25,10 +25,10 @@ public class Intake {
 
     // Auto-launch constants
     public static double SHORT_IN_DIST = 0.25; // revs
-    public static double SHORT_IN_POWER = 0.4;
+    public static double SHORT_IN_POWER = 0.5;
     public static double SHORT_OUT_DIST = 0.25; // revs
     public static double SHORT_OUT_POWER = 0.4;
-    public static double LONG_IN_DIST = 1.0; // revs
+    public static double LONG_IN_DIST = 1.5; // revs
     public static double LONG_OUT_DIST = 0.5; // revs
 
 

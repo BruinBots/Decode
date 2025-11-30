@@ -34,7 +34,8 @@ public class AimBot {
 
     // More turning constants
     public static double ADJUST_kP = 1;
-    public static double STATIC_ANGLE_OFFSET = 2;
+    public static double NEAR_STATIC_OFFSET = 2;
+    public static double FAR_STATIC_OFFSET = 28;
 
     public AimBot() {
         aprilTags = MainBot.shared.aprilTags;
@@ -47,6 +48,13 @@ public class AimBot {
             if (detection.metadata != null && (detection.id == 20 || detection.id == 24)) {
                 distance = detection.ftcPose.y;
 
+                double staticOffset;
+                if (distance > THRESHOLD_DISTANCE) {
+                    staticOffset = FAR_STATIC_OFFSET;
+                } else {
+                    staticOffset = NEAR_STATIC_OFFSET;
+                }
+
                 // compute raw angle from trig
                 horizontal = detection.ftcPose.x;
                 rawAngleError = -Math.toDegrees(Math.atan(horizontal / distance)); // detection.ftcPose.yaw;
@@ -55,7 +63,7 @@ public class AimBot {
                 // https://discord.com/channels/775043247802286080/775048219465220128/1427015590161420450
                 double yaw = detection.ftcPose.yaw;
                 double angleAdjust = -yaw * ADJUST_kP;
-                angleError = rawAngleError - angleAdjust - STATIC_ANGLE_OFFSET;
+                angleError = rawAngleError - angleAdjust - staticOffset;
 
                 foundGoalTime = System.currentTimeMillis();
             }

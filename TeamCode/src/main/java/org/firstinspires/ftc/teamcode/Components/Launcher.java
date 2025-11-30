@@ -48,7 +48,9 @@ public class Launcher { // extends VelMotor {
     public static int MIN_LAUNCH_SPEED = 3000; // rpm
 
     public static int SERVO_WAIT_MS = 1250;
-    public static int POST_LAUNCH_WAIT_MS = 500;
+    public static int POST_LAUNCH_WAIT_MS = 1000;
+
+    public static int KICK_SENSOR_WAIT_MS = 500;
 
     public CookedMotor cookedMotor;
 
@@ -64,6 +66,7 @@ public class Launcher { // extends VelMotor {
     public static double SENSOR_THREHSOLD_DISTANCE = 4.5; // inches
     public boolean artifactPresent = false;
     private double maxTicksPerSec;
+    private long lastServoUpTime = 0;
 
     public Launcher(HardwareMap hardwareMap) {
         motor = new EnhancedMotor(hardwareMap, "launchMotor");
@@ -76,6 +79,9 @@ public class Launcher { // extends VelMotor {
     }
 
     public void updateSensorState() {
+        if (System.currentTimeMillis() - lastServoUpTime < KICK_SENSOR_WAIT_MS) {
+            return; // too soon after kicking; kick arm interferes with sensor
+        }
         double val = sensor.getDistance(DistanceUnit.INCH);
         sensorRunningAverages.add(val);
         if (sensorRunningAverages.size() > SENSOR_RUNNING_AVERAGE_SIZE) {
@@ -114,7 +120,12 @@ public class Launcher { // extends VelMotor {
     }
 
     public void doTelemetry() {
+        if (servo.getPosition() > SERVO_DOWN_POS) {
+            lastServoUpTime = System.currentTimeMillis();
+        }
         updateSensorState();
+        MainBot.shared.telemetry.addData("Launcher Last Servo Up Time", lastServoUpTime);
+        MainBot.shared.telemetry.addData("Launcher Time Delta", System.currentTimeMillis() - lastServoUpTime);
         MainBot.shared.telemetry.addData("Launcher Power", motor.getPower());
         MainBot.shared.telemetry.addData("Launcher Speed", motor.getRPM()); // getCurrentVelocity()
         MainBot.shared.telemetry.addData("Launcher Acceleration", motor.getAcceleration()); // getCurrentAcceleration()

@@ -17,7 +17,7 @@ public class BatteryVoltageCompensator {
      */
 
     public static boolean ENABLED = true;
-    public static double FULL_BATTERY_VOLTAGE = 12.95;
+    public static double FULL_BATTERY_VOLTAGE = 13.35;
 
     private VoltageSensor sensor;
     public double lastVoltage;

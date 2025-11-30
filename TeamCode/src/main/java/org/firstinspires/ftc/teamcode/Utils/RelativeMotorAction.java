@@ -2,12 +2,14 @@ package org.firstinspires.ftc.teamcode.Utils;
 
 import androidx.annotation.NonNull;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
+@Config
 public class RelativeMotorAction implements Action {
-    public static double TOLERANCE = 0.1; // revolutions
+    public static double TOLERANCE = 0.02; // revolutions
 
     private EnhancedMotor motor;
     private double power;
@@ -25,8 +27,8 @@ public class RelativeMotorAction implements Action {
     @Override
     public boolean run(@NonNull TelemetryPacket telemetryPacket) {
         if (firstLoop) {
-            motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             targetPosTicks = motor.setTargetPositionRelative(dist);
+            motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             motor.setPower(dist > 0 ? power : -power); // if moving backwards, use negative power
             firstLoop = false;
         }

@@ -201,10 +201,10 @@ public class MainTeleOp extends OpMode {
         double drive = -gamepad1.left_stick_y - gamepad2.left_stick_y;
         double rotate = gamepad1.right_stick_x + gamepad2.right_stick_x;
         double strafe = gamepad1.left_stick_x + gamepad2.left_stick_x;
-        if (drive != 0) {
+        if (drive != 0 || rotate != 0 || strafe != 0) {
             driveActions.clear();
         }
-        if (driveActions.isEmpty()) {
+        if (driveActions.isEmpty() && launchActions.isEmpty()) {
             bot.moveBotMecanum(drive, rotate, strafe, DRIVE_FACTOR);
         }
     }

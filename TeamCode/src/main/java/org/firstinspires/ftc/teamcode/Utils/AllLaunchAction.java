@@ -53,6 +53,7 @@ public class AllLaunchAction implements Action {
         if (launchAction == null) {
             if (curTime - lastArtifactTime > WAIT_BETWEEN_DURATION) {
                 // nothing more to launch
+                MainBot.shared.launcher.spinUp(0); // stop launcher, done with launches
                 return false;
             }
         }
@@ -78,6 +79,7 @@ public class AllLaunchAction implements Action {
                 lastArtifactTime = curTime;
                 numLaunches ++;
                 if (numLaunches >= maxLaunches) {
+                    MainBot.shared.launcher.spinUp(0); // stop launcher, done with launches
                     return false; // done
                 }
             }
