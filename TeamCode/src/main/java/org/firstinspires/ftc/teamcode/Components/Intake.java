@@ -19,17 +19,24 @@ public class Intake {
 
     public static double REVERSE_POWER = 0.5;
 
-    public static int IN_WAIT_MS = 300;
-    public static int REVERSE_WAIT_MS = 175;
+    public static double WIGGLE_IN_POWER = 0.5;
+    public static int WIGGLE_IN_TIME = 1000; // ms
+    public static double WIGGLE_OUT_POWER = 0.4;
+    public static int WIGGLE_OUT_TIME = 500; // ms
+    public static int WIGGLE_TIMES = 4;
+
+//    public static int IN_WAIT_MS = 300;
+//    public static int REVERSE_WAIT_MS = 175;
 
 
     // Auto-launch constants
-    public static double SHORT_IN_DIST = 0.25; // revs
-    public static double SHORT_IN_POWER = 0.5;
-    public static double SHORT_OUT_DIST = 0.25; // revs
-    public static double SHORT_OUT_POWER = 0.4;
-    public static double LONG_IN_DIST = 1.5; // revs
-    public static double LONG_OUT_DIST = 0.5; // revs
+//    public static double SHORT_IN_DIST = 0.25; // revs
+//    public static double SHORT_IN_POWER = 0.5;
+//    public static double SHORT_OUT_DIST = 0.25; // revs
+//    public static double SHORT_OUT_POWER = 0.4;
+//    public static double LONG_IN_DIST = 1.5; // revs
+//    public static double LONG_IN_POWER = 0.5;
+//    public static double LONG_OUT_DIST = 0.5; // revs
 
 
     public EnhancedMotor motor;

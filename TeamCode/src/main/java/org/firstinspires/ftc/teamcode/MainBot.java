@@ -19,6 +19,7 @@ import org.firstinspires.ftc.teamcode.Autonomous.OpModes.IntakeAuto;
 import org.firstinspires.ftc.teamcode.Components.AprilTags;
 import org.firstinspires.ftc.teamcode.Components.Intake;
 import org.firstinspires.ftc.teamcode.Components.Launcher;
+import org.firstinspires.ftc.teamcode.Components.Lifter;
 import org.firstinspires.ftc.teamcode.Utils.ArtifactShakeAction;
 import org.firstinspires.ftc.teamcode.Utils.ArtifactWaitAction;
 import org.firstinspires.ftc.teamcode.Utils.BatteryVoltageCompensator;
@@ -26,6 +27,9 @@ import org.firstinspires.ftc.teamcode.Utils.ConditionalAction;
 import org.firstinspires.ftc.teamcode.Utils.RelativeMotorAction;
 import org.firstinspires.ftc.teamcode.Utils.ServoAction;
 import org.firstinspires.ftc.teamcode.Utils.WaitAction;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class MainBot {
     public DcMotorEx leftFrontMotor;
@@ -36,6 +40,7 @@ public class MainBot {
     // Components
     public Launcher launcher;
     public Intake intake;
+    public Lifter lifter;
 
     public static MainBot shared;
 
@@ -61,6 +66,7 @@ public class MainBot {
         // Components
         launcher = new Launcher(hardwareMap);
         intake = new Intake(hardwareMap);
+        lifter = new Lifter(hardwareMap);
 
         this.telemetry = new MultipleTelemetry(dashboard.getTelemetry(), telemetry);
         this.hardwareMap = hardwareMap;
@@ -111,16 +117,22 @@ public class MainBot {
 //                    intake.getPowerAction(0), // stop intake
 
                     // Step 4: Wait for spin up (conditional if artifact is now detected)
+                    new ArtifactWaitAction(Launcher.POST_LAUNCH_WAIT_MS),
                     new ConditionalAction(() -> launcher.artifactPresent, new SequentialAction(
                             launcher.getVeloWaitAction(Launcher.MIN_LAUNCH_SPEED),
                             launcher.getAccelWaitAction(Launcher.MAX_LAUNCH_ACCEL),
 
                             // Step 5: Kick to launch
-                            new RelativeMotorAction(intake.motor, Intake.INTAKE_POWER, Intake.SHORT_IN_DIST), // brief intake to prevent congestion in launcher
+//                            new RelativeMotorAction(intake.motor, Intake.INTAKE_POWER, Intake.SHORT_IN_DIST), // brief intake to prevent congestion in launcher
                             intake.getPowerAction(0), // stop intake
 //                        launcher.kickAction()
                             new ServoAction(launcher.servo, Launcher.SERVO_UP_POS),
-                            new WaitAction(Launcher.SERVO_WAIT_MS)
+                            new WaitAction(Launcher.SERVO_FIRST_WAIT_MS),
+                            new ServoAction(launcher.servo, Launcher.SERVO_DOWN_POS),
+                            new WaitAction(Launcher.SERVO_SECOND_WAIT_MS),
+                            new ServoAction(launcher.servo, Launcher.SERVO_UP_POS),
+                            new WaitAction(Launcher.SERVO_THIRD_WAIT_MS),
+                            new ServoAction(launcher.servo, Launcher.SERVO_DOWN_POS)
                     ))
             );
         } else {
@@ -129,18 +141,24 @@ public class MainBot {
     }
 
     public Action singleLaunchAction(double power) {
+        ArrayList<Action> wiggleActions = new ArrayList<>();
+        for (int i = 0; i < Intake.WIGGLE_TIMES; i++) {
+            wiggleActions.add(intake.getPowerAction(Intake.WIGGLE_IN_POWER));
+            wiggleActions.add(new WaitAction(Intake.WIGGLE_IN_TIME));
+            wiggleActions.add(intake.getPowerAction(-Intake.WIGGLE_OUT_POWER));
+            wiggleActions.add(new WaitAction(Intake.WIGGLE_OUT_TIME));
+        }
         if (launcher.artifactPresent) {
             return new SequentialAction(
                     // Steps 1-5: Full launch
                     singleLaunchActionBare(power),
 
                     // Step 6: Intake to reload artifacts for next launch
-                    new RelativeMotorAction(intake.motor, Intake.SHORT_IN_POWER, Intake.LONG_IN_DIST),
-                    new RelativeMotorAction(intake.motor, Intake.REVERSE_POWER, -Intake.LONG_OUT_DIST),
-                    intake.getPowerAction(0),
+                    new ArtifactShakeAction(ArtifactShakeAction.PRE_WAIT, ArtifactShakeAction.MAX_WAIT, new SequentialAction(wiggleActions)),
+                    intake.getPowerAction(0)
 
-                    new ServoAction(launcher.servo, Launcher.SERVO_DOWN_POS),
-                    new ArtifactWaitAction(Launcher.POST_LAUNCH_WAIT_MS)
+//                    new ServoAction(launcher.servo, Launcher.SERVO_DOWN_POS),
+//                    new ArtifactWaitAction(Launcher.POST_LAUNCH_WAIT_MS)
 
                     // Step 7: Outtake to push the bottom artifact into the launcher
                     // (only if there were three artifacts inside before launching)
@@ -161,9 +179,9 @@ public class MainBot {
         if (launcher.artifactPresent) {
             return new SequentialAction(
                     // Steps 1-5: Full launch
-                    singleLaunchActionBare(power),
-                    new ServoAction(launcher.servo, Launcher.SERVO_DOWN_POS),
-                    new WaitAction(Launcher.SERVO_WAIT_MS)
+                    singleLaunchActionBare(power)
+//                    new ServoAction(launcher.servo, Launcher.SERVO_DOWN_POS),
+//                    new WaitAction(Launcher.SERVO_WAIT_MS)
 
                     // Step 7: Outtake to push the bottom artifact into the launcher
                     // (only if there were three artifacts inside before launching)

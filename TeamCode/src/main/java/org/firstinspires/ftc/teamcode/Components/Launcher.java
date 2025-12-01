@@ -35,7 +35,6 @@ public class Launcher { // extends VelMotor {
 
     public static double LAUNCH_POWER = AimBot.CLOSE_POWER;
     public static double ACTIVE_SPEED = 50; // rpm
-    public static int LAUNCH_WAIT_TIME = 500;
     public static double MAX_LAUNCH_ACCEL = 0.01; // rpm/s^2
 
     public static double REVERSE_POWER = 0.075;
@@ -67,6 +66,10 @@ public class Launcher { // extends VelMotor {
     public boolean artifactPresent = false;
     private double maxTicksPerSec;
     private long lastServoUpTime = 0;
+
+    public static int SERVO_FIRST_WAIT_MS = 250;
+    public static int SERVO_SECOND_WAIT_MS = 250;
+    public static int SERVO_THIRD_WAIT_MS = 750;
 
     public Launcher(HardwareMap hardwareMap) {
         motor = new EnhancedMotor(hardwareMap, "launchMotor");

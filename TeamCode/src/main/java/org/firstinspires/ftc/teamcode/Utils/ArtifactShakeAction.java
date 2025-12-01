@@ -11,42 +11,45 @@ import org.firstinspires.ftc.teamcode.MainTeleOp;
 
 @Config
 public class ArtifactShakeAction implements Action {
+    private int preWait;
     private int maxWait;
+    private Action tryAction;
+
+    private long preStartTime = 0;
     private long startTime = 0;
 
-    public static double SHAKE_SEGMENT_POWER = 0.5;
-    public static double SHAKE_SEGMENT_DURATION = 500; // ms
-    public static double SHAKE_EXTRA_TIME = 750; // ms
+    public static int PRE_WAIT = 750;
+    public static int MAX_WAIT = 1500; // ms
 
-    private double lastSegmentTime = 0;
-    private double lastSegmentDir = -1;
-
-    public ArtifactShakeAction(int maxWait) {
+    public ArtifactShakeAction(int preWait, int maxWait, Action tryAction) {
+        this.preWait = preWait;
         this.maxWait = maxWait;
+        this.tryAction = tryAction;
     }
 
     @Override
     public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-        if (startTime == 0) {
-            startTime = System.currentTimeMillis();
+        if (preStartTime == 0) {
+            preStartTime = System.currentTimeMillis();
         }
         long curTime = System.currentTimeMillis();
-        if (MainBot.shared.launcher.artifactPresent) {
-            return false; // done, artifact present
+        if (!MainBot.shared.launcher.artifactPresent) {
+            // artifact registered empty, now we can continue
+            startTime = curTime;
         }
-        if (curTime - startTime > (maxWait + SHAKE_EXTRA_TIME)) {
-            // too long, just exit
-            MainBot.shared.moveBotMecanum(0, 0, 0, 1);
-            return false;
+        if (curTime - preStartTime > preWait) {
+            return false; // waited too long for launcher to empty
         }
-        if (curTime - startTime > maxWait) {
-            // shake
-            if (curTime - lastSegmentTime > SHAKE_SEGMENT_DURATION) {
-                // done with last shake, start new one
-                lastSegmentDir *= -1;
-                lastSegmentTime = curTime;
+        if (startTime != 0) {
+            if (MainBot.shared.launcher.artifactPresent) {
+                return false; // done, artifact present
             }
-            MainBot.shared.moveBotMecanum(lastSegmentDir*SHAKE_SEGMENT_POWER, 0, 0, 1);
+            if (curTime - startTime > maxWait) {
+                // too long, just exit
+                return false;
+            }
+            tryAction.run(telemetryPacket);
+            telemetryPacket.addLine("ArtifactShakeAction " + (curTime - startTime) + "/" + maxWait);
         }
         return true;
     }

@@ -138,6 +138,12 @@ public class MainTeleOp extends OpMode {
             DRIVE_FACTOR = 1.0;
         }
 
+        if (gamepad1.dpad_up) {
+            bot.lifter.doLift();
+        } else if (gamepad1.dpad_down) {
+            bot.lifter.unLift();
+        }
+
 //        if (gamepad1.left_bumper) {
 //            bot.intake.spinUp(-Intake.REVERSE_POWER);
 //        } else if (gamepad1.right_bumper) {
@@ -170,6 +176,7 @@ public class MainTeleOp extends OpMode {
 
         bot.launcher.doTelemetry();
         bot.intake.doTelemetry();
+        bot.lifter.doTelemetry();
 
         bot.launcher.cookedMotor.loop(gamepad2);
         bot.intake.cookedMotor.loop(gamepad2);
@@ -204,7 +211,7 @@ public class MainTeleOp extends OpMode {
         if (drive != 0 || rotate != 0 || strafe != 0) {
             driveActions.clear();
         }
-        if (driveActions.isEmpty() && launchActions.isEmpty()) {
+        if (driveActions.isEmpty()) {
             bot.moveBotMecanum(drive, rotate, strafe, DRIVE_FACTOR);
         }
     }
