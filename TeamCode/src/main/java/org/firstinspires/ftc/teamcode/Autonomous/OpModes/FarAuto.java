@@ -31,15 +31,16 @@ public class FarAuto extends OpMode {
     private MecanumDrive drive;
     private FtcDashboard dashboard;
 
-    public static double GOAL_X = 55;
-    public static double GOAL_Y = -12;
+    public static double GOAL_X = 54;
+    public static double GOAL_Y = -18;
 
-    public static double PICK_X = -12;
-    public static double PICK_Y = -24;
-    public static double GATE_X = -4;
-    public static double GATE_Y = -55;
+    public static double PICK_X = 42;
+    public static double PICK_Y = -10;
 
-    public static double GOAL_ANGLE = 234;
+    public static double PARK_X = 42;
+    public static double PARK_Y = -12;
+
+    public static double GOAL_ANGLE = 195;
 
     public static double WAIT_SECONDS = 3;
 
@@ -79,10 +80,8 @@ public class FarAuto extends OpMode {
                 .lineToY(PICK_Y- IntakeAuto.DISTANCE, new TranslationalVelConstraint(IntakeAuto.VELOCITY))
                 .lineToY(PICK_Y);
 
-        TrajectoryActionBuilder gate = pick.endTrajectory().fresh()
-                .afterDisp(1, bot.launcher.getPowerAction(0))
-                .strafeToConstantHeading(new Vector2d(GATE_X, GATE_Y + 5))
-                .strafeToConstantHeading(new Vector2d(GATE_X, GATE_Y), new TranslationalVelConstraint(IntakeAuto.VELOCITY));
+        TrajectoryActionBuilder park = pick.endTrajectory().fresh()
+                .strafeToConstantHeading(new Vector2d(PARK_X, PARK_Y));
 
         action = new SequentialAction(
                 bot.launcher.getPowerAction(AimBot.CLOSE_POWER),
@@ -90,7 +89,7 @@ public class FarAuto extends OpMode {
                 new AllLaunchAction(AimBot.CLOSE_POWER),
                 pick.build(),
                 bot.launcher.getPowerAction(0),
-                gate.build()
+                park.build()
         );
     }
 
