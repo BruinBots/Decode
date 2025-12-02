@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.Utils;
 
 import com.acmerobotics.dashboard.config.Config;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
 
@@ -21,17 +22,37 @@ public class BatteryVoltageCompensator {
 
     private VoltageSensor sensor;
     public double lastVoltage;
+    private DcMotorEx[] motors;
 
     public BatteryVoltageCompensator(HardwareMap hardwareMap) {
         sensor = hardwareMap.get(VoltageSensor.class, "Control Hub");
         lastVoltage = getCurrentVoltage();
+        motors = new DcMotorEx[]{
+                MainBot.shared.leftFrontMotor,
+                MainBot.shared.leftBackMotor,
+                MainBot.shared.rightBackMotor,
+                MainBot.shared.rightFrontMotor,
+                MainBot.shared.launcher.motor.motor,
+                MainBot.shared.intake.motor.motor,
+                MainBot.shared.lifter.motor.motor
+        };
     }
 
     public double getCurrentVoltage() {
         return sensor.getVoltage();
     }
 
+    private void updateVoltageIfNoMotors() {
+        for (DcMotorEx motor: motors) {
+            if (motor.getPower() != 0) {
+                return;
+            }
+        }
+        lastVoltage = getCurrentVoltage();
+    }
+
     public void doTelemetry() {
+        updateVoltageIfNoMotors();
         MainBot.shared.telemetry.addData("Battery Voltage", lastVoltage+"/"+FULL_BATTERY_VOLTAGE+"V");
     }
 

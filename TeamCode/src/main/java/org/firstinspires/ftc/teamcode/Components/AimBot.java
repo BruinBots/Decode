@@ -29,7 +29,7 @@ public class AimBot {
 
     public static double CLOSE_POWER = 0.71;
     public static double THRESHOLD_DISTANCE = 85.0;
-    public static double FAR_POWER = 0.83;
+    public static double FAR_POWER = 0.85;
     public static double TURN_POWER = 0.11;
 
     // More turning constants
