@@ -37,7 +37,7 @@ public class Launcher { // extends VelMotor {
     public static double ACTIVE_SPEED = 50; // rpm
     public static double MAX_LAUNCH_ACCEL = 0.01; // rpm/s^2
 
-    public static double REVERSE_POWER = 0.075;
+    public static double REVERSE_POWER = 0.15;
 
     public static double SERVO_DOWN_POS = 0.25;
     public static double SERVO_UP_POS = 0.42;
@@ -49,7 +49,8 @@ public class Launcher { // extends VelMotor {
     public static int SERVO_WAIT_MS = 1250;
     public static int POST_LAUNCH_WAIT_MS = 1000;
 
-    public static int KICK_SENSOR_WAIT_MS = 500;
+    public static int KICK_SENSOR_WAIT_MS = 100;
+    public static double SERVO_SENSOR_MARGIN = 0.05;
 
     public CookedMotor cookedMotor;
 
@@ -81,8 +82,12 @@ public class Launcher { // extends VelMotor {
         maxTicksPerSec = motor.motor.getMotorType().getAchieveableMaxTicksPerSecond();
     }
 
+    public boolean willUpdateSensorState() {
+        return System.currentTimeMillis() - lastServoUpTime > KICK_SENSOR_WAIT_MS;
+    }
+
     public void updateSensorState() {
-        if (System.currentTimeMillis() - lastServoUpTime < KICK_SENSOR_WAIT_MS) {
+        if (!willUpdateSensorState()) {
             return; // too soon after kicking; kick arm interferes with sensor
         }
         double val = sensor.getDistance(DistanceUnit.INCH);
@@ -123,7 +128,7 @@ public class Launcher { // extends VelMotor {
     }
 
     public void doTelemetry() {
-        if (servo.getPosition() > SERVO_DOWN_POS) {
+        if (servo.getPosition() > SERVO_DOWN_POS+SERVO_SENSOR_MARGIN) {
             lastServoUpTime = System.currentTimeMillis();
         }
         updateSensorState();

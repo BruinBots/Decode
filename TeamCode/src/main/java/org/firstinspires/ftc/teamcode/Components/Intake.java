@@ -19,9 +19,9 @@ public class Intake {
 
     public static double REVERSE_POWER = 0.5;
 
-    public static double WIGGLE_IN_POWER = 0.5;
+    public static double WIGGLE_IN_POWER = 0.3;
     public static int WIGGLE_IN_TIME = 1000; // ms
-    public static double WIGGLE_OUT_POWER = 0.4;
+    public static double WIGGLE_OUT_POWER = 0.25;
     public static int WIGGLE_OUT_TIME = 500; // ms
     public static int WIGGLE_TIMES = 4;
 

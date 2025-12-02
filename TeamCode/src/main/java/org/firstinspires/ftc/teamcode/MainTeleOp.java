@@ -25,6 +25,7 @@ public class MainTeleOp extends OpMode {
     public ArrayList<Action> driveActions;
 
     public static double DRIVE_FACTOR = 1.0;
+    public static double INTAKE_DRIVE_POWER = 0.2;
 
     public AimBot aimBot;
     public ObeliskReader obeliskReader;
@@ -32,10 +33,9 @@ public class MainTeleOp extends OpMode {
     public FtcDashboard dash;
 
     private boolean didAddAimBotAction = false;
-    private boolean didAddSingleLaunchAction = false;
-    private boolean didAddIntakeDriveAction = false;
+    private boolean didAddLaunchAction = false;
     private boolean isLaunching = false;
-//    private boolean isTestingLaunchPID = false;
+    private boolean isIntakeDriving = false;
 
     @Override
     public void init() {
@@ -60,6 +60,11 @@ public class MainTeleOp extends OpMode {
         left_trigger -> intake reverse power
 
          */
+
+        // NOTE: Left stick y is negative when pushed forward (up) on PS4 controller
+        double drive = -gamepad1.left_stick_y - gamepad2.left_stick_y;
+        double rotate = gamepad1.right_stick_x + gamepad2.right_stick_x;
+        double strafe = gamepad1.left_stick_x + gamepad2.left_stick_x;
 
         if (gamepad1.left_bumper || gamepad2.dpad_down) {
             launchActions.clear();
@@ -88,7 +93,7 @@ public class MainTeleOp extends OpMode {
                 bot.launcher.spinUp(Launcher.REVERSE_POWER);
             }
         } else {
-            if (launchActions.isEmpty() && driveActions.isEmpty()) {
+            if (launchActions.isEmpty() && driveActions.isEmpty() && !isIntakeDriving) {
                 bot.intake.doStop();
                 if (!isLaunching) {
                     bot.launcher.doStop();
@@ -117,19 +122,20 @@ public class MainTeleOp extends OpMode {
             didAddAimBotAction = false;
         }
 
-        if ((gamepad1.right_trigger > 0.8 || gamepad2.right_bumper) && !didAddSingleLaunchAction) {
+        if ((gamepad1.right_trigger > 0.8 || gamepad2.right_bumper) && !didAddLaunchAction) {
 //            launchActions.add(bot.singleLaunchAction(aimBot.getLaunchPower()));
             launchActions.add(new AllLaunchAction(aimBot));
-            didAddSingleLaunchAction = true;
+            didAddLaunchAction = true;
         } else {
-            didAddSingleLaunchAction = false;
+            didAddLaunchAction = false;
         }
 
-        if ((gamepad1.dpad_left || gamepad2.x) && !didAddIntakeDriveAction) {
-            driveActions.add(bot.intakeDriveAction(true));
-            didAddIntakeDriveAction = true;
+        if (gamepad1.dpad_left || gamepad2.x) {
+            drive = INTAKE_DRIVE_POWER;
+            bot.intake.setPower(Intake.INTAKE_POWER);
+            isIntakeDriving = true;
         } else {
-            didAddIntakeDriveAction = false;
+            isIntakeDriving = false;
         }
 
         if (gamepad2.left_stick_button) {
@@ -204,10 +210,7 @@ public class MainTeleOp extends OpMode {
         Drawing.drawRobot(c, bot.drive.localizer.getPose());
         bot.dashboard.sendTelemetryPacket(packet);
 
-        // NOTE: Left stick y is negative when pushed forward (up) on PS4 controller
-        double drive = -gamepad1.left_stick_y - gamepad2.left_stick_y;
-        double rotate = gamepad1.right_stick_x + gamepad2.right_stick_x;
-        double strafe = gamepad1.left_stick_x + gamepad2.left_stick_x;
+
         if (drive != 0 || rotate != 0 || strafe != 0) {
             driveActions.clear();
         }

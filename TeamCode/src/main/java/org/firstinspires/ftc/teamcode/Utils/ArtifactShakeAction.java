@@ -19,7 +19,7 @@ public class ArtifactShakeAction implements Action {
     private long startTime = 0;
 
     public static int PRE_WAIT = 750;
-    public static int MAX_WAIT = 1500; // ms
+    public static int MAX_WAIT = 2500; // ms
 
     public ArtifactShakeAction(int preWait, int maxWait, Action tryAction) {
         this.preWait = preWait;
@@ -33,11 +33,11 @@ public class ArtifactShakeAction implements Action {
             preStartTime = System.currentTimeMillis();
         }
         long curTime = System.currentTimeMillis();
-        if (!MainBot.shared.launcher.artifactPresent) {
+        if (!MainBot.shared.launcher.artifactPresent && startTime == 0) {
             // artifact registered empty, now we can continue
             startTime = curTime;
         }
-        if (curTime - preStartTime > preWait) {
+        if (curTime - preStartTime > preWait && startTime == 0) {
             return false; // waited too long for launcher to empty
         }
         if (startTime != 0) {
@@ -49,7 +49,9 @@ public class ArtifactShakeAction implements Action {
                 return false;
             }
             tryAction.run(telemetryPacket);
-            telemetryPacket.addLine("ArtifactShakeAction " + (curTime - startTime) + "/" + maxWait);
+            telemetryPacket.addLine("ArtifactShakeAction SHAKE " + (curTime - startTime) + "/" + maxWait);
+        } else {
+            telemetryPacket.addLine("ArtifactShakeAction PREWAIT " + (curTime - preStartTime) + "/" + preWait);
         }
         return true;
     }

@@ -68,8 +68,8 @@ public class AllLaunchAction implements Action {
                 power = launchPower;
             }
             if (numLaunches == maxLaunches - 1) { // last launch}
-//                launchAction = MainBot.shared.singleLaunchActionNoPreload(power);
-                launchAction = MainBot.shared.singleLaunchAction(power);
+                launchAction = MainBot.shared.singleLaunchActionNoPreload(power);
+//                launchAction = MainBot.shared.singleLaunchAction(power);
             } else {
                 launchAction = MainBot.shared.singleLaunchAction(power);
             }

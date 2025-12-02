@@ -6,16 +6,15 @@ import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
+import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.SequentialAction;
-import com.acmerobotics.roadrunner.TranslationalVelConstraint;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.teamcode.Autonomous.OpModes.IntakeAuto;
 import org.firstinspires.ftc.teamcode.Components.AprilTags;
 import org.firstinspires.ftc.teamcode.Components.Intake;
 import org.firstinspires.ftc.teamcode.Components.Launcher;
@@ -24,12 +23,10 @@ import org.firstinspires.ftc.teamcode.Utils.ArtifactShakeAction;
 import org.firstinspires.ftc.teamcode.Utils.ArtifactWaitAction;
 import org.firstinspires.ftc.teamcode.Utils.BatteryVoltageCompensator;
 import org.firstinspires.ftc.teamcode.Utils.ConditionalAction;
-import org.firstinspires.ftc.teamcode.Utils.RelativeMotorAction;
 import org.firstinspires.ftc.teamcode.Utils.ServoAction;
 import org.firstinspires.ftc.teamcode.Utils.WaitAction;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class MainBot {
     public DcMotorEx leftFrontMotor;
@@ -154,7 +151,14 @@ public class MainBot {
                     singleLaunchActionBare(power),
 
                     // Step 6: Intake to reload artifacts for next launch
-                    new ArtifactShakeAction(ArtifactShakeAction.PRE_WAIT, ArtifactShakeAction.MAX_WAIT, new SequentialAction(wiggleActions)),
+                    new ParallelAction(
+                        new ArtifactShakeAction(ArtifactShakeAction.PRE_WAIT, ArtifactShakeAction.MAX_WAIT, new SequentialAction(wiggleActions)),
+                        new SequentialAction( // give launcher a little more oomph to launch
+                                launcher.getPowerAction(1),
+                                launcher.getVeloWaitAction(Launcher.MIN_LAUNCH_SPEED),
+                                launcher.getPowerAction(power)
+                        )
+                    ),
                     intake.getPowerAction(0)
 
 //                    new ServoAction(launcher.servo, Launcher.SERVO_DOWN_POS),
@@ -198,18 +202,18 @@ public class MainBot {
         }
     }
 
-    public Action intakeDriveAction(boolean resetPose) {
-        drive.updatePoseEstimate();
-        if (resetPose) {
-            drive.localizer.setPose(new Pose2d(0, 0, 0));
-        }
-        drive.updatePoseEstimate();
-        return new SequentialAction(
-                intake.getPowerAction(Intake.INTAKE_POWER),
-                drive.actionBuilder(drive.localizer.getPose())
-                        .lineToX(IntakeAuto.DISTANCE, new TranslationalVelConstraint(IntakeAuto.VELOCITY))
-                        .build(),
-                intake.getPowerAction(0)
-        );
-    }
+//    public Action intakeDriveAction(boolean resetPose) {
+//        drive.updatePoseEstimate();
+//        if (resetPose) {
+//            drive.localizer.setPose(new Pose2d(0, 0, 0));
+//        }
+//        drive.updatePoseEstimate();
+//        return new SequentialAction(
+//                intake.getPowerAction(Intake.INTAKE_POWER),
+//                drive.actionBuilder(drive.localizer.getPose())
+//                        .lineToX(IntakeAuto.DISTANCE, new TranslationalVelConstraint(IntakeAuto.VELOCITY))
+//                        .build(),
+//                intake.getPowerAction(0)
+//        );
+//    }
 }
