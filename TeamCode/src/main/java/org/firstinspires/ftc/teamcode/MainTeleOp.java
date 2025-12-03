@@ -103,11 +103,11 @@ public class MainTeleOp extends OpMode {
 
         if (gamepad1.x || gamepad2.dpad_up) {
             launchActions.clear();
-            double power = Launcher.LAUNCH_POWER;
+            double vel = Launcher.LAUNCH_VELOCITY;
             if (aimBot.foundGoal) {
-                power = aimBot.getLaunchPower();
+                vel = aimBot.getLaunchVel();
             }
-            bot.launcher.spinUp(power);
+            bot.launcher.motor.setTargetVelocity(vel);
             isLaunching = true;
         } else if (gamepad1.y || gamepad2.y) {
             launchActions.clear();
@@ -144,9 +144,9 @@ public class MainTeleOp extends OpMode {
             DRIVE_FACTOR = 1.0;
         }
 
-        if (gamepad1.dpad_up) {
+        if (gamepad1.dpad_up || gamepad2.dpad_right) {
             bot.lifter.doLift();
-        } else if (gamepad1.dpad_down) {
+        } else if (gamepad1.dpad_down || gamepad2.dpad_left) {
             bot.lifter.unLift();
         }
 
@@ -180,6 +180,7 @@ public class MainTeleOp extends OpMode {
 //            // launch all
 //        }
 
+        bot.launcher.motor.updateVelocityPID();
         bot.launcher.doTelemetry();
         bot.intake.doTelemetry();
         bot.lifter.doTelemetry();

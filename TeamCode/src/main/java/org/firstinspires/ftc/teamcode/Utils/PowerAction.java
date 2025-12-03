@@ -30,6 +30,7 @@ public class PowerAction implements Action {
             motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
             motor.setPower(power);
         } else {
+            emotor.setTargetVelocity(0);
             emotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
             emotor.setPower(power);
         }

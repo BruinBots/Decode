@@ -9,17 +9,21 @@ import org.firstinspires.ftc.teamcode.MainBot;
 
 public class AccelWaitAction implements Action {
     private EnhancedMotor motor;
+    private double targetVel;
     private double maxAccel;
 
-    public AccelWaitAction(EnhancedMotor motor, double maxAccel) {
+    public AccelWaitAction(EnhancedMotor motor, double targetVel, double maxAccel) {
         this.motor = motor;
+        this.targetVel = targetVel;
         this.maxAccel = maxAccel;
     }
 
     @Override
     public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+        motor.setTargetVelocity(targetVel);
+        motor.updateVelocityPID();
         double accel = motor.getAcceleration();
-        telemetryPacket.addLine("AccelWaitAction "+accel+"("+maxAccel+")");
+        telemetryPacket.addLine("AccelWaitAction "+accel+"("+maxAccel+"), v="+targetVel);
         return accel > maxAccel;
     }
 }

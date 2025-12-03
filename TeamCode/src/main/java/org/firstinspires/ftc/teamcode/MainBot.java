@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode;
 import androidx.annotation.NonNull;
 
 import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
@@ -28,6 +29,7 @@ import org.firstinspires.ftc.teamcode.Utils.WaitAction;
 
 import java.util.ArrayList;
 
+@Config
 public class MainBot {
     public DcMotorEx leftFrontMotor;
     public DcMotorEx rightFrontMotor;
@@ -50,6 +52,8 @@ public class MainBot {
     public BatteryVoltageCompensator voltageCompensator;
 
     public Gamepad launcherGamepad = null;
+
+    public static double VELOCITY_BUFFER = 500; // rpm
 
     public MainBot(HardwareMap hardwareMap, Telemetry telemetry) {
         leftFrontMotor = hardwareMap.get(DcMotorEx.class, "leftFront");
@@ -99,11 +103,15 @@ public class MainBot {
         rightBackMotor.setPower(wheelSpeeds[3] * scaleFactor);
     }
 
-    public Action singleLaunchActionBare(double power) {
+    public Action singleLaunchActionBare(double velocity) {
         if (launcher.artifactPresent) {
             return new SequentialAction(
                     // Step 1: Spin up (async)
-                    launcher.getPowerAction(power),
+//                    launcher.getPowerAction(power),
+                    telemetryPacket -> {
+                        launcher.motor.setTargetVelocity(velocity);
+                        return false; // end instantly for async
+                    },
 
                     // Step 2: Intake to push an artifact into the launcher
                     // and get artifacts in a somewhat known position
@@ -117,8 +125,9 @@ public class MainBot {
                     // Step 4: Wait for spin up (conditional if artifact is now detected)
                     new ArtifactWaitAction(Launcher.POST_LAUNCH_WAIT_MS),
                     new ConditionalAction(() -> launcher.artifactPresent, new SequentialAction(
-                            launcher.getVeloWaitAction(Launcher.MIN_LAUNCH_SPEED),
-                            launcher.getAccelWaitAction(Launcher.MAX_LAUNCH_ACCEL),
+//                            launcher.getVeloWaitAction(velocity-VELOCITY_BUFFER),
+                            new WaitAction(Launcher.PRE_LAUNCH_WAIT_MS),
+                            launcher.getAccelWaitAction(velocity, Launcher.MAX_LAUNCH_ACCEL),
 
                             // Step 5: Kick to launch
 //                            new RelativeMotorAction(intake.motor, Intake.INTAKE_POWER, Intake.SHORT_IN_DIST), // brief intake to prevent congestion in launcher
@@ -138,7 +147,7 @@ public class MainBot {
         }
     }
 
-    public Action singleLaunchAction(double power) {
+    public Action singleLaunchAction(double velocity) {
         ArrayList<Action> wiggleActions = new ArrayList<>();
         for (int i = 0; i < Intake.WIGGLE_TIMES; i++) {
             wiggleActions.add(intake.getPowerAction(Intake.WIGGLE_IN_POWER));
@@ -149,16 +158,17 @@ public class MainBot {
         if (launcher.artifactPresent) {
             return new SequentialAction(
                     // Steps 1-5: Full launch
-                    singleLaunchActionBare(power),
+                    singleLaunchActionBare(velocity),
 
                     // Step 6: Intake to reload artifacts for next launch
                     new ParallelAction(
-                        new ArtifactShakeAction(ArtifactShakeAction.PRE_WAIT, ArtifactShakeAction.MAX_WAIT, new SequentialAction(wiggleActions)),
-                        new SequentialAction( // give launcher a little more oomph to launch
-                                launcher.getPowerAction(1),
-                                launcher.getVeloWaitAction(Launcher.MIN_LAUNCH_SPEED),
-                                launcher.getPowerAction(power)
-                        )
+                        new ArtifactShakeAction(ArtifactShakeAction.PRE_WAIT, ArtifactShakeAction.MAX_WAIT, new SequentialAction(wiggleActions))
+//                        new SequentialAction( // give launcher a little more oomph to launch
+////                                launcher.getPowerAction(1),
+//                                launcher.getVeloWaitAction(Launcher.MIN_LAUNCH_SPEED),
+//                                launcher.getAccelWaitAction(velocity, Launcher.MAX_LAUNCH_ACCEL)
+////                                launcher.getPowerAction(power)
+//                        )
                     ),
                     intake.getPowerAction(0)
 

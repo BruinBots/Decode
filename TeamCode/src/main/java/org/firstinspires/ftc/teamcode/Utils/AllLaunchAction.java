@@ -19,7 +19,7 @@ public class AllLaunchAction implements Action {
     private Action launchAction = null;
     private boolean firstLoop = true;
     private AimBot aimBot;
-    private double launchPower;
+    private double launchVel;
     private int maxLaunches;
     private int numLaunches = 0;
 
@@ -33,13 +33,13 @@ public class AllLaunchAction implements Action {
         this.maxLaunches = maxLaunches;
     }
 
-    public AllLaunchAction(double launchPower) {
-        this.launchPower = launchPower;
+    public AllLaunchAction(double launchVel) {
+        this.launchVel = launchVel;
         this.maxLaunches = 3;
     }
 
-    public AllLaunchAction(double launchPower, int maxLaunches) {
-        this.launchPower = launchPower;
+    public AllLaunchAction(double launchVel, int maxLaunches) {
+        this.launchVel = launchVel;
         this.maxLaunches = maxLaunches;
     }
 
@@ -61,17 +61,17 @@ public class AllLaunchAction implements Action {
             lastArtifactTime = curTime;
         }
         if (launchAction == null && MainBot.shared.launcher.artifactPresent) {
-            double power;
+            double vel;
             if (aimBot != null) {
-                power = aimBot.getLaunchPower();
+                vel = aimBot.getLaunchVel();
             } else {
-                power = launchPower;
+                vel = launchVel;
             }
             if (numLaunches == maxLaunches - 1) { // last launch}
-                launchAction = MainBot.shared.singleLaunchActionNoPreload(power);
+                launchAction = MainBot.shared.singleLaunchActionNoPreload(vel);
 //                launchAction = MainBot.shared.singleLaunchAction(power);
             } else {
-                launchAction = MainBot.shared.singleLaunchAction(power);
+                launchAction = MainBot.shared.singleLaunchAction(vel);
             }
         } else if (launchAction != null) {
             if (!launchAction.run(telemetryPacket)) {

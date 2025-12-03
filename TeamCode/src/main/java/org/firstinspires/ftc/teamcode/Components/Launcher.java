@@ -33,7 +33,7 @@ public class Launcher { // extends VelMotor {
     Far: 0.9
      */
 
-    public static double LAUNCH_POWER = AimBot.CLOSE_POWER;
+    public static double LAUNCH_VELOCITY = AimBot.CLOSE_VELOCITY;
     public static double ACTIVE_SPEED = 50; // rpm
     public static double MAX_LAUNCH_ACCEL = 0.01; // rpm/s^2
 
@@ -47,6 +47,7 @@ public class Launcher { // extends VelMotor {
     public static int MIN_LAUNCH_SPEED = 3500; // rpm
 
     public static int SERVO_WAIT_MS = 1250;
+    public static int PRE_LAUNCH_WAIT_MS = 750;
     public static int POST_LAUNCH_WAIT_MS = 1000;
 
     public static int KICK_SENSOR_WAIT_MS = 100;
@@ -123,6 +124,7 @@ public class Launcher { // extends VelMotor {
     }
 
     public void spinUp(double power) {
+        motor.setTargetVelocity(0);
         motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         motor.setPower(power);
     }
@@ -156,12 +158,12 @@ public class Launcher { // extends VelMotor {
         return new PowerAction(motor, power);
     }
 
-    public AccelWaitAction getAccelWaitAction(double maxAccel) {
-        return new AccelWaitAction(motor, maxAccel);
+    public AccelWaitAction getAccelWaitAction(double targetVel, double maxAccel) {
+        return new AccelWaitAction(motor, targetVel, maxAccel);
     }
 
-    public VeloWaitAction getVeloWaitAction(double minVel) {
-
-        return new VeloWaitAction(motor, minVel);
-    }
+//    public VeloWaitAction getVeloWaitAction(double minVel) {
+//
+//        return new VeloWaitAction(motor, minVel);
+//    }
 }

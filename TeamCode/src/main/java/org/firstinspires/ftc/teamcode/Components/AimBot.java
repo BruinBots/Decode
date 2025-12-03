@@ -27,9 +27,11 @@ public class AimBot {
 
     public static double TIME_BUFFER = 500; // max time in ms from last found april tag to reading there's no april tag
 
-    public static double CLOSE_POWER = 0.71;
+//    public static double CLOSE_POWER = 0.71;
+    public static double CLOSE_VELOCITY = 4300; // rpm
     public static double THRESHOLD_DISTANCE = 85.0;
-    public static double FAR_POWER = 0.85;
+//    public static double FAR_POWER = 0.85;
+    public static double FAR_VELOCITY = 5300;
     public static double TURN_POWER = 0.11;
 
     // More turning constants
@@ -77,13 +79,23 @@ public class AimBot {
         }
     }
 
-    public double getLaunchPower() {
+//    public double getLaunchPower() {
+//        if (distance < THRESHOLD_DISTANCE) {
+//            return CLOSE_POWER;
+//        } else if (distance > THRESHOLD_DISTANCE) {
+//            return FAR_POWER;
+//        } else {
+//            return CLOSE_POWER;
+//        }
+//    }
+
+    public double getLaunchVel() {
         if (distance < THRESHOLD_DISTANCE) {
-            return CLOSE_POWER;
+            return CLOSE_VELOCITY;
         } else if (distance > THRESHOLD_DISTANCE) {
-            return FAR_POWER;
+            return FAR_VELOCITY;
         } else {
-            return CLOSE_POWER;
+            return CLOSE_VELOCITY;
         }
     }
 
@@ -99,7 +111,7 @@ public class AimBot {
     public void doTelemetry() {
 //        if (foundGoal) {
             MainBot.shared.telemetry.addData("AimBot Read", distance + "in, " + angleError + "º");
-            MainBot.shared.telemetry.addData("AimBot Result", getLaunchPower() + "L, " + getTurnPower() + "T");
+            MainBot.shared.telemetry.addData("AimBot Result", getLaunchVel() + "L, " + getTurnPower() + "T");
 //        } else {
 //            MainBot.shared.telemetry.addData("AimBot Read", "N/A");
 //            MainBot.shared.telemetry.addData("AimBot Result", "N/A");
@@ -134,7 +146,6 @@ public class AimBot {
                 return true; // Keep iterating later on
             }
             aimBot.readAprilTag();
-            double launchPower = getLaunchPower();
             double turnPower = getTurnPower();
 
             MainBot.shared.moveBotMecanum(0, turnPower, 0, 1);

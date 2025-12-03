@@ -26,6 +26,7 @@ public class EnhancedMotor {
     public DcMotorEx motor;
     public double ticksPerRev;
 
+    public static double VEL_INTERVAL = 150;
     public static double ACCEL_INTERVAL = 500;
 
     public EnhancedMotor(DcMotorEx motor) {
@@ -66,9 +67,25 @@ public class EnhancedMotor {
 
     private double lastVelTime = 0;
     private double lastVel = 0;
+    private double lastPosTime = 0;
+    private double lastPos = 0;
+    private double vel = 0;
     private double accel = 0;
 
+    // Velocity PID
+    private double targetVelocityRPM = 0;
+    private double kP = 0.0007; // tune as needed
+    private double kI = 0.0005;
+    private double kD = 0.00001;
+    private double integral = 0;
+    private double lastError = 0;
+
+    private double lastOutputPower = 0;
+    public static double MAX_POWER_DELTA = 0.01; // max change per call
+    public static double MAX_POWER_DELTA_BAND = 250; // tolerance within target in which MAX_POWER_DELTA is enforced
+
     public double getRPM() {
+        // Update accel
         double curVel = motor.getVelocity() * 60.0 / ticksPerRev;
         double curTime = System.currentTimeMillis();
 
@@ -81,7 +98,18 @@ public class EnhancedMotor {
             lastVelTime = curTime;
         }
 
-        return curVel;
+        // Smoothed velocity
+        double curPos = motor.getCurrentPosition() * 60.0 / ticksPerRev; // revs
+        if (curTime - lastPosTime > VEL_INTERVAL) {
+            double dx = curPos - lastPos;
+            double dt = (curTime - lastPosTime) / 1000.0;
+            vel = dx / dt;
+
+            lastPos = curPos;
+            lastPosTime = curTime;
+        }
+
+        return vel;
     }
 
     public double getAcceleration() {
@@ -90,5 +118,46 @@ public class EnhancedMotor {
 
     public double getPower() {
         return motor.getPower();
+    }
+
+    public void setVelPID(double kP, double kI, double kD) {
+        this.kP = kP;
+        this.kI = kI;
+        this.kD = kD;
+    }
+
+    public void setTargetVelocity(double rpm) {
+        this.targetVelocityRPM = rpm;
+        integral = 0;
+        lastError = 0;
+    }
+
+    public void updateVelocityPID() {
+        if (targetVelocityRPM == 0) {
+//            setPower(0);
+            return;
+        }
+
+        double currentRPM = getRPM();
+        double error = targetVelocityRPM - currentRPM;
+        integral += error;
+        double derivative = error - lastError;
+        double output = kP * error + kI * integral + kD * derivative;
+
+        // Clamp output
+        output = Math.max(0, Math.min(1, output));
+
+        // Limit sudden power changes
+        if (Math.abs(error) < MAX_POWER_DELTA_BAND) {
+            double delta = output - lastOutputPower;
+            if (delta > MAX_POWER_DELTA) delta = MAX_POWER_DELTA;
+            else if (delta < -MAX_POWER_DELTA) delta = -MAX_POWER_DELTA;
+            output = lastOutputPower + delta;
+        }
+
+        setPower(output);
+
+        lastOutputPower = output;
+        lastError = error;
     }
 }
