@@ -36,8 +36,8 @@ public class NearAuto extends OpMode {
 
     public static double PICK_X = -12;
     public static double PICK_Y = -24;
-    public static double GATE_X = -4;
-    public static double GATE_Y = -55;
+    public static double PARK_X = -34;
+    public static double PARK_Y = -12;
 
     public static double GOAL_ANGLE = 234;
 
@@ -79,18 +79,21 @@ public class NearAuto extends OpMode {
                 .lineToY(PICK_Y- IntakeAuto.DISTANCE, new TranslationalVelConstraint(IntakeAuto.VELOCITY))
                 .lineToY(PICK_Y);
 
-        TrajectoryActionBuilder gate = pick.endTrajectory().fresh()
-                .afterDisp(1, bot.launcher.getPowerAction(0))
-                .strafeToConstantHeading(new Vector2d(GATE_X, GATE_Y + 5))
-                .strafeToConstantHeading(new Vector2d(GATE_X, GATE_Y), new TranslationalVelConstraint(IntakeAuto.VELOCITY));
+        TrajectoryActionBuilder driveToLaunch2 = pick.endTrajectory().fresh()
+                .strafeToLinearHeading(new Vector2d(GOAL_X, GOAL_Y), Math.toRadians(GOAL_ANGLE));
+
+        TrajectoryActionBuilder park = driveToLaunch2.endTrajectory().fresh()
+                .strafeToConstantHeading(new Vector2d(PARK_X, PARK_Y));
 
         action = new SequentialAction(
                 bot.launcher.getPowerAction(AimBot.CLOSE_POWER),
                 driveToLaunch1.build(),
                 new AllLaunchAction(AimBot.CLOSE_POWER),
                 pick.build(),
+                bot.launcher.getPowerAction(AimBot.CLOSE_POWER),
+                driveToLaunch2.build(),
                 bot.launcher.getPowerAction(0),
-                gate.build()
+                park.build()
         );
     }
 

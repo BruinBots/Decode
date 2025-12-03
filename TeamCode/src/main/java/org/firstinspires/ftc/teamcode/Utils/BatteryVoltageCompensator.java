@@ -27,6 +27,13 @@ public class BatteryVoltageCompensator {
     public BatteryVoltageCompensator(HardwareMap hardwareMap) {
         sensor = hardwareMap.get(VoltageSensor.class, "Control Hub");
         lastVoltage = getCurrentVoltage();
+    }
+
+    public double getCurrentVoltage() {
+        return sensor.getVoltage();
+    }
+
+    private void updateVoltageIfNoMotors() {
         motors = new DcMotorEx[]{
                 MainBot.shared.leftFrontMotor,
                 MainBot.shared.leftBackMotor,
@@ -36,13 +43,6 @@ public class BatteryVoltageCompensator {
                 MainBot.shared.intake.motor.motor,
                 MainBot.shared.lifter.motor.motor
         };
-    }
-
-    public double getCurrentVoltage() {
-        return sensor.getVoltage();
-    }
-
-    private void updateVoltageIfNoMotors() {
         for (DcMotorEx motor: motors) {
             if (motor.getPower() != 0) {
                 return;

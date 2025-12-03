@@ -21,7 +21,7 @@ public class IntakeAuto extends OpMode {
     private Action action;
 
     public static double DISTANCE = 28;
-    public static double VELOCITY = 8;
+    public static double VELOCITY = 20;
 
     @Override
     public void init() {

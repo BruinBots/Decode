@@ -71,6 +71,7 @@ public class MainBot {
         aprilTags = new AprilTags(hardwareMap);
 
         drive = new MecanumDrive(hardwareMap, new Pose2d(0, 0, 0));
+
         voltageCompensator = new BatteryVoltageCompensator(hardwareMap);
     }
 

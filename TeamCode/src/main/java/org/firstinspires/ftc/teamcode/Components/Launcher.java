@@ -44,7 +44,7 @@ public class Launcher { // extends VelMotor {
 
     // time to wait after spin up to initiate accel check
     // give the motor a little time to accelerate
-    public static int MIN_LAUNCH_SPEED = 3000; // rpm
+    public static int MIN_LAUNCH_SPEED = 3500; // rpm
 
     public static int SERVO_WAIT_MS = 1250;
     public static int POST_LAUNCH_WAIT_MS = 1000;
@@ -161,6 +161,7 @@ public class Launcher { // extends VelMotor {
     }
 
     public VeloWaitAction getVeloWaitAction(double minVel) {
+
         return new VeloWaitAction(motor, minVel);
     }
 }
