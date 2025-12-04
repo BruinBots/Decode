@@ -2,22 +2,25 @@ package org.firstinspires.ftc.teamcode.Utils;
 
 import androidx.annotation.NonNull;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
 
+@Config
 public class VeloWaitAction implements Action {
     private EnhancedMotor motor;
-    private double minVel;
+    private double velTarget;
+    public static double TOLERANCE = 50; // rpm
 
-    public VeloWaitAction(EnhancedMotor motor, double minVel) {
+    public VeloWaitAction(EnhancedMotor motor, double velTarget) {
         this.motor = motor;
-        this.minVel = minVel;
+        this.velTarget = velTarget;
     }
 
     @Override
     public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-        double vel = motor.getRPM();
-        telemetryPacket.addLine("VeloWaitAction "+vel+"("+minVel+")");
-        return vel < minVel;
+        motor.setTargetVelocity(velTarget);
+        telemetryPacket.addLine("VeloWaitAction ("+velTarget+"RPM)");
+        return Math.abs(motor.getRPM() - velTarget) > TOLERANCE;
     }
 }

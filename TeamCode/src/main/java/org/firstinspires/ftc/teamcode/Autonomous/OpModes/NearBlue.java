@@ -101,6 +101,7 @@ public class NearBlue extends OpMode {
                 },
 //                bot.launcher.getPowerAction(AimBot.CLOSE_POWER),
                 driveToLaunch2.build(),
+                new AllLaunchAction(AimBot.CLOSE_VELOCITY),
                 bot.launcher.getPowerAction(0),
                 park.build()
         );

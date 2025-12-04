@@ -14,7 +14,7 @@ public class Lifter {
     private double ticksPerRev = 5281.1;
 
     public static int OFF_POSITION = 0;
-    public static int ON_POSITION = -(int)(5281.1 / 4.0); // 1/4 revolution
+    public static int ON_POSITION = -650;
 
     public static double ON_POWER = 0.5;
     public static double OFF_POWER = 0.2;

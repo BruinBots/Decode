@@ -21,24 +21,12 @@ public class Intake {
 
     public static double REVERSE_POWER = 0.5;
 
-    public static double WIGGLE_IN_POWER = 0.3;
-    public static int WIGGLE_IN_TIME = 1000; // ms
-    public static double WIGGLE_OUT_POWER = 0.25;
-    public static int WIGGLE_OUT_TIME = 1000; // ms
+    public static double WIGGLE_IN_POWER = 0.6;
+    public static int WIGGLE_IN_TIME = 250; // ms
+    public static double WIGGLE_OUT_POWER = 0.6;
+    public static int WIGGLE_OUT_TIME = 100; // ms
     public static int WIGGLE_TIMES = 4;
-
-//    public static int IN_WAIT_MS = 300;
-//    public static int REVERSE_WAIT_MS = 175;
-
-
-    // Auto-launch constants
-//    public static double SHORT_IN_DIST = 0.25; // revs
-//    public static double SHORT_IN_POWER = 0.5;
-//    public static double SHORT_OUT_DIST = 0.25; // revs
-//    public static double SHORT_OUT_POWER = 0.4;
-//    public static double LONG_IN_DIST = 1.5; // revs
-//    public static double LONG_IN_POWER = 0.5;
-//    public static double LONG_OUT_DIST = 0.5; // revs
+    public static int STOP_RPM = 30;
 
 
     public EnhancedMotor motor;
@@ -50,7 +38,7 @@ public class Intake {
         motor.setTicksPerRev(145.1);
         motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         motor.setDirection(DcMotorSimple.Direction.REVERSE);
-        motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         cookedMotor = new CookedMotor(motor.motor, 6);
     }
 

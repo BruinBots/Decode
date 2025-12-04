@@ -89,6 +89,10 @@ public class Launcher { // extends VelMotor {
 
     public void updateSensorState() {
         if (!willUpdateSensorState()) {
+            motor.resetVPIDIntegral();
+            // kicking an artifact, reset integral term on PID control
+            // since artifact will cause a TON of resistance in the launcher
+            // and make the PID loop overshoot
             return; // too soon after kicking; kick arm interferes with sensor
         }
         double val = sensor.getDistance(DistanceUnit.INCH);
@@ -162,8 +166,7 @@ public class Launcher { // extends VelMotor {
         return new AccelWaitAction(motor, targetVel, maxAccel);
     }
 
-//    public VeloWaitAction getVeloWaitAction(double minVel) {
-//
-//        return new VeloWaitAction(motor, minVel);
-//    }
+    public VeloWaitAction getVeloWaitAction(double minVel) {
+        return new VeloWaitAction(motor, minVel);
+    }
 }

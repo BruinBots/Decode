@@ -53,8 +53,6 @@ public class MainBot {
 
     public Gamepad launcherGamepad = null;
 
-    public static double VELOCITY_BUFFER = 500; // rpm
-
     public MainBot(HardwareMap hardwareMap, Telemetry telemetry) {
         leftFrontMotor = hardwareMap.get(DcMotorEx.class, "leftFront");
         rightFrontMotor = hardwareMap.get(DcMotorEx.class, "rightFront");
@@ -125,9 +123,9 @@ public class MainBot {
                     // Step 4: Wait for spin up (conditional if artifact is now detected)
                     new ArtifactWaitAction(Launcher.POST_LAUNCH_WAIT_MS),
                     new ConditionalAction(() -> launcher.artifactPresent, new SequentialAction(
-//                            launcher.getVeloWaitAction(velocity-VELOCITY_BUFFER),
-                            new WaitAction(Launcher.PRE_LAUNCH_WAIT_MS),
-                            launcher.getAccelWaitAction(velocity, Launcher.MAX_LAUNCH_ACCEL),
+                            launcher.getVeloWaitAction(velocity),
+//                            new WaitAction(Launcher.PRE_LAUNCH_WAIT_MS),
+//                            launcher.getAccelWaitAction(velocity, Launcher.MAX_LAUNCH_ACCEL),
 
                             // Step 5: Kick to launch
 //                            new RelativeMotorAction(intake.motor, Intake.INTAKE_POWER, Intake.SHORT_IN_DIST), // brief intake to prevent congestion in launcher
@@ -152,6 +150,10 @@ public class MainBot {
         for (int i = 0; i < Intake.WIGGLE_TIMES; i++) {
             wiggleActions.add(intake.getPowerAction(Intake.WIGGLE_IN_POWER));
             wiggleActions.add(new WaitAction(Intake.WIGGLE_IN_TIME));
+            wiggleActions.add(intake.getPowerAction(0));
+            wiggleActions.add(telemetryPacket -> {
+                return intake.motor.getRPM() >= Intake.STOP_RPM;
+            });
             wiggleActions.add(intake.getPowerAction(-Intake.WIGGLE_OUT_POWER));
             wiggleActions.add(new WaitAction(Intake.WIGGLE_OUT_TIME));
         }
@@ -190,11 +192,11 @@ public class MainBot {
         }
     }
 
-    public Action singleLaunchActionNoPreload(double power) {
+    public Action singleLaunchActionNoPreload(double velocity) {
         if (launcher.artifactPresent) {
             return new SequentialAction(
                     // Steps 1-5: Full launch
-                    singleLaunchActionBare(power)
+                    singleLaunchActionBare(velocity)
 //                    new ServoAction(launcher.servo, Launcher.SERVO_DOWN_POS),
 //                    new WaitAction(Launcher.SERVO_WAIT_MS)
 

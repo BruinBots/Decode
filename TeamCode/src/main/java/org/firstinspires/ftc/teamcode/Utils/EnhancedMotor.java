@@ -74,15 +74,22 @@ public class EnhancedMotor {
 
     // Velocity PID
     private double targetVelocityRPM = 0;
-    private double kP = 0.0007; // tune as needed
-    private double kI = 0.0005;
-    private double kD = 0.00001;
+    public static double kP = 0.0007;
+    public static double kI = 0;
+    public static double kD = 0.00001;
+
+    // multiply all target velocities by this amount
+    // (compensation for improperly tuned or absent kI term)
+    public static double VELOCITY_ADJUSTMENT = 1.24;
+
     private double integral = 0;
     private double lastError = 0;
 
     private double lastOutputPower = 0;
     public static double MAX_POWER_DELTA = 0.01; // max change per call
-    public static double MAX_POWER_DELTA_BAND = 250; // tolerance within target in which MAX_POWER_DELTA is enforced
+    // tolerance within target
+    // in which MAX_POWER_DELTA is enforced
+    public static double MAX_POWER_DELTA_BAND = 250;
 
     public double getRPM() {
         // Update accel
@@ -126,8 +133,12 @@ public class EnhancedMotor {
         this.kD = kD;
     }
 
+    public void resetVPIDIntegral() {
+        integral = 0;
+    }
+
     public void setTargetVelocity(double rpm) {
-        this.targetVelocityRPM = rpm;
+        this.targetVelocityRPM = rpm*VELOCITY_ADJUSTMENT;
         integral = 0;
         lastError = 0;
     }

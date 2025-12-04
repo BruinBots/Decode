@@ -28,15 +28,15 @@ public class AimBot {
     public static double TIME_BUFFER = 500; // max time in ms from last found april tag to reading there's no april tag
 
 //    public static double CLOSE_POWER = 0.71;
-    public static double CLOSE_VELOCITY = 4300; // rpm
+    public static double CLOSE_VELOCITY = 3900; // rpm
     public static double THRESHOLD_DISTANCE = 85.0;
 //    public static double FAR_POWER = 0.85;
-    public static double FAR_VELOCITY = 5300;
+    public static double FAR_VELOCITY = 4600;
     public static double TURN_POWER = 0.11;
 
     // More turning constants
     public static double ADJUST_kP = 1;
-    public static double NEAR_STATIC_OFFSET = 2;
+    public static double NEAR_STATIC_OFFSET = 14;
     public static double FAR_STATIC_OFFSET = 28;
 
     public AimBot() {

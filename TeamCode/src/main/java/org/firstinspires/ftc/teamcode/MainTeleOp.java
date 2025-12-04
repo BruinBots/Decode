@@ -124,7 +124,7 @@ public class MainTeleOp extends OpMode {
 
         if ((gamepad1.right_trigger > 0.8 || gamepad2.right_bumper) && !didAddLaunchAction) {
 //            launchActions.add(bot.singleLaunchAction(aimBot.getLaunchPower()));
-            launchActions.add(new AllLaunchAction(aimBot));
+            launchActions.add(new AllLaunchAction(aimBot.getLaunchVel()));
             didAddLaunchAction = true;
         } else {
             didAddLaunchAction = false;

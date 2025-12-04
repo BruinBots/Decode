@@ -12,9 +12,16 @@ import org.firstinspires.ftc.teamcode.MainBot;
 public class VeloPIDTest extends OpMode {
     public static double TARGET_SPEED = 0;
 
-    public static double kP = 0;
-    public static double kI = 0;
-    public static double kD = 0;
+//    public static double kP = 0;
+//    public static double kI = 0;
+//    public static double kD = 0;
+
+    /*
+    rpm adjustment
+    input, output
+    4300, 3700
+    5300, 4550
+     */
 
     public static boolean kickUp = false;
 
@@ -27,8 +34,11 @@ public class VeloPIDTest extends OpMode {
 
     @Override
     public void loop() {
-        bot.launcher.motor.setVelPID(kP, kI, kD);
+//        bot.launcher.motor.setVelPID(kP, kI, kD);
         bot.launcher.motor.setTargetVelocity(TARGET_SPEED);
+        if (TARGET_SPEED == 0) {
+            bot.launcher.spinUp(0);
+        }
         bot.launcher.motor.updateVelocityPID();
         bot.launcher.doTelemetry();
         if (kickUp) {

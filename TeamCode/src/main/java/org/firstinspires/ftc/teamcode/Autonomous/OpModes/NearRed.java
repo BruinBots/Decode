@@ -78,7 +78,7 @@ public class NearRed extends OpMode {
                         bot.launcher.getPowerAction(-Launcher.REVERSE_POWER)
                 ))
                 .splineToSplineHeading(new Pose2d(PICK_X, PICK_Y, Math.toRadians(90)), Math.toRadians(90))
-                .lineToY(PICK_Y- IntakeAuto.DISTANCE, new TranslationalVelConstraint(IntakeAuto.VELOCITY))
+                .lineToY(PICK_Y+IntakeAuto.DISTANCE, new TranslationalVelConstraint(IntakeAuto.VELOCITY))
                 .lineToY(PICK_Y);
 
         TrajectoryActionBuilder driveToLaunch2 = pick.endTrajectory().fresh()

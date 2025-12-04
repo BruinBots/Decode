@@ -7,6 +7,7 @@ import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.SequentialAction;
 import com.acmerobotics.roadrunner.TranslationalVelConstraint;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
 import org.firstinspires.ftc.teamcode.Components.Intake;
@@ -14,6 +15,7 @@ import org.firstinspires.ftc.teamcode.MainBot;
 import org.firstinspires.ftc.teamcode.MecanumDrive;
 
 @Config
+@Disabled
 @Autonomous(name="IntakeAuto", group="Testing")
 public class IntakeAuto extends OpMode {
     private MainBot bot;
