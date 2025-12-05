@@ -38,8 +38,9 @@ public class NearBlue extends OpMode {
 
     public static double PICK_X = -12;
     public static double PICK_Y = -24;
-    public static double PARK_X = -34;
-    public static double PARK_Y = -12;
+    public static double GATE_X = -6;
+    public static double GATE_Y = -36;
+    public static double GATE_DISTANCE = 6;
 
     public static double GOAL_ANGLE = 234;
 
@@ -85,7 +86,8 @@ public class NearBlue extends OpMode {
                 .strafeToLinearHeading(new Vector2d(GOAL_X, GOAL_Y), Math.toRadians(GOAL_ANGLE));
 
         TrajectoryActionBuilder park = driveToLaunch2.endTrajectory().fresh()
-                .strafeToConstantHeading(new Vector2d(PARK_X, PARK_Y));
+                .strafeToLinearHeading(new Vector2d(GATE_X, GATE_Y), Math.toRadians(270))
+                .lineToY(GATE_Y - GATE_DISTANCE);
 
         action = new SequentialAction(
                 telemetryPacket -> {
