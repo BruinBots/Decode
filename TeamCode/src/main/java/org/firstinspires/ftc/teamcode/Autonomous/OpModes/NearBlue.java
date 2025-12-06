@@ -38,11 +38,13 @@ public class NearBlue extends OpMode {
 
     public static double PICK_X = -12;
     public static double PICK_Y = -24;
-    public static double GATE_X = -6;
-    public static double GATE_Y = -36;
-    public static double GATE_DISTANCE = 6;
+    public static double GATE_X = -7.5;
+    public static double GATE_Y = -45;
+    public static double GATE_DISTANCE = 10;
 
-    public static double GOAL_ANGLE = 234;
+    public static double INTAKE_DISTANCE = 28;
+
+    public static double GOAL_ANGLE = 229;
 
     public static double WAIT_SECONDS = 3;
 
@@ -79,7 +81,7 @@ public class NearBlue extends OpMode {
                         bot.launcher.getPowerAction(-Launcher.REVERSE_POWER)
                 ))
                 .splineToSplineHeading(new Pose2d(PICK_X, PICK_Y, Math.toRadians(270)), Math.toRadians(270))
-                .lineToY(PICK_Y- IntakeAuto.DISTANCE, new TranslationalVelConstraint(IntakeAuto.VELOCITY))
+                .lineToY(PICK_Y- INTAKE_DISTANCE, new TranslationalVelConstraint(IntakeAuto.VELOCITY))
                 .lineToY(PICK_Y);
 
         TrajectoryActionBuilder driveToLaunch2 = pick.endTrajectory().fresh()

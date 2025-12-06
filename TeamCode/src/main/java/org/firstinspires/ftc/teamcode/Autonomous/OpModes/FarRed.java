@@ -6,6 +6,7 @@ import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
+import com.acmerobotics.roadrunner.AngularVelConstraint;
 import com.acmerobotics.roadrunner.Arclength;
 import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.Pose2d;
@@ -78,8 +79,8 @@ public class FarRed extends OpMode {
                         bot.intake.getPowerAction(Intake.INTAKE_POWER),
                         bot.launcher.getPowerAction(-Launcher.REVERSE_POWER)
                 ))
-                .splineToSplineHeading(new Pose2d(PICK_X, PICK_Y, Math.toRadians(90)), Math.toRadians(90))
-                .lineToY(PICK_Y- IntakeAuto.DISTANCE, new TranslationalVelConstraint(IntakeAuto.VELOCITY))
+                .strafeToLinearHeading(new Vector2d(PICK_X, PICK_Y), Math.toRadians(270))
+                .lineToY(PICK_Y+ NearBlue.INTAKE_DISTANCE, new TranslationalVelConstraint(IntakeAuto.VELOCITY))
                 .lineToY(PICK_Y);
 
         TrajectoryActionBuilder driveToLaunch2 = pick.endTrajectory().fresh()
@@ -90,19 +91,31 @@ public class FarRed extends OpMode {
 
         action = new SequentialAction(
                 telemetryPacket -> {
-                    bot.launcher.motor.setTargetVelocity(AimBot.CLOSE_VELOCITY);
+                    bot.launcher.motor.setTargetVelocity(AimBot.FAR_VELOCITY);
                     return false;
                 },
                 driveToLaunch1.build(),
-                new AllLaunchAction(AimBot.CLOSE_VELOCITY),
+                new AllLaunchAction(AimBot.FAR_VELOCITY),
                 pick.build(),
                 telemetryPacket -> {
-                    bot.launcher.motor.setTargetVelocity(AimBot.CLOSE_VELOCITY);
+                    bot.launcher.motor.setTargetVelocity(AimBot.FAR_VELOCITY);
                     return false;
                 },
 //                bot.launcher.getPowerAction(AimBot.CLOSE_POWER),
                 driveToLaunch2.build(),
-                new AllLaunchAction(AimBot.CLOSE_VELOCITY),
+                new Action() { // correct last move
+                    private Action action;
+                    @Override
+                    public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+                        if (action == null) {
+                            action = drive.actionBuilder(drive.localizer.getPose())
+                                    .strafeToLinearHeading(new Vector2d(GOAL_X, GOAL_Y), Math.toRadians(GOAL_ANGLE), new AngularVelConstraint(Math.PI / 4.0))
+                                    .build();
+                        }
+                        return action.run(telemetryPacket);
+                    }
+                },
+                new AllLaunchAction(AimBot.FAR_VELOCITY),
                 bot.launcher.getPowerAction(0),
                 park.build()
         );

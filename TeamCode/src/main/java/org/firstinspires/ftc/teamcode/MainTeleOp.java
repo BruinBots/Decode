@@ -5,6 +5,8 @@ import com.acmerobotics.dashboard.canvas.Canvas;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
+import com.acmerobotics.roadrunner.Pose2d;
+import com.acmerobotics.roadrunner.Vector2d;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
@@ -36,6 +38,8 @@ public class MainTeleOp extends OpMode {
     private boolean didAddLaunchAction = false;
     private boolean isLaunching = false;
     private boolean isIntakeDriving = false;
+    private boolean didAddDriveToSave = false;
+    private Pose2d savePose = null;
 
     @Override
     public void init() {
@@ -138,16 +142,32 @@ public class MainTeleOp extends OpMode {
             isIntakeDriving = false;
         }
 
-        if (gamepad2.left_stick_button) {
+        if (gamepad2.left_stick_button || gamepad1.left_stick_button) {
             DRIVE_FACTOR = 0.5;
-        } else if (gamepad2.right_stick_button) {
+        } else if (gamepad2.right_stick_button || gamepad1.right_stick_button) {
             DRIVE_FACTOR = 1.0;
         }
 
-        if (gamepad1.dpad_up || gamepad2.dpad_right) {
+        if ((gamepad1.dpad_up && !(gamepad1.left_trigger > 0.8)) || gamepad2.dpad_right) {
             bot.lifter.doLift();
         } else if (gamepad1.dpad_down || gamepad2.dpad_left) {
             bot.lifter.unLift();
+        }
+
+        // Save and go to position
+        if ((gamepad1.left_trigger > 0.8 && gamepad1.dpad_up) || gamepad2.left_bumper) {
+            savePose = bot.drive.localizer.getPose();
+        } else if ((gamepad1.left_trigger > 0.8 && gamepad1.right_bumper) || gamepad2.left_trigger > 0.8) {
+            if (savePose != null && driveActions.isEmpty()) {
+                Pose2d curPose = bot.drive.localizer.getPose();
+                if (savePose.position.minus(curPose.position).norm() > 8) { // at least 8in
+                    driveActions.add(
+                            bot.drive.actionBuilder(bot.drive.localizer.getPose())
+                                    .strafeToLinearHeading(new Vector2d(savePose.position.x, savePose.position.y), savePose.heading)
+                                    .build()
+                    );
+                }
+            }
         }
 
 //        if (gamepad1.left_bumper) {
@@ -193,6 +213,9 @@ public class MainTeleOp extends OpMode {
         bot.voltageCompensator.doTelemetry();
 
         bot.telemetry.addData("Obelisk", obeliskReader.read().toString());
+        if (savePose != null) {
+            bot.telemetry.addData("Saved Position", savePose.position.x + "," + savePose.position.y + "," + Math.toRadians(savePose.heading.real));
+        }
 
         actions = actionLoop(actions);
         launchActions = actionLoop(launchActions);

@@ -15,8 +15,8 @@ import org.firstinspires.ftc.teamcode.MainBot;
 import org.firstinspires.ftc.teamcode.MecanumDrive;
 
 @Config
-@Disabled
-@Autonomous(name="IntakeAuto", group="Testing")
+//@Disabled
+@Autonomous(name="DO NOT USE IntakeAuto", group="Testing")
 public class IntakeAuto extends OpMode {
     private MainBot bot;
     private MecanumDrive drive;
