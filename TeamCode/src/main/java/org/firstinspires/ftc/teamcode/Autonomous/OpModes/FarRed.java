@@ -37,11 +37,11 @@ public class FarRed extends OpMode {
     public static double GOAL_X = FarBlue.GOAL_X;
     public static double GOAL_Y = -FarBlue.GOAL_Y;
 
-    public static double PICK_X = FarBlue.PICK_X;
-    public static double PICK_Y = -FarBlue.PICK_Y;
+    public static double PICK_X = 34;
+    public static double PICK_Y = 26;
 
     public static double PARK_X = FarBlue.PARK_X;
-    public static double PARK_Y = -FarBlue.PARK_Y;
+    public static double PARK_Y = 18;
 
     public static double GOAL_ANGLE = 360-FarBlue.GOAL_ANGLE;
 
@@ -79,9 +79,11 @@ public class FarRed extends OpMode {
                         bot.intake.getPowerAction(Intake.INTAKE_POWER),
                         bot.launcher.getPowerAction(-Launcher.REVERSE_POWER)
                 ))
-                .strafeToLinearHeading(new Vector2d(PICK_X, PICK_Y), Math.toRadians(270))
-                .lineToY(PICK_Y+ NearBlue.INTAKE_DISTANCE, new TranslationalVelConstraint(IntakeAuto.VELOCITY))
-                .lineToY(PICK_Y);
+                .strafeToLinearHeading(new Vector2d(PICK_X, PICK_Y), Math.toRadians(90))
+                .strafeToConstantHeading(new Vector2d(PICK_X, PICK_Y+FarBlue.INTAKE_DISTANCE), new TranslationalVelConstraint(IntakeAuto.VELOCITY))
+                .strafeToConstantHeading(new Vector2d(PICK_X, PICK_Y));
+//                .lineToY(PICK_Y+ NearBlue.INTAKE_DISTANCE, new TranslationalVelConstraint(IntakeAuto.VELOCITY))
+//                .lineToY(PICK_Y);
 
         TrajectoryActionBuilder driveToLaunch2 = pick.endTrajectory().fresh()
                 .strafeToLinearHeading(new Vector2d(GOAL_X, GOAL_Y), Math.toRadians(GOAL_ANGLE));
@@ -95,6 +97,18 @@ public class FarRed extends OpMode {
                     return false;
                 },
                 driveToLaunch1.build(),
+                new Action() { // correct last move
+                    private Action action;
+                    @Override
+                    public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+                        if (action == null) {
+                            action = drive.actionBuilder(drive.localizer.getPose())
+                                    .strafeToLinearHeading(new Vector2d(GOAL_X, GOAL_Y), Math.toRadians(GOAL_ANGLE), new AngularVelConstraint(Math.PI / 4.0))
+                                    .build();
+                        }
+                        return action.run(telemetryPacket);
+                    }
+                },
                 new AllLaunchAction(AimBot.FAR_VELOCITY),
                 pick.build(),
                 telemetryPacket -> {

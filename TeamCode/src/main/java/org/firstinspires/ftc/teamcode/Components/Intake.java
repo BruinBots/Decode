@@ -21,12 +21,12 @@ public class Intake {
 
     public static double REVERSE_POWER = 0.5;
 
-    public static double WIGGLE_IN_POWER = 0.6;
-    public static int WIGGLE_IN_TIME = 65; // ms
+    public static double WIGGLE_IN_POWER = 0.65;
+    public static int WIGGLE_IN_TIME = 95; // ms
     public static double WIGGLE_OUT_POWER = 0.55;
-    public static int WIGGLE_OUT_TIME = 40; // ms
+    public static int WIGGLE_OUT_TIME = 45; // ms
     public static int WIGGLE_TIMES = 10;
-    public static int STOP_RPM = 60;
+    public static int STOP_RPM = 30;
 
 
     public EnhancedMotor motor;

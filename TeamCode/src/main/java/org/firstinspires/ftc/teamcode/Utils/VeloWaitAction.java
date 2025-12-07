@@ -22,5 +22,7 @@ public class VeloWaitAction implements Action {
         motor.setTargetVelocity(velTarget);
         telemetryPacket.addLine("VeloWaitAction ("+velTarget+"RPM)");
         return Math.abs(motor.getRPM() - velTarget) > TOLERANCE;
+//        return Math.abs(motor.lastDerivativeAverage) > TOLERANCE;
+//        return motor.getRPM() > velTarget - TOLERANCE;
     }
 }

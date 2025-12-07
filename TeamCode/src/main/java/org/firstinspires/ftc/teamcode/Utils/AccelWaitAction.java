@@ -21,7 +21,7 @@ public class AccelWaitAction implements Action {
     @Override
     public boolean run(@NonNull TelemetryPacket telemetryPacket) {
         motor.setTargetVelocity(targetVel);
-        motor.updateVelocityPID();
+//        motor.updateVelocityPID();
         double accel = motor.getAcceleration();
         telemetryPacket.addLine("AccelWaitAction "+accel+"("+maxAccel+"), v="+targetVel);
         return accel > maxAccel;

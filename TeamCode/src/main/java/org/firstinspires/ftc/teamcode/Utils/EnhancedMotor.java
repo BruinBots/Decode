@@ -21,6 +21,8 @@ import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import org.firstinspires.ftc.teamcode.Components.Launcher;
 import org.firstinspires.ftc.teamcode.MainBot;
 
+import java.util.ArrayList;
+
 @Config
 public class EnhancedMotor {
     public DcMotorEx motor;
@@ -80,7 +82,7 @@ public class EnhancedMotor {
 
     // multiply all target velocities by this amount
     // (compensation for improperly tuned or absent kI term)
-    public static double VELOCITY_ADJUSTMENT = 1.24;
+    public static double VELOCITY_ADJUSTMENT = 1.26;
 
     private double integral = 0;
     private double lastError = 0;
@@ -90,6 +92,13 @@ public class EnhancedMotor {
     // tolerance within target
     // in which MAX_POWER_DELTA is enforced
     public static double MAX_POWER_DELTA_BAND = 250;
+
+    private ArrayList<Double> derivativeRunningAverage = new ArrayList<>();
+    public double lastDerivativeAverage;
+    public static int DERIVATIVE_RUNNING_AVERAGE_SIZE = 10;
+
+    public ArrayList<Double> pastVelocities = new ArrayList<>();
+    public static int PAST_VELOCITIES_SIZE = 50;
 
     public double getRPM() {
         // Update accel
@@ -116,6 +125,11 @@ public class EnhancedMotor {
             lastPosTime = curTime;
         }
 
+        pastVelocities.add(vel);
+        if (pastVelocities.size() > PAST_VELOCITIES_SIZE) {
+            pastVelocities.remove(0);
+        }
+
         return vel;
     }
 
@@ -139,6 +153,8 @@ public class EnhancedMotor {
 
     public void setTargetVelocity(double rpm) {
         this.targetVelocityRPM = rpm*VELOCITY_ADJUSTMENT;
+        derivativeRunningAverage.clear();
+        lastDerivativeAverage = 99999;
         integral = 0;
         lastError = 0;
     }
@@ -153,6 +169,16 @@ public class EnhancedMotor {
         double error = targetVelocityRPM - currentRPM;
         integral += error;
         double derivative = error - lastError;
+        derivativeRunningAverage.add(derivative);
+        if (derivativeRunningAverage.size() > DERIVATIVE_RUNNING_AVERAGE_SIZE) {
+            derivativeRunningAverage.remove(0);
+        }
+        double sum = 0;
+        for (double i: derivativeRunningAverage) {
+            sum += i;
+        }
+        lastDerivativeAverage = sum / derivativeRunningAverage.size();
+
         double output = kP * error + kI * integral + kD * derivative;
 
         // Clamp output

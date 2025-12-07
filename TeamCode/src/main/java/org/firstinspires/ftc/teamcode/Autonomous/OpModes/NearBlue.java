@@ -25,6 +25,7 @@ import org.firstinspires.ftc.teamcode.Components.Launcher;
 import org.firstinspires.ftc.teamcode.MainBot;
 import org.firstinspires.ftc.teamcode.MecanumDrive;
 import org.firstinspires.ftc.teamcode.Utils.AllLaunchAction;
+import org.firstinspires.ftc.teamcode.Utils.WaitAction;
 
 @Autonomous(name="NearBlue")
 @Config
@@ -33,14 +34,14 @@ public class NearBlue extends OpMode {
     private MecanumDrive drive;
     private FtcDashboard dashboard;
 
-    public static double GOAL_X = -18;
-    public static double GOAL_Y = -12;
+    public static double GOAL_X = -26;
+    public static double GOAL_Y = -22;
 
     public static double PICK_X = -12;
     public static double PICK_Y = -24;
     public static double GATE_X = -7.5;
     public static double GATE_Y = -45;
-    public static double GATE_DISTANCE = 10;
+    public static double GATE_DISTANCE = 0;
 
     public static double INTAKE_DISTANCE = 28;
 
@@ -51,7 +52,7 @@ public class NearBlue extends OpMode {
     public Action action;
 
     public Pose2d getStartPose() {
-        return new Pose2d(-60, -36, Math.toRadians(270));
+        return new Pose2d(-60, -40, Math.toRadians(270));
     }
     public PoseMap getPoseMap() {
         return new PoseMap() {
@@ -97,7 +98,11 @@ public class NearBlue extends OpMode {
                     return false;
                 },
                 driveToLaunch1.build(),
-                new AllLaunchAction(AimBot.CLOSE_VELOCITY),
+//                bot.singleLaunchAction(AimBot.CLOSE_VELOCITY),
+//                bot.singleLaunchAction(AimBot.CLOSE_VELOCITY),
+//                bot.singleLaunchActionNoPreload(AimBot.CLOSE_VELOCITY),
+                bot.singleLaunchActionBlind(AimBot.CLOSE_VELOCITY),
+                new AllLaunchAction(AimBot.CLOSE_VELOCITY, 2),
                 pick.build(),
                 telemetryPacket -> {
                     bot.launcher.motor.setTargetVelocity(AimBot.CLOSE_VELOCITY);
@@ -105,10 +110,17 @@ public class NearBlue extends OpMode {
                 },
 //                bot.launcher.getPowerAction(AimBot.CLOSE_POWER),
                 driveToLaunch2.build(),
+                new WaitAction(750),
                 new AllLaunchAction(AimBot.CLOSE_VELOCITY),
                 bot.launcher.getPowerAction(0),
                 park.build()
         );
+
+        bot.launcher.setServo(Launcher.SERVO_DOWN_POS);
+
+        for (int i = 0; i < Launcher.SENSOR_RUNNING_AVERAGE_SIZE; i ++) {
+            bot.launcher.updateSensorState();
+        }
     }
 
     @Override

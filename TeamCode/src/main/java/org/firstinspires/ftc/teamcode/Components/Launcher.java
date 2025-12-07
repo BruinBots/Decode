@@ -48,7 +48,7 @@ public class Launcher { // extends VelMotor {
 
     public static int SERVO_WAIT_MS = 1250;
     public static int PRE_LAUNCH_WAIT_MS = 750;
-    public static int POST_LAUNCH_WAIT_MS = 1000;
+    public static int POST_LAUNCH_WAIT_MS = 750;
 
     public static int KICK_SENSOR_WAIT_MS = 100;
     public static double SERVO_SENSOR_MARGIN = 0.05;
@@ -64,14 +64,14 @@ public class Launcher { // extends VelMotor {
     private ArrayList<Double> sensorRunningAverages = new ArrayList<>();
     public double lastSensorAverage;
     public static int SENSOR_RUNNING_AVERAGE_SIZE = 10;
-    public static double SENSOR_THREHSOLD_DISTANCE = 4.5; // inches
+    public static double SENSOR_THREHSOLD_DISTANCE = 5; // inches
     public boolean artifactPresent = false;
     private double maxTicksPerSec;
     private long lastServoUpTime = 0;
 
     public static int SERVO_FIRST_WAIT_MS = 250;
     public static int SERVO_SECOND_WAIT_MS = 250;
-    public static int SERVO_THIRD_WAIT_MS = 750;
+    public static int SERVO_THIRD_WAIT_MS = 75;
 
     public Launcher(HardwareMap hardwareMap) {
         motor = new EnhancedMotor(hardwareMap, "launchMotor");
@@ -143,6 +143,7 @@ public class Launcher { // extends VelMotor {
         MainBot.shared.telemetry.addData("Launcher Power", motor.getPower());
         MainBot.shared.telemetry.addData("Launcher Speed", motor.getRPM()); // getCurrentVelocity()
         MainBot.shared.telemetry.addData("Launcher Acceleration", motor.getAcceleration()); // getCurrentAcceleration()
+        MainBot.shared.telemetry.addData("Launcher D", motor.lastDerivativeAverage);
         MainBot.shared.telemetry.addData("Launcher Sensor", lastSensorAverage);
     }
 

@@ -19,7 +19,7 @@ public class ArtifactShakeAction implements Action {
     private long startTime = 0;
 
     public static int PRE_WAIT = 750;
-    public static int MAX_WAIT = 2500; // ms
+    public static int MAX_WAIT = 3500; // ms
 
     public ArtifactShakeAction(int preWait, int maxWait, Action tryAction) {
         this.preWait = preWait;

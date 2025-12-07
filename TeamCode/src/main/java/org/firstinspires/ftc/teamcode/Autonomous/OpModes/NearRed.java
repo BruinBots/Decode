@@ -25,6 +25,7 @@ import org.firstinspires.ftc.teamcode.Components.Launcher;
 import org.firstinspires.ftc.teamcode.MainBot;
 import org.firstinspires.ftc.teamcode.MecanumDrive;
 import org.firstinspires.ftc.teamcode.Utils.AllLaunchAction;
+import org.firstinspires.ftc.teamcode.Utils.WaitAction;
 
 @Autonomous(name="NearRed")
 @Config
@@ -49,7 +50,7 @@ public class NearRed extends OpMode {
     public Action action;
 
     public Pose2d getStartPose() {
-        return new Pose2d(-60, 36, Math.toRadians(90));
+        return new Pose2d(-60, 40, Math.toRadians(90));
     }
     public PoseMap getPoseMap() {
         return new PoseMap() {
@@ -103,6 +104,7 @@ public class NearRed extends OpMode {
                 },
 //                bot.launcher.getPowerAction(AimBot.CLOSE_POWER),
                 driveToLaunch2.build(),
+                new WaitAction(750),
                 bot.launcher.getPowerAction(0),
                 park.build()
         );

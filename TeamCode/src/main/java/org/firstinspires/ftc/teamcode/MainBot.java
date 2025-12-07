@@ -126,6 +126,8 @@ public class MainBot {
                             launcher.getVeloWaitAction(velocity),
 //                            new WaitAction(Launcher.PRE_LAUNCH_WAIT_MS),
 //                            launcher.getAccelWaitAction(velocity, Launcher.MAX_LAUNCH_ACCEL),
+//                            new WaitAction(Launcher.PRE_LAUNCH_WAIT_MS),
+//                            launcher.getAccelWaitAction(velocity, Launcher.MAX_LAUNCH_ACCEL),
 
                             // Step 5: Kick to launch
 //                            new RelativeMotorAction(intake.motor, Intake.INTAKE_POWER, Intake.SHORT_IN_DIST), // brief intake to prevent congestion in launcher
@@ -138,11 +140,53 @@ public class MainBot {
                             new ServoAction(launcher.servo, Launcher.SERVO_UP_POS),
                             new WaitAction(Launcher.SERVO_THIRD_WAIT_MS),
                             new ServoAction(launcher.servo, Launcher.SERVO_DOWN_POS)
-                    ))
+                    )),
+                    new WaitAction(Launcher.POST_LAUNCH_WAIT_MS)
             );
         } else {
             return telemetryPacket -> false;
         }
+    }
+
+    public Action singleLaunchActionBlind(double velocity) {
+        return new SequentialAction(
+                // Step 1: Spin up (async)
+//                    launcher.getPowerAction(power),
+                telemetryPacket -> {
+                    launcher.motor.setTargetVelocity(velocity);
+                    return false; // end instantly for async
+                },
+
+                // Step 2: Intake to push an artifact into the launcher
+                // and get artifacts in a somewhat known position
+//                    new RelativeMotorAction(intake.motor, Intake.SHORT_IN_POWER, Intake.SHORT_IN_DIST),
+
+                // Step 3: Outtake to ensure intake artifact isn't pushing against
+                // artifact in launcher
+//                    new RelativeMotorAction(intake.motor, Intake.SHORT_OUT_POWER, -Intake.SHORT_OUT_DIST),
+//                    intake.getPowerAction(0), // stop intake
+
+                // Step 4: Wait for spin up (conditional if artifact is now detected)
+                new ArtifactWaitAction(Launcher.POST_LAUNCH_WAIT_MS),
+                launcher.getVeloWaitAction(velocity),
+//                            new WaitAction(Launcher.PRE_LAUNCH_WAIT_MS),
+//                            launcher.getAccelWaitAction(velocity, Launcher.MAX_LAUNCH_ACCEL),
+//                            new WaitAction(Launcher.PRE_LAUNCH_WAIT_MS),
+//                            launcher.getAccelWaitAction(velocity, Launcher.MAX_LAUNCH_ACCEL),
+
+                // Step 5: Kick to launch
+//                            new RelativeMotorAction(intake.motor, Intake.INTAKE_POWER, Intake.SHORT_IN_DIST), // brief intake to prevent congestion in launcher
+                intake.getPowerAction(0), // stop intake
+//                        launcher.kickAction()
+                new ServoAction(launcher.servo, Launcher.SERVO_UP_POS),
+                new WaitAction(Launcher.SERVO_FIRST_WAIT_MS),
+                new ServoAction(launcher.servo, Launcher.SERVO_DOWN_POS),
+                new WaitAction(Launcher.SERVO_SECOND_WAIT_MS),
+                new ServoAction(launcher.servo, Launcher.SERVO_UP_POS),
+                new WaitAction(Launcher.SERVO_THIRD_WAIT_MS),
+                new ServoAction(launcher.servo, Launcher.SERVO_DOWN_POS),
+                new WaitAction(Launcher.POST_LAUNCH_WAIT_MS)
+        );
     }
 
     public Action singleLaunchAction(double velocity) {
