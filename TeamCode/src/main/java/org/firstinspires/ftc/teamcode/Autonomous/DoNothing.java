@@ -7,7 +7,7 @@ import com.sun.tools.javac.Main;
 
 import org.firstinspires.ftc.teamcode.MainBot;
 
-@Autonomous(name="DoNothing", group="A-Backup")
+@Autonomous(name="DoNothing")
 public class DoNothing extends OpMode {
     @Override
     public void init() {
@@ -16,6 +16,6 @@ public class DoNothing extends OpMode {
 
     @Override
     public void loop() {
-        requestOpModeStop();
+        stop();
     }
 }
