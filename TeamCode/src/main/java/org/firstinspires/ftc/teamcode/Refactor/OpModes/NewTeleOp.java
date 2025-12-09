@@ -61,10 +61,6 @@ public class NewTeleOp extends OpMode {
         follower = Constants.createFollower(hardwareMap);
         follower.setStartingPose(new Pose(0, 0, 0));
         follower.update();
-        m_telemetry = new TelemetryLogger(
-                PanelsTelemetry.INSTANCE.getTelemetry(),
-                telemetry
-        );
 
         m_gamepad1 = new GamepadEx(gamepad1);
         m_gamepad2 = new GamepadEx(gamepad2);
@@ -73,6 +69,10 @@ public class NewTeleOp extends OpMode {
         RLOGWriter logwriter = new RLOGWriter("NewTeleOp");
         Logger.addDataReceiver(logserver); // NOTE: Must be disabled during comp to be legal
         Logger.addDataReceiver(logwriter); // Comp legal
+        m_telemetry = new TelemetryLogger(
+                PanelsTelemetry.INSTANCE.getTelemetry(),
+                telemetry
+        );
         // Pull with:
         // adb pull /sdcard/FIRST/PsiKit/NewTeleOp.rlog
         // or

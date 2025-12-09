@@ -80,6 +80,12 @@ public class Shooter extends SubsystemBase {
         targetSpeed = 0;
     }
 
+    public void setPower(double power) {
+        m_motor.setRunMode(Motor.RunMode.RawPower);
+        m_motor.set(power);
+        targetSpeed = 0;
+    }
+
     public double getSpeed() {
         return m_motor.getCorrectedVelocity();
     }
