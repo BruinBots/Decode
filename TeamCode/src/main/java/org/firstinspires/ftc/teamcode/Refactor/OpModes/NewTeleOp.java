@@ -16,6 +16,8 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.Autonomous.Constants;
 import org.firstinspires.ftc.teamcode.Refactor.Jimmy;
+import org.firstinspires.ftc.teamcode.Refactor.Subsystems.Intake;
+import org.firstinspires.ftc.teamcode.Refactor.Subsystems.Shooter;
 
 @TeleOp
 @Configurable
@@ -28,6 +30,9 @@ public class NewTeleOp extends OpMode {
     private LynxModule controlHub;
     private LynxModule expansionHub;
 
+    private Intake m_intake;
+    private Shooter m_shooter;
+
     private GamepadEx m_gamepad1;
     private GamepadEx m_gamepad2;
 
@@ -39,7 +44,12 @@ public class NewTeleOp extends OpMode {
     @Override
     public void init() {
         m_scheduler = CommandScheduler.getInstance();
+
         m_bot = Jimmy.shared = new Jimmy(hardwareMap);
+        m_intake = m_bot.getIntake();
+        m_shooter = m_bot.getShooter();
+
+        m_scheduler.registerSubsystem(m_intake, m_shooter);
 
         controlHub = m_bot.getControlHub();
         expansionHub = m_bot.getExpansionHub();
@@ -88,6 +98,9 @@ public class NewTeleOp extends OpMode {
         );
         telemetryM.debug("position", follower.getPose());
         telemetryM.debug("velocity", follower.getVelocity());
+
+        m_intake.doTelemetry(telemetryM);
+        m_shooter.doTelemetry(telemetryM);
 
         m_gamepad1.readButtons();
         m_gamepad2.readButtons();

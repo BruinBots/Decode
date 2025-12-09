@@ -4,6 +4,7 @@ import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.arcrobotics.ftclib.hardware.motors.Motor;
 import com.arcrobotics.ftclib.hardware.motors.MotorEx;
 import com.bylazar.configurables.annotations.Configurable;
+import com.bylazar.telemetry.TelemetryManager;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.teamcode.Refactor.Commands.Intake.IntakeStopCommand;
@@ -22,6 +23,10 @@ public class Intake extends SubsystemBase {
         motor.setRunMode(Motor.RunMode.RawPower);
 
         setDefaultCommand(new IntakeStopCommand(this));
+    }
+
+    public void doTelemetry(TelemetryManager telemetryM) {
+        telemetryM.debug("Intake Power", motor.get());
     }
 
     public void activate() {

@@ -6,6 +6,7 @@ import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.teamcode.Refactor.Subsystems.Intake;
+import org.firstinspires.ftc.teamcode.Refactor.Subsystems.Shooter;
 
 @Configurable
 public class Jimmy {
@@ -15,7 +16,8 @@ public class Jimmy {
     private LynxModule controlHub;
     private LynxModule expansionHub;
 
-    public final Intake intake;
+    private final Intake intake;
+    private final Shooter shooter;
 
     public Jimmy(HardwareMap hMap) {
         for (LynxModule mod: hMap.getAll(LynxModule.class)) {
@@ -27,6 +29,15 @@ public class Jimmy {
         }
 
         intake = new Intake(hMap, "intakeMotor");
+        shooter = new Shooter(hMap, "launchMotor");
+    }
+
+    public Intake getIntake() {
+        return intake;
+    }
+
+    public Shooter getShooter() {
+        return shooter;
     }
 
     public LynxModule getControlHub() {
