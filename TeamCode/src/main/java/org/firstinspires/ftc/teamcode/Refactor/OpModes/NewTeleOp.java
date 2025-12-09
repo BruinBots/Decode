@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.Refactor.OpModes;
 
+import android.graphics.Color;
+
 import com.arcrobotics.ftclib.command.CommandScheduler;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
@@ -8,6 +10,7 @@ import com.bylazar.telemetry.PanelsTelemetry;
 import com.bylazar.telemetry.TelemetryManager;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.Pose;
+import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
@@ -22,6 +25,9 @@ public class NewTeleOp extends OpMode {
     private Jimmy m_bot;
     private TelemetryManager telemetryM;
 
+    private LynxModule controlHub;
+    private LynxModule expansionHub;
+
     private GamepadEx m_gamepad1;
     private GamepadEx m_gamepad2;
 
@@ -34,6 +40,10 @@ public class NewTeleOp extends OpMode {
     public void init() {
         m_scheduler = CommandScheduler.getInstance();
         m_bot = Jimmy.shared = new Jimmy(hardwareMap);
+
+        controlHub = m_bot.getControlHub();
+        expansionHub = m_bot.getExpansionHub();
+
         follower = Constants.createFollower(hardwareMap);
         follower.setStartingPose(new Pose(0, 0, 0));
         follower.update();
@@ -56,6 +66,8 @@ public class NewTeleOp extends OpMode {
         if (m_gamepad1.wasJustPressed(GamepadKeys.Button.A)) {
             isRobotCentric = !isRobotCentric;
         }
+        // Red if robot-centric, else teal
+        controlHub.setConstant(isRobotCentric ? Color.rgb(1,0,0) : Color.rgb(0,1,1));
         telemetryM.debug("Robot Centric", isRobotCentric ? "YES" : "NO");
 
         if (m_gamepad1.isDown(GamepadKeys.Button.LEFT_STICK_BUTTON)) {
@@ -63,6 +75,8 @@ public class NewTeleOp extends OpMode {
         } else if (m_gamepad1.isDown(GamepadKeys.Button.RIGHT_STICK_BUTTON)) {
             slowMode = false;
         }
+        // Yellow if slow mode, else purple
+        expansionHub.setConstant(slowMode ? Color.rgb(1,1,0) : Color.rgb(1,0,1));
         telemetryM.debug("Slow Mode", slowMode ? "YES" : "NO");
 
         double driveMultiplier = slowMode ? SLOW_SPEED_MULTIPLIER : 1;
