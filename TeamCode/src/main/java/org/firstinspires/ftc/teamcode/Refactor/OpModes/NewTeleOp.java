@@ -18,6 +18,9 @@ import org.firstinspires.ftc.teamcode.Autonomous.Constants;
 import org.firstinspires.ftc.teamcode.Refactor.Jimmy;
 import org.firstinspires.ftc.teamcode.Refactor.Subsystems.Intake;
 import org.firstinspires.ftc.teamcode.Refactor.Subsystems.Shooter;
+import org.psilynx.psikit.core.Logger;
+import org.psilynx.psikit.core.rlog.RLOGServer;
+import org.psilynx.psikit.core.rlog.RLOGWriter;
 
 @TeleOp
 @Configurable
@@ -61,6 +64,15 @@ public class NewTeleOp extends OpMode {
 
         m_gamepad1 = new GamepadEx(gamepad1);
         m_gamepad2 = new GamepadEx(gamepad2);
+
+        RLOGServer logserver = new RLOGServer();
+        RLOGWriter logwriter = new RLOGWriter("NewTeleOp");
+        Logger.addDataReceiver(logserver); // NOTE: Must be disabled during comp to be legal
+        Logger.addDataReceiver(logwriter); // Comp legal
+        // Pull with:
+        // adb pull /sdcard/FIRST/PsiKit/NewTeleOp.rlog
+        // or
+        // adb shell ls /sdcard/FIRST
     }
 
     @Override
@@ -98,6 +110,9 @@ public class NewTeleOp extends OpMode {
         );
         telemetryM.debug("position", follower.getPose());
         telemetryM.debug("velocity", follower.getVelocity());
+
+        Logger.recordOutput("position", follower.getPose().toString());
+        Logger.recordOutput("velocity", follower.getVelocity().toString());
 
         m_intake.doTelemetry(telemetryM);
         m_shooter.doTelemetry(telemetryM);
