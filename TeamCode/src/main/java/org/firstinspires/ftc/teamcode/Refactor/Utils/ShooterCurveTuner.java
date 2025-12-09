@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.Refactor.Utils;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.bylazar.telemetry.PanelsTelemetry;
+import com.pedropathing.util.Timer;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
@@ -57,7 +58,13 @@ public class ShooterCurveTuner extends LinearOpMode {
 
         for (double power: testPowers) {
             shooter.setPower(power);
-            wait((int)(STABILIZE_TIME*1000));
+            Timer timer = new Timer();
+            timer.resetTimer();
+            while (timer.getElapsedTimeSeconds() < STABILIZE_TIME) {
+                shooter.doTelemetry(m_telemetry);
+                m_telemetry.update();
+                wait(10); // short 10ms delay
+            }
             double speed = shooter.getSpeed();
             m_telemetry.debug("Test "+power, power+","+speed);
         }
