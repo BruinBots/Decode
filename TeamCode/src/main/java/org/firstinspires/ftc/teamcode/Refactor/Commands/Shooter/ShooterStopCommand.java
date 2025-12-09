@@ -4,19 +4,19 @@ import com.arcrobotics.ftclib.command.CommandBase;
 
 import org.firstinspires.ftc.teamcode.Refactor.Subsystems.Shooter;
 
-public class ShooterStopAction extends CommandBase {
+public class ShooterStopCommand extends CommandBase {
 
     private final Shooter m_shooter;
     private final boolean m_brake;
 
-    public ShooterStopAction(Shooter shooter) {
+    public ShooterStopCommand(Shooter shooter) {
         m_shooter = shooter;
         m_brake = false;
 
         addRequirements(shooter);
     }
 
-    public ShooterStopAction(Shooter shooter, boolean brake) {
+    public ShooterStopCommand(Shooter shooter, boolean brake) {
         m_shooter = shooter;
         m_brake = brake;
 

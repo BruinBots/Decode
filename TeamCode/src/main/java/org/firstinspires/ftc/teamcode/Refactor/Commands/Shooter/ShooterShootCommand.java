@@ -4,14 +4,16 @@ import com.arcrobotics.ftclib.command.CommandBase;
 
 import org.firstinspires.ftc.teamcode.Refactor.Subsystems.Shooter;
 
-public class ShooterSpinAction extends CommandBase {
+public class ShooterShootCommand extends CommandBase {
 
     private final Shooter m_shooter;
     private final double m_speed;
+    private final int m_num_shots;
 
-    public ShooterSpinAction(Shooter shooter, double speed) {
+    public ShooterShootCommand(Shooter shooter, double speed, int numShots) {
         m_shooter = shooter;
         m_speed = speed;
+        m_num_shots = numShots;
 
         addRequirements(shooter);
     }
@@ -19,10 +21,11 @@ public class ShooterSpinAction extends CommandBase {
     @Override
     public void initialize() {
         m_shooter.setSpeed(m_speed);
+        m_shooter.fireShots(m_num_shots);
     }
 
     @Override
     public boolean isFinished() {
-        return true;
+        return !m_shooter.isBusy();
     }
 }

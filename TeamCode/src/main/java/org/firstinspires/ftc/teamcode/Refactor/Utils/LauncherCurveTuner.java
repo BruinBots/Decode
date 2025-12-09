@@ -1,11 +1,9 @@
-package org.firstinspires.ftc.teamcode.Utils;
+package org.firstinspires.ftc.teamcode.Refactor.Utils;
 
 import com.acmerobotics.dashboard.config.Config;
-import com.bylazar.telemetry.PanelsTelemetry;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ReadWriteFile;
-import com.sun.tools.javac.Main;
 
 import org.firstinspires.ftc.teamcode.MainBot;
 

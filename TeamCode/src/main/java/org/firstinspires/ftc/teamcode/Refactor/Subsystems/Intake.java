@@ -8,36 +8,37 @@ import com.bylazar.telemetry.TelemetryManager;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.teamcode.Refactor.Commands.Intake.IntakeStopCommand;
+import org.firstinspires.ftc.teamcode.Refactor.Utils.TelemetryLogger;
 
 @Configurable
 public class Intake extends SubsystemBase {
 
-    private final MotorEx motor;
+    private final MotorEx m_motor;
 
     public static double POWER = 0.5;
     public static double REVERSE_POWER = 0.3;
 
     public Intake(final HardwareMap hMap, final String name) {
-        motor = new MotorEx(hMap, name);
-        motor.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
-        motor.setRunMode(Motor.RunMode.RawPower);
+        m_motor = new MotorEx(hMap, name);
+        m_motor.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
+        m_motor.setRunMode(Motor.RunMode.RawPower);
 
         setDefaultCommand(new IntakeStopCommand(this));
     }
 
-    public void doTelemetry(TelemetryManager telemetryM) {
-        telemetryM.debug("Intake Power", motor.get());
+    public void doTelemetry(TelemetryLogger telemetryM) {
+        telemetryM.debug("Intake Power", m_motor.get());
     }
 
     public void activate() {
-        motor.set(POWER);
+        m_motor.set(POWER);
     }
 
     public void reverse() {
-        motor.set(REVERSE_POWER);
+        m_motor.set(REVERSE_POWER);
     }
 
     public void stop() {
-        motor.set(0);
+        m_motor.set(0);
     }
 }

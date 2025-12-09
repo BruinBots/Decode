@@ -18,6 +18,7 @@ import org.firstinspires.ftc.teamcode.Autonomous.Constants;
 import org.firstinspires.ftc.teamcode.Refactor.Jimmy;
 import org.firstinspires.ftc.teamcode.Refactor.Subsystems.Intake;
 import org.firstinspires.ftc.teamcode.Refactor.Subsystems.Shooter;
+import org.firstinspires.ftc.teamcode.Refactor.Utils.TelemetryLogger;
 import org.psilynx.psikit.core.Logger;
 import org.psilynx.psikit.core.rlog.RLOGServer;
 import org.psilynx.psikit.core.rlog.RLOGWriter;
@@ -28,7 +29,7 @@ public class NewTeleOp extends OpMode {
 
     private CommandScheduler m_scheduler;
     private Jimmy m_bot;
-    private TelemetryManager telemetryM;
+    private TelemetryLogger m_telemetry;
 
     private LynxModule controlHub;
     private LynxModule expansionHub;
@@ -60,7 +61,10 @@ public class NewTeleOp extends OpMode {
         follower = Constants.createFollower(hardwareMap);
         follower.setStartingPose(new Pose(0, 0, 0));
         follower.update();
-        telemetryM = PanelsTelemetry.INSTANCE.getTelemetry();
+        m_telemetry = new TelemetryLogger(
+                PanelsTelemetry.INSTANCE.getTelemetry(),
+                telemetry
+        );
 
         m_gamepad1 = new GamepadEx(gamepad1);
         m_gamepad2 = new GamepadEx(gamepad2);
@@ -83,14 +87,14 @@ public class NewTeleOp extends OpMode {
     @Override
     public void loop() {
         follower.update();
-        telemetryM.update();
+        m_telemetry.update();
 
         if (m_gamepad1.wasJustPressed(GamepadKeys.Button.A)) {
             isRobotCentric = !isRobotCentric;
         }
         // Red if robot-centric, else teal
         controlHub.setConstant(isRobotCentric ? Color.rgb(1,0,0) : Color.rgb(0,1,1));
-        telemetryM.debug("Robot Centric", isRobotCentric ? "YES" : "NO");
+        m_telemetry.debug("Robot Centric", isRobotCentric ? "YES" : "NO");
 
         if (m_gamepad1.isDown(GamepadKeys.Button.LEFT_STICK_BUTTON)) {
             slowMode = true;
@@ -99,7 +103,7 @@ public class NewTeleOp extends OpMode {
         }
         // Yellow if slow mode, else purple
         expansionHub.setConstant(slowMode ? Color.rgb(1,1,0) : Color.rgb(1,0,1));
-        telemetryM.debug("Slow Mode", slowMode ? "YES" : "NO");
+        m_telemetry.debug("Slow Mode", slowMode ? "YES" : "NO");
 
         double driveMultiplier = slowMode ? SLOW_SPEED_MULTIPLIER : 1;
         follower.setTeleOpDrive(
@@ -108,14 +112,11 @@ public class NewTeleOp extends OpMode {
                 gamepad1.right_stick_x * driveMultiplier,
                 isRobotCentric
         );
-        telemetryM.debug("position", follower.getPose());
-        telemetryM.debug("velocity", follower.getVelocity());
+        m_telemetry.debug("position", follower.getPose());
+        m_telemetry.debug("velocity", follower.getVelocity());
 
-        Logger.recordOutput("position", follower.getPose().toString());
-        Logger.recordOutput("velocity", follower.getVelocity().toString());
-
-        m_intake.doTelemetry(telemetryM);
-        m_shooter.doTelemetry(telemetryM);
+        m_intake.doTelemetry(m_telemetry);
+        m_shooter.doTelemetry(m_telemetry);
 
         m_gamepad1.readButtons();
         m_gamepad2.readButtons();
