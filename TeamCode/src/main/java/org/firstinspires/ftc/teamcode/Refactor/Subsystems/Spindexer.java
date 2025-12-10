@@ -7,6 +7,8 @@ import com.arcrobotics.ftclib.hardware.motors.MotorEx;
 import com.bylazar.configurables.annotations.Configurable;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
+import org.firstinspires.ftc.teamcode.Refactor.Utils.TelemetryLogger;
+
 @Configurable
 public class Spindexer extends SubsystemBase {
 
@@ -25,14 +27,13 @@ public class Spindexer extends SubsystemBase {
     private enum SlotState {
         UNKNOWN,
         EMPTY,
-        FULL,
         PURPLE,
         GREEN
     }
 
     private enum SlotPosition {
         INTAKE,
-        LAUNCHER
+        LAUNCHER,
     }
 
     private int curSlot;
@@ -51,6 +52,12 @@ public class Spindexer extends SubsystemBase {
         slotStates = new SlotState[]{SlotState.UNKNOWN, SlotState.UNKNOWN, SlotState.UNKNOWN};
     }
 
+    public void doTelemetry(TelemetryLogger telemetryM) {
+        telemetryM.debug("Spindexer Slot", curSlot);
+        telemetryM.debug("Spindexer Slot Pos", curSlotPos+(isMoving() ? " (moving)" : ""));
+        telemetryM.debug("Spindexer Slots", slotStates[0]+","+slotStates[1]+","+slotStates[2]);
+    }
+
     private int posForIntake(int slot) {
         return INCREMENT * slot;
     }
@@ -65,9 +72,6 @@ public class Spindexer extends SubsystemBase {
         // Validated with Python algorithm:
         // cur + ((pos - cur + ppr/2) % ppr) - ppr/2
     }
-
-    // TODO: State machine (currently selecting)
-    // TODO: Slot reader
 
     public void moveSlotToIntake(int slot) {
         int pos = closestPos(posForIntake(slot));
@@ -91,28 +95,39 @@ public class Spindexer extends SubsystemBase {
         m_motor.set(POWER);
     }
 
-    private double euclidianDistance(int[] argb1, int[] argb2) {
-        int dr = argb1[1] - argb2[1];
-        int dg = argb1[2] - argb2[2];
-        int db = argb1[3] - argb2[3];
+    public boolean isMoving() {
+        return !m_motor.atTargetPosition();
+    }
+
+    private int[] toRGB(int[] argb) {
+        return new int[]{ argb[1], argb[2], argb[3] };
+    }
+
+    private double rgbDistance(int[] rgb1, int[] rgb2) {
+        int dr = rgb1[0] - rgb2[0];
+        int dg = rgb1[1] - rgb2[1];
+        int db = rgb1[2] - rgb2[2];
         return Math.sqrt(dr*dr + dg*dg + db*db);
     }
 
-    private SlotState determineColor(int[] argb) {
-        double dblack = euclidianDistance(argb, BLACK);
-        double dpurple = euclidianDistance(argb, PURPLE);
-        double dgreen = euclidianDistance(argb, GREEN);
-        double min = Math.min(Math.min(dgreen, dpurple), dgreen);
-        if (min == dblack) { return SlotState.EMPTY; }
-        if (min == dpurple) { return SlotState.PURPLE; }
-        if (min == dgreen) { return SlotState.GREEN; }
+    private SlotState determineColor(int[] rgb) {
+        double dblack  = rgbDistance(rgb, BLACK);
+        double dpurple = rgbDistance(rgb, PURPLE);
+        double dgreen  = rgbDistance(rgb, GREEN);
+
+        double min = Math.min(dblack, Math.min(dpurple, dgreen));
+
+        if (min == dblack)  return SlotState.EMPTY;
+        if (min == dpurple) return SlotState.PURPLE;
+        if (min == dgreen)  return SlotState.GREEN;
+
         return SlotState.UNKNOWN;
     }
 
     private void readSlotWithSensor() {
-        if (curSlotPos == SlotPosition.INTAKE) {
+        if (curSlotPos == SlotPosition.INTAKE && !isMoving()) {
             int[] argb = m_sensor.getARGB();
-            slotStates[curSlot] = determineColor(argb);
+            slotStates[curSlot] = determineColor(toRGB(argb));
         }
     }
 
