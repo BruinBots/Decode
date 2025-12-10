@@ -9,6 +9,7 @@ import com.bylazar.telemetry.TelemetryManager;
 import com.pedropathing.util.Timer;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
+import com.seattlesolvers.solverslib.hardware.servos.ServoEx;
 
 import org.firstinspires.ftc.teamcode.Refactor.Commands.Shooter.ShooterStopCommand;
 import org.firstinspires.ftc.teamcode.Refactor.Utils.TelemetryLogger;
@@ -17,7 +18,7 @@ import org.firstinspires.ftc.teamcode.Refactor.Utils.TelemetryLogger;
 public class Shooter extends SubsystemBase {
 
     private final MotorEx m_motor;
-    private final SimpleServo m_servo;
+    private final ServoEx m_servo;
     private Timer stateTimer;
 
     public static PIDFCoefficients VELO_COEFFS = new PIDFCoefficients(
@@ -39,6 +40,7 @@ public class Shooter extends SubsystemBase {
 
     // Spin up constants
     private double targetSpeed = 0;
+    public static double SPEED = 3600;
     public static double SPEED_TOLERANCE = 50; // ticks/s
     public static double MAX_SPIN_UP_TIME = 4.; // seconds
 
@@ -54,7 +56,7 @@ public class Shooter extends SubsystemBase {
         m_motor.setRunMode(Motor.RunMode.VelocityControl);
         m_motor.setDistancePerPulse(1 / 28.);
 
-        m_servo = new SimpleServo(hMap, "kickServo", KICK_DOWN_POS, KICK_UP_POS);
+        m_servo = new ServoEx(hMap, "kickServo", KICK_DOWN_POS, KICK_UP_POS);
 
         stateTimer.resetTimer();
 
@@ -101,6 +103,9 @@ public class Shooter extends SubsystemBase {
         return state != ShooterState.IDLE;
     }
 
+    public void kickUp() { m_servo.set(KICK_UP_POS); }
+    public void kickDown() { m_servo.set(KICK_DOWN_POS); }
+
     @Override
     public void periodic() {
         // State machine
@@ -114,14 +119,14 @@ public class Shooter extends SubsystemBase {
             case SPIN_UP:
                 double error = Math.abs(targetSpeed - getSpeed());
                 if (error < SPEED_TOLERANCE || stateTimer.getElapsedTimeSeconds() > MAX_SPIN_UP_TIME) {
-                    m_servo.setPosition(KICK_UP_POS);
+                    m_servo.set(KICK_UP_POS);
                     stateTimer.resetTimer();
                     state = ShooterState.LAUNCH;
                 }
                 break;
             case LAUNCH:
                 if (stateTimer.getElapsedTimeSeconds() > KICK_UP_DURATION) {
-                    m_servo.setPosition(KICK_DOWN_POS);
+                    m_servo.set(KICK_DOWN_POS);
                     stateTimer.resetTimer();
                     state = ShooterState.RESET;
                 }

@@ -8,12 +8,10 @@ public class ShooterSpinWaitCommand extends CommandBase {
 
     private final Shooter m_shooter;
     private final double m_speed;
-    private final double m_tolerance;
 
-    public ShooterSpinWaitCommand(Shooter shooter, double speed, double tolerance) {
+    public ShooterSpinWaitCommand(Shooter shooter, double speed) {
         m_shooter = shooter;
         m_speed = speed;
-        m_tolerance = tolerance;
 
         addRequirements(shooter);
     }
@@ -25,6 +23,6 @@ public class ShooterSpinWaitCommand extends CommandBase {
 
     @Override
     public boolean isFinished() {
-        return Math.abs(m_shooter.getSpeed() - m_speed) < m_tolerance;
+        return Math.abs(m_shooter.getSpeed() - m_speed) < Shooter.SPEED_TOLERANCE;
     }
 }
