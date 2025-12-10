@@ -1,9 +1,9 @@
 package org.firstinspires.ftc.teamcode.Refactor.Subsystems;
 
-import com.arcrobotics.ftclib.command.SubsystemBase;
-import com.arcrobotics.ftclib.hardware.SimpleServo;
-import com.arcrobotics.ftclib.hardware.motors.Motor;
-import com.arcrobotics.ftclib.hardware.motors.MotorEx;
+import com.seattlesolvers.solverslib.command.SubsystemBase;
+import com.seattlesolvers.solverslib.hardware.SimpleServo;
+import com.seattlesolvers.solverslib.hardware.motors.Motor;
+import com.seattlesolvers.solverslib.hardware.motors.MotorEx;
 import com.bylazar.configurables.annotations.Configurable;
 import com.bylazar.telemetry.TelemetryManager;
 import com.pedropathing.util.Timer;
@@ -52,6 +52,7 @@ public class Shooter extends SubsystemBase {
         m_motor = new MotorEx(hMap, name);
         m_motor.setZeroPowerBehavior(Motor.ZeroPowerBehavior.FLOAT);
         m_motor.setRunMode(Motor.RunMode.VelocityControl);
+        m_motor.setDistancePerPulse(1 / 28.);
 
         m_servo = new SimpleServo(hMap, "kickServo", KICK_DOWN_POS, KICK_UP_POS);
 
@@ -142,5 +143,9 @@ public class Shooter extends SubsystemBase {
         // Update PIDF from dash
         m_motor.setVeloCoefficients(VELO_COEFFS.p, VELO_COEFFS.i, VELO_COEFFS.d);
         m_motor.setFeedforwardCoefficients(0., VELO_COEFFS.f);
+
+        if (targetSpeed != 0) {
+            m_motor.setVelocity(targetSpeed);
+        }
     }
 }

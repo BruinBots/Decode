@@ -1,6 +1,6 @@
 package org.firstinspires.ftc.teamcode.Refactor.Commands.Shooter;
 
-import com.arcrobotics.ftclib.command.CommandBase;
+import com.seattlesolvers.solverslib.command.CommandBase;
 
 import org.firstinspires.ftc.teamcode.Refactor.Subsystems.Shooter;
 

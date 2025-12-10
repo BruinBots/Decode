@@ -1,7 +1,7 @@
 package org.firstinspires.ftc.teamcode.Components;
 
 // Source: FTCLib
-// https://github.com/FTCLib/FTCLib/blob/master/core/src/main/java/com/arcrobotics/ftclib/controller/PIDFController.java
+// https://github.com/FTCLib/FTCLib/blob/master/core/src/main/java/com.seattlesolvers.solverslib/controller/PIDFController.java
 // Mix of PIDFController and PIDController
 
 import com.qualcomm.robotcore.hardware.PIDCoefficients;

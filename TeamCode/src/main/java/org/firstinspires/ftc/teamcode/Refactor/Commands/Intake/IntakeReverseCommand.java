@@ -1,7 +1,7 @@
 package org.firstinspires.ftc.teamcode.Refactor.Commands.Intake;
 
-import com.arcrobotics.ftclib.command.CommandBase;
-import com.arcrobotics.ftclib.command.Subsystem;
+import com.seattlesolvers.solverslib.command.CommandBase;
+import com.seattlesolvers.solverslib.command.Subsystem;
 
 import org.firstinspires.ftc.teamcode.Refactor.Subsystems.Intake;
 
