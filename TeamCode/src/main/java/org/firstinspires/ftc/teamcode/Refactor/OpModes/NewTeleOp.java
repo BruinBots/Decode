@@ -52,6 +52,7 @@ public class NewTeleOp extends CommandOpMode {
     @Override
     public void initialize() {
         m_bot = Jimmy.shared = new Jimmy(hardwareMap);
+        m_bot.alliance = Jimmy.Alliance.BLUE; // TODO: Separate opmodes for different alliances
         m_intake = m_bot.getIntake();
         m_shooter = m_bot.getShooter();
 

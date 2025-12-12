@@ -19,6 +19,13 @@ public class Jimmy {
     private final Intake intake;
     private final Shooter shooter;
 
+    public enum Alliance {
+        BLUE,
+        RED,
+        UNKNOWN
+    }
+    public Alliance alliance;
+
     public Jimmy(HardwareMap hMap) {
         for (LynxModule mod: hMap.getAll(LynxModule.class)) {
             if (mod.isParent()) {
