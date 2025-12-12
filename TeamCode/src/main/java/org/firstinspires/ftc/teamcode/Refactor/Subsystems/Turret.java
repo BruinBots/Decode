@@ -10,6 +10,7 @@ import com.seattlesolvers.solverslib.command.SubsystemBase;
 import com.seattlesolvers.solverslib.controller.PIDFController;
 import com.seattlesolvers.solverslib.hardware.motors.Motor;
 import com.seattlesolvers.solverslib.hardware.motors.MotorEx;
+import com.seattlesolvers.solverslib.util.MathUtils;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.Refactor.Jimmy;
@@ -41,6 +42,7 @@ public class Turret extends SubsystemBase {
     public static double MIN_POS = -250;
     public static double MAX_POS = 250;
     public static double SEEK_POWER = 0.3;
+    public static double MAX_POWER_AMPLITUDE = 0.7;
     public static double TOLERANCE = 5; // inches
 
     public Turret(HardwareMap hMap) {
@@ -99,7 +101,7 @@ public class Turret extends SubsystemBase {
 
         if (m_aprilpos != null) { // april tag found
             // PIDF control loop
-            double calc = m_controller.calculate(m_aprilpos, 0);
+            double calc = MathUtils.clamp(m_controller.calculate(m_aprilpos, 0), -MAX_POWER_AMPLITUDE, MAX_POWER_AMPLITUDE);
             if (curPos >= MAX_POS) {
                 if (calc < 0) {
                     power = calc;
